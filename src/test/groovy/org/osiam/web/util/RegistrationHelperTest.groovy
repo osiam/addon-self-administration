@@ -17,11 +17,11 @@ class RegistrationHelperTest extends Specification {
         User user = new User.Builder('theMan').setEmails([theEmail] as List).build()
 
         when:
-        Optional<String> email = RegistrationHelper.extractSendToEmail(user)
+        Optional<Email> email = RegistrationHelper.extractSendToEmail(user)
 
         then:
         email.isPresent()
-        email.get() == thePrimaryMail
+        email.get().value == thePrimaryMail
     }
 
     def 'should return not null if no primary email was found'() {
@@ -32,11 +32,11 @@ class RegistrationHelperTest extends Specification {
         User user = new User.Builder('theMan').setEmails([theEmail] as List).build()
 
         when:
-        Optional<String> email = RegistrationHelper.extractSendToEmail(user)
+        Optional<Email> email = RegistrationHelper.extractSendToEmail(user)
 
         then:
         email.isPresent()
-        email.get() == 'primary@mail.com'
+        email.get().value == 'primary@mail.com'
     }
 
     def 'should not throw exception if users emails are not present'() {
@@ -44,7 +44,7 @@ class RegistrationHelperTest extends Specification {
         User user = new User.Builder('theMan').build()
 
         when:
-        Optional<String> email = RegistrationHelper.extractSendToEmail(user)
+        Optional<Email> email = RegistrationHelper.extractSendToEmail(user)
 
         then:
         !email.isPresent()

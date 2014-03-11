@@ -246,7 +246,7 @@ public class RegisterController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    private UpdateUser getPreparedUserForActivation(Extension extension) throws JsonProcessingException {
+    private UpdateUser getPreparedUserForActivation(Extension extension) {
         UpdateUser updateUser = new UpdateUser.Builder()
                 .deleteExtensionField(extension.getUrn(), activationTokenField)
                 .updateActive(true).build();

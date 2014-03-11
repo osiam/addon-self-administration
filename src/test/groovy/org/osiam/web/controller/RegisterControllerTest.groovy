@@ -28,7 +28,7 @@ import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
 import org.osiam.client.connector.OsiamConnector
-import org.osiam.helper.HttpClientHelper
+import org.osiam.client.exception.NoResultException;
 import org.osiam.helper.HttpClientRequestResult
 import org.osiam.helper.ObjectMapperWithExtensionConfig
 import org.osiam.resources.scim.Email
@@ -38,7 +38,6 @@ import org.osiam.web.exception.OsiamException
 import org.osiam.web.mail.SendEmail
 import org.osiam.web.service.ConnectorBuilder
 import org.osiam.web.service.RegistrationExtensionUrnProvider
-import org.osiam.web.service.ResourceServerUriBuilder
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
 import org.osiam.web.util.HttpHeader
@@ -51,8 +50,6 @@ class RegisterControllerTest extends Specification {
     def mapper = new ObjectMapperWithExtensionConfig()
 
     def registrationExtensionUrnProvider = Mock(RegistrationExtensionUrnProvider)
-    def resourceServerUriBuilder = Mock(ResourceServerUriBuilder)
-    def httpClientMock = Mock(HttpClientHelper)
     def contextMock = Mock(ServletContext)
 
     def urn = 'urn:scim:schemas:osiam:1.0:Registration'
@@ -101,23 +98,16 @@ class RegisterControllerTest extends Specification {
         given:
         def userId = UUID.randomUUID().toString()
         def activationToken = UUID.randomUUID().toString()
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-        def requestResultMock = Mock(HttpClientRequestResult)
-        def userString = getUserAsStringWithExtension(activationToken)
+        User user = getUserWithExtension(activationToken)
 
         when:
         def response = registerController.activate('Bearer ACCESS_TOKEN', userId, activationToken)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, 'Bearer ACCESS_TOKEN') >> requestResultMock
-        1 * requestResultMock.getStatusCode() >> 200
-        1 * requestResultMock.getBody() >> userString
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, 'Bearer ACCESS_TOKEN') >> requestResultMock
-        1 * requestResultMock.getStatusCode() >> 200
-        1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * connectorBuilder.createConnector().getCurrentUser(_) >> null
+        2 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.updateUser(_, _, _) >> _
         response.getStatusCode() == HttpStatus.OK
     }
 
@@ -133,9 +123,8 @@ class RegisterControllerTest extends Specification {
         def response = registerController.activate('Bearer ACCESS_TOKEN', userId, activationToken)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, 'Bearer ACCESS_TOKEN') >> requestResultMock
-        2 * requestResultMock.getStatusCode() >> 400
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getCurrentUser(_) >> {throw NoResultException}
         response.getStatusCode() == HttpStatus.BAD_REQUEST
     }
 
@@ -147,7 +136,7 @@ class RegisterControllerTest extends Specification {
 
         def requestResultGetMock = Mock(HttpClientRequestResult)
         def requestResultPutMock = Mock(HttpClientRequestResult)
-        def userString = getUserAsStringWithExtension(activationToken)
+        def userString = getUserWithExtension(activationToken)
 
         when:
         def response = registerController.activate('Bearer ACCESS_TOKEN', userId, activationToken)
@@ -261,32 +250,28 @@ class RegisterControllerTest extends Specification {
         result.getStatusCode() == HttpStatus.UNAUTHORIZED
     }
 
-    def getUserAsStringWithExtension(String token) {
+    def getUserWithExtension(String token) {
         def emails = new Email.Builder().setPrimary(true).setValue('email@example.org').build()
 
         Extension extension = new Extension(urn)
         extension.addOrUpdateField('activationToken', token)
 
-        def user = new User.Builder('George')
+        new User.Builder('George')
                 .setPassword('password')
                 .setEmails([emails])
                 .addExtension(extension)
                 .setActive(false)
                 .build()
-
-        return mapper.writeValueAsString(user)
     }
     
-    def getUserAsStringWithExtensionAndWithoutEmail(String token) {
+    def getUserWithExtensionAndWithoutEmail(String token) {
         Extension extension = new Extension(urn)
         extension.addOrUpdateField('activationToken', token)
 
-        def user = new User.Builder('George')
+        new User.Builder('George')
                 .setPassword('password')
                 .addExtension(extension)
                 .setActive(false)
                 .build()
-
-        return mapper.writeValueAsString(user)
     }
 }
