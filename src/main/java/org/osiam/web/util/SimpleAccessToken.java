@@ -1,5 +1,7 @@
 package org.osiam.web.util;
 
+import java.util.Objects;
+
 import org.osiam.client.oauth.AccessToken;
 
 public class SimpleAccessToken extends AccessToken {
@@ -60,5 +62,25 @@ public class SimpleAccessToken extends AccessToken {
     @Override
     public String getRefreshToken() {
         throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AccessToken that = (AccessToken) o;
+
+        return token.equals(that.getToken());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.token);
     }
 }
