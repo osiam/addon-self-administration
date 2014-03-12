@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse
 
 import org.osiam.client.connector.OsiamConnector
 import org.osiam.client.exception.OsiamRequestException
-import org.osiam.helper.ObjectMapperWithExtensionConfig
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.User
@@ -38,6 +37,7 @@ import org.osiam.web.mail.SendEmail
 import org.osiam.web.service.ConnectorBuilder
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
+import org.osiam.web.util.UserObjectMapper
 import org.springframework.http.HttpStatus
 
 import spock.lang.Specification
@@ -47,7 +47,8 @@ import spock.lang.Specification
  */
 class LostPasswordControllerTest extends Specification {
 
-    def mapper = new ObjectMapperWithExtensionConfig()
+    UserObjectMapper mapper = new UserObjectMapper()
+    
     def contextMock = Mock(ServletContext)
 
     def urn = 'urn:scim:schemas:osiam:1.0:Registration'

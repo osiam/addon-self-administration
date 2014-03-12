@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
-import org.osiam.helper.ObjectMapperWithExtensionConfig;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
@@ -53,6 +52,7 @@ import org.osiam.web.service.ConnectorBuilder;
 import org.osiam.web.template.RenderAndSendEmail;
 import org.osiam.web.util.RegistrationHelper;
 import org.osiam.web.util.SimpleAccessToken;
+import org.osiam.web.util.UserObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,7 +76,7 @@ public class RegisterController {
     private static final Logger LOGGER = Logger.getLogger(RegisterController.class.getName());
 
     @Inject
-    private ObjectMapperWithExtensionConfig mapper;
+    private UserObjectMapper mapper;
 
     @Inject
     private ServletContext context;
@@ -88,32 +88,32 @@ public class RegisterController {
     private ConnectorBuilder connectorBuilder;
 
     /* Registration email configuration */
-    @Value("${osiam.mail.register.linkprefix}")
+    @Value("${org.osiam.mail.register.linkprefix}")
     private String registermailLinkPrefix;
-    @Value("${osiam.mail.from}")
+    @Value("${org.osiam.mail.from}")
     private String fromAddress;
 
     /* Registration extension configuration */
-    @Value("${osiam.scim.extension.field.activationtoken}")
+    @Value("${org.osiam.scim.extension.field.activationtoken}")
     private String activationTokenField;
 
     /* URI for the registration call from JavaScript */
-    @Value("${osiam.html.register.url}")
+    @Value("${org.osiam.html.register.url}")
     private String clientRegistrationUri;
 
     // css and js libs
-    @Value("${osiam.html.dependencies.bootstrap}")
+    @Value("${org.osiam.html.dependencies.bootstrap}")
     private String bootStrapLib;
 
-    @Value("${osiam.html.dependencies.angular}")
+    @Value("${org.osiam.html.dependencies.angular}")
     private String angularLib;
 
-    @Value("${osiam.html.dependencies.jquery}")
+    @Value("${org.osiam.html.dependencies.jquery}")
     private String jqueryLib;
 
-    @Value("${osiam.scim.extension.urn}")
+    @Value("${org.osiam.scim.extension.urn}")
     private String internalScimExtensionUrn;
-    
+
     /**
      * Generates a HTTP form with the fields for registration purpose.
      */
@@ -149,7 +149,7 @@ public class RegisterController {
      * @throws MessagingException
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> create(@RequestHeader final String token, @RequestBody String user)
+    public ResponseEntity<String> create(@RequestHeader final String authorization, @RequestBody String user)
             throws IOException, MessagingException {
 
         User parsedUser = mapper.readValue(user, User.class);
@@ -168,7 +168,8 @@ public class RegisterController {
 
         User createdUser;
         try {
-            createdUser = connectorBuilder.createConnector().createUser(createUser, new SimpleAccessToken(token));
+            createdUser = connectorBuilder.createConnector().createUser(createUser,
+                    new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization)));
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
@@ -219,7 +220,7 @@ public class RegisterController {
             return new ResponseEntity<>("{\"error\":\"Activation token miss match!\"}", HttpStatus.UNAUTHORIZED);
         }
 
-        SimpleAccessToken accessToken = new SimpleAccessToken(token);
+        SimpleAccessToken accessToken = new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization));
         try {
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 

@@ -43,7 +43,6 @@ import org.osiam.client.connector.OsiamConnector;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.user.BasicUser;
-import org.osiam.helper.ObjectMapperWithExtensionConfig;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
@@ -54,6 +53,7 @@ import org.osiam.web.service.ConnectorBuilder;
 import org.osiam.web.template.RenderAndSendEmail;
 import org.osiam.web.util.RegistrationHelper;
 import org.osiam.web.util.SimpleAccessToken;
+import org.osiam.web.util.UserObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,7 +76,7 @@ public class ChangeEmailController {
     private static final Logger LOGGER = Logger.getLogger(ChangeEmailController.class.getName());
 
     @Inject
-    private ObjectMapperWithExtensionConfig mapper;
+    private UserObjectMapper mapper;
 
     @Inject
     private RenderAndSendEmail renderAndSendEmailService;
@@ -88,32 +88,32 @@ public class ChangeEmailController {
     private ConnectorBuilder connectorBuilder;
 
     /* Extension configuration */
-    @Value("${osiam.scim.extension.field.tempemail}")
+    @Value("${org.osiam.scim.extension.field.tempemail}")
     private String tempEmail;
-    @Value("${osiam.scim.extension.field.emailconfirmtoken}")
+    @Value("${org.osiam.scim.extension.field.emailconfirmtoken}")
     private String confirmationTokenField;
-    @Value("${osiam.mail.from}")
+    @Value("${org.osiam.mail.from}")
     private String fromAddress;
 
     /* Change email configuration */
-    @Value("${osiam.mail.emailchange.linkprefix}")
+    @Value("${org.osiam.mail.emailchange.linkprefix}")
     private String emailChangeLinkPrefix;
 
     /* URI for the change email call from JavaScript */
-    @Value("${osiam.html.emailchange.url}")
+    @Value("${org.osiam.html.emailchange.url}")
     private String clientEmailChangeUri;
 
     // css and js libs
-    @Value("${osiam.html.dependencies.bootstrap}")
+    @Value("${org.osiam.html.dependencies.bootstrap}")
     private String bootStrapLib;
-    @Value("${osiam.html.dependencies.angular}")
+    @Value("${org.osiam.html.dependencies.angular}")
     private String angularLib;
-    @Value("${osiam.html.dependencies.jquery}")
+    @Value("${org.osiam.html.dependencies.jquery}")
     private String jqueryLib;
 
-    @Value("${osiam.scim.extension.urn}")
+    @Value("${org.osiam.scim.extension.urn}")
     private String internalScimExtensionUrn;
-    
+
     /**
      * Generates a HTTP form with the fields for change email purpose.
      */
@@ -140,7 +140,7 @@ public class ChangeEmailController {
      * Saving the new E-Mail temporary, generating confirmation token and sending an E-Mail to the old registered
      * address.
      * 
-     * @param token
+     * @param authorization
      *        Authorization header with HTTP Bearer authorization and a valid access token
      * @param newEmail
      *        The new email address value
@@ -149,13 +149,14 @@ public class ChangeEmailController {
      * @throws MessagingException
      */
     @RequestMapping(method = RequestMethod.POST, value = "/change", produces = "application/json")
-    public ResponseEntity<String> change(@RequestHeader final String token,
+    public ResponseEntity<String> change(@RequestHeader final String authorization,
             @RequestParam final String newEmail) throws IOException, MessagingException {
 
         User updatedUser;
         String confirmationToken = UUID.randomUUID().toString();
         try {
-            updatedUser = getUpdatedUserForEmailChange(token, newEmail, confirmationToken);
+            updatedUser = getUpdatedUserForEmailChange(RegistrationHelper.extractAccessToken(authorization), newEmail,
+                    confirmationToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
@@ -204,7 +205,7 @@ public class ChangeEmailController {
     /**
      * Validating the confirm token and saving the new email value as primary email if the validation was successful.
      * 
-     * @param token
+     * @param authorization
      *        Authorization header with HTTP Bearer authorization and a valid access token
      * @param userId
      *        The user id for the user whom email address should be changed
@@ -213,7 +214,7 @@ public class ChangeEmailController {
      * @return The HTTP status code and the updated user if successful
      */
     @RequestMapping(method = RequestMethod.POST, value = "/confirm", produces = "application/json")
-    public ResponseEntity<String> confirm(@RequestHeader final String token, @RequestParam final String userId,
+    public ResponseEntity<String> confirm(@RequestHeader final String authorization, @RequestParam final String userId,
             @RequestParam final String confirmToken) throws IOException, MessagingException {
 
         if (Strings.isNullOrEmpty(confirmToken)) {
@@ -225,7 +226,7 @@ public class ChangeEmailController {
         Optional<Email> oldEmail;
 
         try {
-            SimpleAccessToken accessToken = new SimpleAccessToken(token);
+            SimpleAccessToken accessToken = new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization));
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
             Extension extension = user.getExtension(internalScimExtensionUrn);

@@ -28,10 +28,8 @@ import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
 import org.osiam.client.connector.OsiamConnector
-import org.osiam.client.exception.OsiamRequestException
+import org.osiam.client.exception.UnauthorizedException
 import org.osiam.client.user.BasicUser
-import org.osiam.helper.HttpClientRequestResult
-import org.osiam.helper.ObjectMapperWithExtensionConfig
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.User
@@ -41,15 +39,15 @@ import org.osiam.web.service.ConnectorBuilder
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
 import org.osiam.web.util.SimpleAccessToken
+import org.osiam.web.util.UserObjectMapper
 import org.springframework.http.HttpStatus
 
 import spock.lang.Specification
 
 class ChangeEmailControllerTest extends Specification {
 
-    def mapper = new ObjectMapperWithExtensionConfig()
+    UserObjectMapper mapper = new UserObjectMapper()
 
-    def resultMock = Mock(HttpClientRequestResult)
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()
     RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService, emailTemplateRendererService: emailTemplateRendererService)
@@ -155,17 +153,17 @@ class ChangeEmailControllerTest extends Specification {
         result.getStatusCode() == HttpStatus.OK
     }
 
-    def 'should catch IllegalArgumentException and returning response with error message'(){
+    def 'should catch UnauthorizedException and returning response with error message'(){
         given:
         def authZ = 'invalid access token'
-        SimpleAccessToken accessToken = new SimpleAccessToken(authZ)
+        SimpleAccessToken accessToken = new SimpleAccessToken('token')
 
         when:
         def result = changeEmailController.change(authZ, 'some@email.de')
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUserBasic(accessToken) >> {throw new OsiamRequestException(401, 'unauthorized')}
+        1 * osiamConnector.getCurrentUserBasic(accessToken) >> {throw new UnauthorizedException('unauthorized')}
         result.getBody() == '{\"error\":\"unauthorized\"}'
     }
 
