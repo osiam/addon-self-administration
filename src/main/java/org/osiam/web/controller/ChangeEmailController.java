@@ -142,7 +142,7 @@ public class ChangeEmailController {
      * 
      * @param authorization
      *        Authorization header with HTTP Bearer authorization and a valid access token
-     * @param newEmail
+     * @param newEmailValue
      *        The new email address value
      * @return The HTTP status code
      * @throws IOException
@@ -150,12 +150,12 @@ public class ChangeEmailController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/change", produces = "application/json")
     public ResponseEntity<String> change(@RequestHeader final String authorization,
-            @RequestParam final String newEmail) throws IOException, MessagingException {
+            @RequestParam final String newEmailValue) throws IOException, MessagingException {
 
         User updatedUser;
         String confirmationToken = UUID.randomUUID().toString();
         try {
-            updatedUser = getUpdatedUserForEmailChange(RegistrationHelper.extractAccessToken(authorization), newEmail,
+            updatedUser = getUpdatedUserForEmailChange(RegistrationHelper.extractAccessToken(authorization), newEmailValue,
                     confirmationToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
@@ -174,7 +174,7 @@ public class ChangeEmailController {
         mailVariables.put("activatelink", activateLink);
 
         try {
-            renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmail, updatedUser,
+            renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, updatedUser,
                     mailVariables);
         } catch (OsiamException e) {
             return new ResponseEntity<>("{\"error\":\"Problems creating email for confirming new user email: \""

@@ -206,16 +206,16 @@ public class RegisterController {
      *        an valid OAuth2 token
      * @param userId
      *        the id of the registered user
-     * @param token
+     * @param activationToken
      *        the user's activation token, send by E-Mail
      * 
      * @return HTTP status, HTTP.OK (200) for a valid activation
      */
     @RequestMapping(value = "/activate", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<String> activate(@RequestHeader final String authorization,
-            @RequestParam final String userId, @RequestParam final String token) throws IOException {
+            @RequestParam final String userId, @RequestParam final String activationToken) throws IOException {
 
-        if (token.equals("")) {
+        if (activationToken.equals("")) {
             LOGGER.log(Level.WARNING, "Activation token miss match!");
             return new ResponseEntity<>("{\"error\":\"Activation token miss match!\"}", HttpStatus.UNAUTHORIZED);
         }
@@ -227,7 +227,7 @@ public class RegisterController {
             Extension extension = user.getExtension(internalScimExtensionUrn);
             String activationTokenFieldValue = extension.getField(activationTokenField, ExtensionFieldType.STRING);
 
-            if (!activationTokenFieldValue.equals(token)) {
+            if (!activationTokenFieldValue.equals(activationToken)) {
                 LOGGER.log(Level.WARNING, "Activation token miss match!");
                 return new ResponseEntity<>("{\"error\":\"Activation token miss match!\"}", HttpStatus.UNAUTHORIZED);
             }

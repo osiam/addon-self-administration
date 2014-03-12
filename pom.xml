@@ -38,7 +38,7 @@
         <java.version>1.7</java.version>
         <org.springframework-version>4.0.2.RELEASE</org.springframework-version>
         <org.thymeleaf-version>2.1.2.RELEASE</org.thymeleaf-version>
-        <org.springframework.security-version>3.2.1.RELEASE</org.springframework.security-version>
+        <org.springframework.security-version>3.2.2.RELEASE</org.springframework.security-version>
         <org.aspectj-version>1.7.4</org.aspectj-version>
         <org.slf4j-version>1.7.6</org.slf4j-version>
         <metrics.version>3.0.2</metrics.version>
@@ -114,7 +114,6 @@
                     <parallel>classes</parallel>
                     <threadCount>3</threadCount>
                     <includes>
-                        <include>**/*Test.*</include>
                         <include>**/*Spec.*</include>
                     </includes>
                 </configuration>
@@ -203,7 +202,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <warName>osiam-self-administration</warName>
+                    <warName>osiam-registration-module</warName>
                 </configuration>
             </plugin>
         </plugins>
@@ -217,6 +216,12 @@
             <version>${org.osiam.scim-schema.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.osiam</groupId>
+            <artifactId>osiam-interaction-model</artifactId>
+            <version>${org.osiam.server.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>connector4java</artifactId>

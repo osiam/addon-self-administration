@@ -208,7 +208,7 @@ public class LostPasswordController {
     /**
      * Method to change the users password if the preconditions are satisfied.
      * 
-     * @param token
+     * @param authorization
      *        authZ header with valid access token
      * @param oneTimePassword
      *        the previously generated one time password
@@ -218,7 +218,7 @@ public class LostPasswordController {
      * @throws IOException
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> change(@RequestHeader final String token,
+    public ResponseEntity<String> change(@RequestHeader final String authorization,
             @RequestParam String oneTimePassword,
              @RequestParam String newPassword) throws IOException {
 
@@ -231,7 +231,7 @@ public class LostPasswordController {
         User updatedUser;
         try {
 
-            SimpleAccessToken accessToken = new SimpleAccessToken(token);
+            SimpleAccessToken accessToken = new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization));
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
             // validate the oneTimePassword with the saved one from DB
