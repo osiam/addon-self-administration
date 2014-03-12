@@ -47,7 +47,6 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.osiam.web.exception.OsiamException;
 import org.osiam.web.service.ConnectorBuilder;
-import org.osiam.web.service.RegistrationExtensionUrnProvider;
 import org.osiam.web.template.RenderAndSendEmail;
 import org.osiam.web.util.RegistrationHelper;
 import org.osiam.web.util.SimpleAccessToken;
@@ -73,9 +72,6 @@ import com.google.common.base.Strings;
 public class LostPasswordController {
 
     private static final Logger LOGGER = Logger.getLogger(LostPasswordController.class.getName());
-
-    @Inject
-    private RegistrationExtensionUrnProvider registrationExtensionUrnProvider;
 
     @Inject
     private ObjectMapperWithExtensionConfig mapper;
@@ -111,6 +107,9 @@ public class LostPasswordController {
     @Value("${osiam.html.dependencies.jquery}")
     private String jqueryLib;
 
+    @Value("${osiam.scim.extension.urn}")
+    private String internalScimExtensionUrn;
+    
     /**
      * This endpoint generates an one time password and send an confirmation email including the one time password to
      * users primary email
@@ -236,7 +235,7 @@ public class LostPasswordController {
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
             // validate the oneTimePassword with the saved one from DB
-            Extension extension = user.getExtension(registrationExtensionUrnProvider.getExtensionUrn());
+            Extension extension = user.getExtension(internalScimExtensionUrn);
             String savedOneTimePassword = extension.getField(this.oneTimePassword, ExtensionFieldType.STRING);
 
             if (!savedOneTimePassword.equals(oneTimePassword)) {
@@ -260,7 +259,7 @@ public class LostPasswordController {
     }
 
     private UpdateUser getPreparedUserForLostPassword(String oneTimePassword) {
-        Extension extension = new Extension(registrationExtensionUrnProvider.getExtensionUrn());
+        Extension extension = new Extension(internalScimExtensionUrn);
         extension.addOrUpdateField(this.oneTimePassword, oneTimePassword);
         return new UpdateUser.Builder().updateExtension(extension).build();
     }

@@ -50,7 +50,6 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.osiam.web.exception.OsiamException;
 import org.osiam.web.service.ConnectorBuilder;
-import org.osiam.web.service.RegistrationExtensionUrnProvider;
 import org.osiam.web.template.RenderAndSendEmail;
 import org.osiam.web.util.RegistrationHelper;
 import org.osiam.web.util.SimpleAccessToken;
@@ -78,9 +77,6 @@ public class RegisterController {
 
     @Inject
     private ObjectMapperWithExtensionConfig mapper;
-
-    @Inject
-    private RegistrationExtensionUrnProvider registrationExtensionUrnProvider;
 
     @Inject
     private ServletContext context;
@@ -115,6 +111,9 @@ public class RegisterController {
     @Value("${osiam.html.dependencies.jquery}")
     private String jqueryLib;
 
+    @Value("${osiam.scim.extension.urn}")
+    private String internalScimExtensionUrn;
+    
     /**
      * Generates a HTTP form with the fields for registration purpose.
      */
@@ -224,7 +223,7 @@ public class RegisterController {
         try {
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
-            Extension extension = user.getExtension(registrationExtensionUrnProvider.getExtensionUrn());
+            Extension extension = user.getExtension(internalScimExtensionUrn);
             String activationTokenFieldValue = extension.getField(activationTokenField, ExtensionFieldType.STRING);
 
             if (!activationTokenFieldValue.equals(token)) {
@@ -254,7 +253,7 @@ public class RegisterController {
     }
 
     private User createUserForRegistration(User parsedUser, String activationToken) {
-        Extension extension = new Extension(registrationExtensionUrnProvider.getExtensionUrn());
+        Extension extension = new Extension(internalScimExtensionUrn);
         extension.addOrUpdateField(activationTokenField, activationToken);
         List<Role> roles = new ArrayList<Role>();
         Role role = new Role.Builder().setValue("USER").build();

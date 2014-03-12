@@ -36,7 +36,6 @@ import org.osiam.resources.scim.User
 import org.osiam.web.exception.OsiamException
 import org.osiam.web.mail.SendEmail
 import org.osiam.web.service.ConnectorBuilder
-import org.osiam.web.service.RegistrationExtensionUrnProvider
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
 import org.springframework.http.HttpStatus
@@ -50,8 +49,6 @@ class LostPasswordControllerTest extends Specification {
 
     def mapper = new ObjectMapperWithExtensionConfig()
     def contextMock = Mock(ServletContext)
-
-    RegistrationExtensionUrnProvider registrationExtensionUrnProvider = Mock(RegistrationExtensionUrnProvider)
 
     def urn = 'urn:scim:schemas:osiam:1.0:Registration'
 
@@ -78,7 +75,7 @@ class LostPasswordControllerTest extends Specification {
     LostPasswordController lostPasswordController = new LostPasswordController(oneTimePassword: oneTimePasswordField,
     passwordlostLinkPrefix: passwordlostLinkPrefix,
     fromAddress: passwordlostMailFrom, context: contextMock,
-    registrationExtensionUrnProvider : registrationExtensionUrnProvider,
+    internalScimExtensionUrn : urn,
     clientPasswordChangeUri: clientPasswordChangeUri, mapper: mapper, bootStrapLib: bootStrapLib, angularLib: angularLib,
     jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
     connectorBuilder : connectorBuilder)
@@ -100,7 +97,6 @@ class LostPasswordControllerTest extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> emailContent
         1 * sendMailService.sendHTMLMail(_, _, _, _)
@@ -119,7 +115,6 @@ class LostPasswordControllerTest extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> {throw new OsiamRequestException(400, '')}
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         response.getStatusCode() == HttpStatus.BAD_REQUEST
     }
 
@@ -136,7 +131,6 @@ class LostPasswordControllerTest extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         response.getStatusCode() == HttpStatus.BAD_REQUEST
         response.getBody() != null
     }
@@ -156,7 +150,6 @@ class LostPasswordControllerTest extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> {throw new OsiamException()}
         response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
         response.getBody() != null
@@ -182,7 +175,6 @@ class LostPasswordControllerTest extends Specification {
         2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * osiamConnector.getCurrentUser(_) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
 
         result.getStatusCode() == HttpStatus.OK
         result.getBody() != null
@@ -225,7 +217,6 @@ class LostPasswordControllerTest extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
 
@@ -250,7 +241,6 @@ class LostPasswordControllerTest extends Specification {
         2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
         1 * osiamConnector.updateUser(_, _, _) >> {throw new OsiamRequestException(400, '')}
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         result.getStatusCode() == HttpStatus.BAD_REQUEST
         result.getBody() != null
     }

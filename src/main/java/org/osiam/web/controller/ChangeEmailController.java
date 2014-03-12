@@ -51,7 +51,6 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.osiam.web.exception.OsiamException;
 import org.osiam.web.service.ConnectorBuilder;
-import org.osiam.web.service.RegistrationExtensionUrnProvider;
 import org.osiam.web.template.RenderAndSendEmail;
 import org.osiam.web.util.RegistrationHelper;
 import org.osiam.web.util.SimpleAccessToken;
@@ -75,9 +74,6 @@ import com.google.common.base.Strings;
 public class ChangeEmailController {
 
     private static final Logger LOGGER = Logger.getLogger(ChangeEmailController.class.getName());
-
-    @Inject
-    private RegistrationExtensionUrnProvider registrationExtensionUrnProvider;
 
     @Inject
     private ObjectMapperWithExtensionConfig mapper;
@@ -115,6 +111,9 @@ public class ChangeEmailController {
     @Value("${osiam.html.dependencies.jquery}")
     private String jqueryLib;
 
+    @Value("${osiam.scim.extension.urn}")
+    private String internalScimExtensionUrn;
+    
     /**
      * Generates a HTTP form with the fields for change email purpose.
      */
@@ -229,7 +228,7 @@ public class ChangeEmailController {
             SimpleAccessToken accessToken = new SimpleAccessToken(token);
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
-            Extension extension = user.getExtension(registrationExtensionUrnProvider.getExtensionUrn());
+            Extension extension = user.getExtension(internalScimExtensionUrn);
             String existingConfirmToken = extension.getField(confirmationTokenField, ExtensionFieldType.STRING);
 
             if (!existingConfirmToken.equals(confirmToken)) {
@@ -267,7 +266,7 @@ public class ChangeEmailController {
 
     private UpdateUser buildUpdateUserForEmailChange(String newEmailValue, String confirmationToken) {
 
-        Extension extension = new Extension(registrationExtensionUrnProvider.getExtensionUrn());
+        Extension extension = new Extension(internalScimExtensionUrn);
         extension.addOrUpdateField(confirmationTokenField, confirmationToken);
         extension.addOrUpdateField(tempEmail, newEmailValue);
 
