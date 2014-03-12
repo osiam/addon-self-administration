@@ -156,7 +156,7 @@ public class ChangeEmailController {
         User updatedUser;
         String confirmationToken = UUID.randomUUID().toString();
         try {
-            updatedUser = getPreparedUserForEmailChange(token, newEmail, confirmationToken);
+            updatedUser = getUpdatedUserForEmailChange(token, newEmail, confirmationToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
@@ -192,7 +192,7 @@ public class ChangeEmailController {
      * @param confirmationToken
      * @return User which has the values in his extension
      */
-    private User getPreparedUserForEmailChange(String token, String newEmail, String confirmationToken) {
+    private User getUpdatedUserForEmailChange(String token, String newEmail, String confirmationToken) {
         OsiamConnector connector = connectorBuilder.createConnector();
         SimpleAccessToken accessToken = new SimpleAccessToken(token);
         BasicUser user = connector.getCurrentUserBasic(accessToken);
