@@ -27,18 +27,18 @@ import javax.servlet.ServletContext
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
-import org.osiam.helper.HttpClientHelper
-import org.osiam.helper.HttpClientRequestResult
+import org.osiam.client.connector.OsiamConnector
+import org.osiam.client.exception.OsiamRequestException
 import org.osiam.helper.ObjectMapperWithExtensionConfig
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.User
 import org.osiam.web.exception.OsiamException
 import org.osiam.web.mail.SendEmail
+import org.osiam.web.service.ConnectorBuilder
 import org.osiam.web.service.RegistrationExtensionUrnProvider
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
-import org.osiam.web.util.HttpHeader
 import org.springframework.http.HttpStatus
 
 import spock.lang.Specification
@@ -49,11 +49,9 @@ import spock.lang.Specification
 class LostPasswordControllerTest extends Specification {
 
     def mapper = new ObjectMapperWithExtensionConfig()
-    def httpClientMock = Mock(HttpClientHelper)
-    def requestResultMock = Mock(HttpClientRequestResult)
     def contextMock = Mock(ServletContext)
 
-    def registrationExtensionUrnProvider = Mock(RegistrationExtensionUrnProvider)
+    RegistrationExtensionUrnProvider registrationExtensionUrnProvider = Mock(RegistrationExtensionUrnProvider)
 
     def urn = 'urn:scim:schemas:osiam:1.0:Registration'
 
@@ -61,9 +59,9 @@ class LostPasswordControllerTest extends Specification {
 
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()
-    RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService, 
-        emailTemplateRendererService: emailTemplateRendererService);
-    
+    RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService,
+    emailTemplateRendererService: emailTemplateRendererService)
+
     def passwordlostLinkPrefix = 'http://localhost:8080'
     def passwordlostMailFrom = 'noreply@example.org'
     def passwordlostMailSubject = 'Subject'
@@ -74,29 +72,35 @@ class LostPasswordControllerTest extends Specification {
     def angularLib = 'http://angular'
     def jqueryLib = 'http://jquery'
 
-    def lostPasswordController = new LostPasswordController(httpClient: httpClientMock, oneTimePassword: oneTimePasswordField,
-            context: contextMock, passwordlostLinkPrefix: passwordlostLinkPrefix,
-            fromAddress: passwordlostMailFrom, registrationExtensionUrnProvider: registrationExtensionUrnProvider, 
-            clientPasswordChangeUri: clientPasswordChangeUri, mapper: mapper, bootStrapLib: bootStrapLib, angularLib: angularLib,
-            jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService)
+    ConnectorBuilder connectorBuilder = Mock()
+    OsiamConnector osiamConnector = Mock()
+
+    LostPasswordController lostPasswordController = new LostPasswordController(oneTimePassword: oneTimePasswordField,
+    passwordlostLinkPrefix: passwordlostLinkPrefix,
+    fromAddress: passwordlostMailFrom, context: contextMock,
+    registrationExtensionUrnProvider : registrationExtensionUrnProvider,
+    clientPasswordChangeUri: clientPasswordChangeUri, mapper: mapper, bootStrapLib: bootStrapLib, angularLib: angularLib,
+    jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
+    connectorBuilder : connectorBuilder)
 
     def 'The controller should start the flow by generating a one time password and send an email to the user'() {
         given:
         def userId = 'someId'
         def authZHeader = 'Bearer ACCESSTOKEN'
 
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/'+ userId
-        def userString = getUserAsStringWithExtension('token')
-
         def emailContent = 'nine bytes and one placeholder $PASSWORDLOSTURL and $BOOTSTRAP and $ANGULAR and $JQUERY'
+        User user = new User.Builder()
+                .setEmails([
+                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
 
         when:
         def result = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.updateUser(_, _, _) >> user
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, authZHeader) >> new HttpClientRequestResult(userString, 200)
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> emailContent
         1 * sendMailService.sendHTMLMail(_, _, _, _)
@@ -108,16 +112,14 @@ class LostPasswordControllerTest extends Specification {
         given:
         def userId = 'someId'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-        def userString = getUserAsStringWithExtension('token')
 
         when:
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.updateUser(_, _, _) >> {throw new OsiamRequestException(400, '')}
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, authZHeader) >> new HttpClientRequestResult('body', 400)
         response.getStatusCode() == HttpStatus.BAD_REQUEST
     }
 
@@ -125,16 +127,16 @@ class LostPasswordControllerTest extends Specification {
         given:
         def userId = 'someId'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-        def userString = getUserAsStringWithExtensionAndWithoutEmail('token')
+        User user = new User.Builder()
+                .build()
 
         when:
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.updateUser(_, _, _) >> user
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, authZHeader) >> new HttpClientRequestResult(userString, 200)
         response.getStatusCode() == HttpStatus.BAD_REQUEST
         response.getBody() != null
     }
@@ -143,17 +145,18 @@ class LostPasswordControllerTest extends Specification {
         given:
         def userId = 'someId'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-        def userString = getUserAsStringWithExtension('token')
+        User user = new User.Builder()
+                .setEmails([
+                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
 
         when:
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.updateUser(_, _, _) >> user
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, authZHeader) >> new HttpClientRequestResult(userString, 200)
-        1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> {throw new OsiamException()}
         response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
         response.getBody() != null
@@ -162,67 +165,66 @@ class LostPasswordControllerTest extends Specification {
     def 'The controller should verify the user and change its password'() {
         given:
         def otp = 'someOTP'
-        def userId = 'someId'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-
-        def userById = getUserAsStringWithExtension(otp)
+        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
+        extension.addOrUpdateField('oneTimePassword', otp)
+        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        User user = new User.Builder().addExtension(extension)
+                .setEmails([
+                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, userId, newPassword)
+        def result = lostPasswordController.change(authZHeader, otp, newPassword)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, authZHeader) >> requestResultMock
-        1 * requestResultMock.getStatusCode() >> 200
-        1 * requestResultMock.getBody() >> userById
+        2 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.getCurrentUser(_) >> user
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, authZHeader) >> requestResultMock
-        1 * requestResultMock.getStatusCode() >> 200
-        1 * requestResultMock.getBody() >> 'updated user'
 
         result.getStatusCode() == HttpStatus.OK
-        result.getBody() == 'updated user'
+        result.getBody() != null
     }
 
-    def 'If the user will not be found by his id the response should contain the appropriate status code'() {
+    def 'If the user will not be found by his access token the response should contain the appropriate status code'() {
         given:
         def otp = 'someOTP'
-        def userId = 'someId'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, userId, newPassword)
+        def result = lostPasswordController.change(authZHeader, otp, newPassword)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, authZHeader) >> requestResultMock
-        2 * requestResultMock.getStatusCode() >> 400
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getCurrentUser(_) >> {throw new OsiamRequestException(409, '')}
 
-        result.getStatusCode() == HttpStatus.BAD_REQUEST
+        result.getStatusCode() == HttpStatus.CONFLICT
     }
 
     def 'If the provided one time password has no match with the saved one from the database the appropriate status code will be returned and the process is stopped'() {
         given:
-        def otp = 'someOTP'
-        def userId = 'someId'
+        def otp = 'invalid one time password'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
+        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
+        extension.addOrUpdateField('oneTimePassword', 'someOTP')
+        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        User user = new User.Builder().addExtension(extension)
+                .setEmails([
+                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
 
         def userById = getUserAsStringWithExtension('Invalid OTP')
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, userId, newPassword)
+        def result = lostPasswordController.change(authZHeader, otp, newPassword)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, authZHeader) >> requestResultMock
-        1 * requestResultMock.getStatusCode() >> 200
-        1 * requestResultMock.getBody() >> userById
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getCurrentUser(_) >> user
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
@@ -233,28 +235,29 @@ class LostPasswordControllerTest extends Specification {
         def userId = 'someId'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-
-        def userById = getUserAsStringWithExtension('someOTP')
+        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
+        extension.addOrUpdateField('oneTimePassword', 'someOTP')
+        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        User user = new User.Builder().addExtension(extension)
+                .setEmails([
+                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, userId, newPassword)
+        def result = lostPasswordController.change(authZHeader, otp, newPassword)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, authZHeader) >> requestResultMock
-        1 * requestResultMock.getStatusCode() >> 200
-        1 * requestResultMock.getBody() >> userById
+        2 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.updateUser(_, _, _) >> {throw new OsiamRequestException(400, '')}
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, authZHeader) >> requestResultMock
-        2 * requestResultMock.getStatusCode() >> 400
         result.getStatusCode() == HttpStatus.BAD_REQUEST
         result.getBody() != null
     }
 
     def 'there should be a failure if the provided one time password is empty'() {
         when:
-        def result = lostPasswordController.change('authZ', '', 'userId', 'newPW')
+        def result = lostPasswordController.change('authZ', '', 'newPW')
 
         then:
         result.getStatusCode() == HttpStatus.UNAUTHORIZED
@@ -292,7 +295,7 @@ class LostPasswordControllerTest extends Specification {
 
         return mapper.writeValueAsString(user)
     }
-    
+
     def getUserAsStringWithExtensionAndWithoutEmail(String token) {
         Extension extension = new Extension(urn)
         extension.addOrUpdateField('activationToken', token)
