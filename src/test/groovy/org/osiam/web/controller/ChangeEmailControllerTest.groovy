@@ -38,10 +38,9 @@ import org.osiam.resources.scim.User
 import org.osiam.web.exception.OsiamException
 import org.osiam.web.mail.SendEmail
 import org.osiam.web.service.ConnectorBuilder
-import org.osiam.web.service.RegistrationExtensionUrnProvider
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
-import org.osiam.web.util.*
+import org.osiam.web.util.SimpleAccessToken
 import org.springframework.http.HttpStatus
 
 import spock.lang.Specification
@@ -51,7 +50,6 @@ class ChangeEmailControllerTest extends Specification {
     def mapper = new ObjectMapperWithExtensionConfig()
 
     def resultMock = Mock(HttpClientRequestResult)
-    def registrationExtensionUrnProvider = Mock(RegistrationExtensionUrnProvider)
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()
     RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService, emailTemplateRendererService: emailTemplateRendererService)
@@ -77,7 +75,7 @@ class ChangeEmailControllerTest extends Specification {
 
     ChangeEmailController changeEmailController = new ChangeEmailController(confirmationTokenField: confirmTokenField,
     tempEmail: tempMailField, context: context, emailChangeLinkPrefix: emailChangeLinkPrefix,
-    fromAddress: emailChangeMailFrom, registrationExtensionUrnProvider: registrationExtensionUrnProvider,
+    fromAddress: emailChangeMailFrom, internalScimExtensionUrn: urn,
     mapper: mapper, clientEmailChangeUri: clientEmailChangeUri, bootStrapLib: bootStrapLib, angularLib: angularLib,
     jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
     connectorBuilder : connectorBuilder)
@@ -114,7 +112,6 @@ class ChangeEmailControllerTest extends Specification {
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> {throw new OsiamException()}
     }
@@ -133,7 +130,6 @@ class ChangeEmailControllerTest extends Specification {
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> {throw new OsiamException()}
     }
 
@@ -153,7 +149,6 @@ class ChangeEmailControllerTest extends Specification {
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> emailContent
         1 * sendMailService.sendHTMLMail(_, _, _, _)
@@ -196,7 +191,6 @@ class ChangeEmailControllerTest extends Specification {
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
 
         result.getStatusCode() == HttpStatus.OK
 
@@ -220,7 +214,6 @@ class ChangeEmailControllerTest extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         response.getStatusCode() == HttpStatus.FORBIDDEN
     }
 

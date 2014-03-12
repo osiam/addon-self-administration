@@ -31,7 +31,6 @@ import org.osiam.client.connector.OsiamConnector
 import org.osiam.client.exception.ConflictException
 import org.osiam.client.exception.NoResultException
 import org.osiam.client.exception.UnauthorizedException
-import org.osiam.helper.HttpClientRequestResult
 import org.osiam.helper.ObjectMapperWithExtensionConfig
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
@@ -39,7 +38,6 @@ import org.osiam.resources.scim.User
 import org.osiam.web.exception.OsiamException
 import org.osiam.web.mail.SendEmail
 import org.osiam.web.service.ConnectorBuilder
-import org.osiam.web.service.RegistrationExtensionUrnProvider
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
 import org.springframework.http.HttpStatus
@@ -50,7 +48,6 @@ class RegisterControllerTest extends Specification {
 
     def mapper = new ObjectMapperWithExtensionConfig()
 
-    def registrationExtensionUrnProvider = Mock(RegistrationExtensionUrnProvider)
     def contextMock = Mock(ServletContext)
 
     def urn = 'urn:scim:schemas:osiam:1.0:Registration'
@@ -75,7 +72,7 @@ class RegisterControllerTest extends Specification {
     RegisterController registerController = new RegisterController(context: contextMock,
     clientRegistrationUri: clientRegistrationUri, activationTokenField: activationTokenField,
     fromAddress: registermailFrom, registermailLinkPrefix: registermailLinkPrefix,
-    registrationExtensionUrnProvider: registrationExtensionUrnProvider,
+    internalScimExtensionUrn: urn,
     mapper: mapper, connectorBuilder: connectorBuilder,
     bootStrapLib: bootStrapLib, angularLib: angularLib,
     renderAndSendEmailService: renderAndSendEmailService)
@@ -105,7 +102,6 @@ class RegisterControllerTest extends Specification {
         def response = registerController.activate('Bearer ACCESS_TOKEN', userId, activationToken)
 
         then:
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
         1 * osiamConnector.updateUser(_, _, _) >> _
@@ -138,7 +134,6 @@ class RegisterControllerTest extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> { throw new ConflictException() }
         response.getStatusCode() == HttpStatus.CONFLICT
