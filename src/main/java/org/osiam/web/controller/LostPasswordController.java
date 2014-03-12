@@ -213,8 +213,6 @@ public class LostPasswordController {
      *        authZ header with valid access token
      * @param oneTimePassword
      *        the previously generated one time password
-     * @param userId
-     *        the user id for whom you want to change the password
      * @param newPassword
      *        the new user password
      * @return the response with status code and the updated user if successfully
@@ -223,7 +221,7 @@ public class LostPasswordController {
     @RequestMapping(value = "/change", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<String> change(@RequestHeader final String token,
             @RequestParam String oneTimePassword,
-            @RequestParam String userId, @RequestParam String newPassword) throws IOException {
+             @RequestParam String newPassword) throws IOException {
 
         if (Strings.isNullOrEmpty(oneTimePassword)) {
             LOGGER.log(Level.SEVERE, "The submitted one time password is invalid!");
@@ -248,7 +246,7 @@ public class LostPasswordController {
             }
 
             UpdateUser updateUser = getPreparedUserToChangePassword(extension, newPassword);
-            updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser, accessToken);
+            updatedUser = connectorBuilder.createConnector().updateUser(user.getId(), updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
