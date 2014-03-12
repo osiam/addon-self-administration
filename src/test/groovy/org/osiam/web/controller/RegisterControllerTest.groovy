@@ -28,7 +28,9 @@ import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
 import org.osiam.client.connector.OsiamConnector
-import org.osiam.client.exception.NoResultException;
+import org.osiam.client.exception.ConflictException
+import org.osiam.client.exception.NoResultException
+import org.osiam.client.exception.UnauthorizedException
 import org.osiam.helper.HttpClientRequestResult
 import org.osiam.helper.ObjectMapperWithExtensionConfig
 import org.osiam.resources.scim.Email
@@ -40,7 +42,6 @@ import org.osiam.web.service.ConnectorBuilder
 import org.osiam.web.service.RegistrationExtensionUrnProvider
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
-import org.osiam.web.util.HttpHeader
 import org.springframework.http.HttpStatus
 
 import spock.lang.Specification
@@ -63,21 +64,21 @@ class RegisterControllerTest extends Specification {
 
     def bootStrapLib = 'http://bootstrap'
     def angularLib = 'http://angular'
-    
+
     OsiamConnector osiamConnector = Mock()
     ConnectorBuilder connectorBuilder = Mock()
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()
-    RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService, 
-        emailTemplateRendererService: emailTemplateRendererService)
+    RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService,
+    emailTemplateRendererService: emailTemplateRendererService)
 
     RegisterController registerController = new RegisterController(context: contextMock,
-            clientRegistrationUri: clientRegistrationUri, activationTokenField: activationTokenField,
-            fromAddress: registermailFrom, registermailLinkPrefix: registermailLinkPrefix,
-            registrationExtensionUrnProvider: registrationExtensionUrnProvider,
-            mapper: mapper, connectorBuilder: connectorBuilder,
-            bootStrapLib: bootStrapLib, angularLib: angularLib,
-            renderAndSendEmailService: renderAndSendEmailService)
+    clientRegistrationUri: clientRegistrationUri, activationTokenField: activationTokenField,
+    fromAddress: registermailFrom, registermailLinkPrefix: registermailLinkPrefix,
+    registrationExtensionUrnProvider: registrationExtensionUrnProvider,
+    mapper: mapper, connectorBuilder: connectorBuilder,
+    bootStrapLib: bootStrapLib, angularLib: angularLib,
+    renderAndSendEmailService: renderAndSendEmailService)
 
     def 'The registration controller should return a HTML file as stream'() {
         given:
@@ -115,79 +116,63 @@ class RegisterControllerTest extends Specification {
         given:
         def userId = UUID.randomUUID().toString()
         def activationToken = UUID.randomUUID().toString()
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-
-        def requestResultMock = Mock(HttpClientRequestResult)
 
         when:
         def response = registerController.activate('Bearer ACCESS_TOKEN', userId, activationToken)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> {throw NoResultException}
-        response.getStatusCode() == HttpStatus.BAD_REQUEST
+        1 * osiamConnector.getCurrentUser(_) >> { throw new NoResultException() }
+        response.getStatusCode() == HttpStatus.NOT_FOUND
     }
 
     def 'The registration controller should return the status code if the user was not updated at activation'(){
         given:
         def userId = UUID.randomUUID().toString()
         def activationToken = UUID.randomUUID().toString()
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-
-        def requestResultGetMock = Mock(HttpClientRequestResult)
-        def requestResultPutMock = Mock(HttpClientRequestResult)
-        def userString = getUserWithExtension(activationToken)
+        User user = getUserWithExtension(activationToken)
 
         when:
         def response = registerController.activate('Bearer ACCESS_TOKEN', userId, activationToken)
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, 'Bearer ACCESS_TOKEN') >> requestResultGetMock
-        1 * requestResultGetMock.getStatusCode() >> 200
-        1 * requestResultGetMock.getBody() >> userString
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getCurrentUser(_) >> user
         1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * httpClientMock.executeHttpPatch(uri, _, HttpHeader.AUTHORIZATION, 'Bearer ACCESS_TOKEN') >> requestResultPutMock
-        2 * requestResultPutMock.getStatusCode() >> 400
-        response.getStatusCode() == HttpStatus.BAD_REQUEST
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.updateUser(_, _, _) >> { throw new ConflictException() }
+        response.getStatusCode() == HttpStatus.CONFLICT
     }
 
     def 'The registration controller should not activate an previously registered user if wrong activation token is presented'(){
         given:
         def userId = UUID.randomUUID().toString()
         def activationToken = UUID.randomUUID().toString()
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/' + userId
-        def requestResultMock = Mock(HttpClientRequestResult)
-        def userString = getUserAsStringWithExtension(activationToken)
+        User user = getUserWithExtension(activationToken)
 
         when:
         def response = registerController.activate('Bearer ACCESS_TOKEN', userId, UUID.randomUUID().toString())
 
         then:
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId(userId) >> uri
-        1 * httpClientMock.executeHttpGet(uri, HttpHeader.AUTHORIZATION, 'Bearer ACCESS_TOKEN') >> requestResultMock
-        1 * requestResultMock.getStatusCode() >> 200
-        1 * requestResultMock.getBody() >> userString
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getCurrentUser(_) >> { throw new UnauthorizedException() }
         response.getStatusCode() == HttpStatus.UNAUTHORIZED
     }
 
     def 'The registration controller should send a html register-mail'() {
         given:
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/'
-
         def registerMailContent = 'irrelevant'
         def registerSubjectContent = 'irrelevant'
         def auth = 'BEARER ABC=='
-        def body = getUserAsStringWithExtension('')
+        User createdUser = getUserWithExtension('')
+        def userString = mapper.writeValueAsString(createdUser)
 
         when:
-        def response = registerController.create(auth, body)
+        def response = registerController.create(auth, userString)
 
         then:
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId('') >> uri
-        1 * httpClientMock.executeHttpPost(_, _, _, _) >> new HttpClientRequestResult('{"id":"1234","schemas":["urn"]}', 201)
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.createUser(_, _) >> createdUser
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> registerSubjectContent
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> registerMailContent
         1 * sendMailService.sendHTMLMail('noreply@example.org', 'email@example.org', registerSubjectContent, registerMailContent)
@@ -197,10 +182,11 @@ class RegisterControllerTest extends Specification {
     def 'there should be an failure if no primary email was found'() {
         given:
         def auth = 'BEARER ABC=='
-        def body = getUserAsStringWithExtensionAndWithoutEmail('')
+        User user = getUserWithExtensionAndWithoutEmail('')
+        def userString = mapper.writeValueAsString(user)
 
         when:
-        def response = registerController.create(auth, body)
+        def response = registerController.create(auth, userString)
 
         then:
         response.getStatusCode() == HttpStatus.BAD_REQUEST
@@ -208,35 +194,32 @@ class RegisterControllerTest extends Specification {
 
     def 'there should be an failure if the user could not be updated with activation token'() {
         given:
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/'
-
         def auth = 'BEARER ABC=='
-        def body = getUserAsStringWithExtension('')
+        User user = getUserWithExtension('')
+        def userString = mapper.writeValueAsString(user)
 
         when:
-        def response = registerController.create(auth, body)
+        def response = registerController.create(auth, userString)
 
         then:
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId('') >> uri
-        1 * httpClientMock.executeHttpPost(_, _, _, _) >> new HttpClientRequestResult('', 400)
-        response.getStatusCode() == HttpStatus.BAD_REQUEST
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.createUser(_, _) >> { throw new UnauthorizedException()}
+        response.getStatusCode() == HttpStatus.UNAUTHORIZED
     }
 
     def 'there should be an failure if the email content for confirmation mail was not found'() {
         given:
-        def uri = 'http://localhost:8080/osiam-resource-server/Users/'
-
         def auth = 'BEARER ABC=='
-        def body = getUserAsStringWithExtension('')
+        User user = getUserWithExtension('')
+        def userString = mapper.writeValueAsString(user)
+        
 
         when:
-        def response = registerController.create(auth, body)
+        def response = registerController.create(auth, userString)
 
         then:
-        1 * registrationExtensionUrnProvider.getExtensionUrn() >> urn
-        1 * resourceServerUriBuilder.buildUsersUriWithUserId('') >> uri
-        1 * httpClientMock.executeHttpPost(_, _, _, _) >> new HttpClientRequestResult('{"id":"1234","schemas":["urn"]}', 201)
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.createUser(_, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> {throw new OsiamException()}
         response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
@@ -263,7 +246,7 @@ class RegisterControllerTest extends Specification {
                 .setActive(false)
                 .build()
     }
-    
+
     def getUserWithExtensionAndWithoutEmail(String token) {
         Extension extension = new Extension(urn)
         extension.addOrUpdateField('activationToken', token)
