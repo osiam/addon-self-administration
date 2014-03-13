@@ -50,7 +50,6 @@
         <!-- set path for unit tests reports -->
 
         <org.osiam.scim-schema.version>0.40-SNAPSHOT</org.osiam.scim-schema.version>
-        <org.osiam.server.version>0.19-SNAPSHOT</org.osiam.server.version>
         <org.osiam.connector4java.version>0.14-SNAPSHOT</org.osiam.connector4java.version>
     </properties>
 
@@ -202,7 +201,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <warName>osiam-registration-module</warName>
+                    <warName>osiam-self-administration</warName>
                 </configuration>
             </plugin>
         </plugins>
@@ -216,12 +215,6 @@
             <version>${org.osiam.scim-schema.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.osiam</groupId>
-            <artifactId>osiam-interaction-model</artifactId>
-            <version>${org.osiam.server.version}</version>
-        </dependency>
-        
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>connector4java</artifactId>
