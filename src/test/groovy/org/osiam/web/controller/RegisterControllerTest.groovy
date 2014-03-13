@@ -103,7 +103,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getUser(_, _) >> user
         1 * osiamConnector.updateUser(_, _, _) >> _
         response.getStatusCode() == HttpStatus.OK
     }
@@ -118,7 +118,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> { throw new NoResultException() }
+        1 * osiamConnector.getUser(_, _) >> { throw new NoResultException() }
         response.getStatusCode() == HttpStatus.NOT_FOUND
     }
 
@@ -133,7 +133,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getUser(_, _) >> user
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> { throw new ConflictException() }
         response.getStatusCode() == HttpStatus.CONFLICT
@@ -150,7 +150,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> { throw new UnauthorizedException() }
+        1 * osiamConnector.getUser(_, _) >> { throw new UnauthorizedException() }
         response.getStatusCode() == HttpStatus.UNAUTHORIZED
     }
 

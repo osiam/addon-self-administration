@@ -188,7 +188,7 @@ class ChangeEmailControllerTest extends Specification {
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getUser(_, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
 
@@ -211,7 +211,7 @@ class ChangeEmailControllerTest extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getUser(_, _) >> user
         response.getStatusCode() == HttpStatus.FORBIDDEN
     }
 

@@ -227,7 +227,7 @@ public class ChangeEmailController {
 
         try {
             SimpleAccessToken accessToken = new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization));
-            User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
+            User user = connectorBuilder.createConnector().getUser(userId, accessToken);
 
             Extension extension = user.getExtension(internalScimExtensionUrn);
             String existingConfirmToken = extension.getField(confirmationTokenField, ExtensionFieldType.STRING);
