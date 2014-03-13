@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
-import org.osiam.helper.ObjectMapperWithExtensionConfig;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
@@ -50,6 +49,7 @@ import org.osiam.web.service.ConnectorBuilder;
 import org.osiam.web.template.RenderAndSendEmail;
 import org.osiam.web.util.RegistrationHelper;
 import org.osiam.web.util.SimpleAccessToken;
+import org.osiam.web.util.UserObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +74,7 @@ public class LostPasswordController {
     private static final Logger LOGGER = Logger.getLogger(LostPasswordController.class.getName());
 
     @Inject
-    private ObjectMapperWithExtensionConfig mapper;
+    private UserObjectMapper mapper;
 
     @Inject
     private RenderAndSendEmail renderAndSendEmailService;
@@ -86,28 +86,28 @@ public class LostPasswordController {
     private ConnectorBuilder connectorBuilder;
 
     /* Extension configuration */
-    @Value("${osiam.scim.extension.field.onetimepassword}")
+    @Value("${org.osiam.scim.extension.field.onetimepassword}")
     private String oneTimePassword;
 
     /* Password lost email configuration */
-    @Value("${osiam.mail.passwordlost.linkprefix}")
+    @Value("${org.osiam.mail.passwordlost.linkprefix}")
     private String passwordlostLinkPrefix;
-    @Value("${osiam.mail.from}")
+    @Value("${org.osiam.mail.from}")
     private String fromAddress;
 
     /* URI for the change password call from JavaScript */
-    @Value("${osiam.html.passwordlost.url}")
+    @Value("${org.osiam.html.passwordlost.url}")
     private String clientPasswordChangeUri;
 
     // css and js libs
-    @Value("${osiam.html.dependencies.bootstrap}")
+    @Value("${org.osiam.html.dependencies.bootstrap}")
     private String bootStrapLib;
-    @Value("${osiam.html.dependencies.angular}")
+    @Value("${org.osiam.html.dependencies.angular}")
     private String angularLib;
-    @Value("${osiam.html.dependencies.jquery}")
+    @Value("${org.osiam.html.dependencies.jquery}")
     private String jqueryLib;
 
-    @Value("${osiam.scim.extension.urn}")
+    @Value("${org.osiam.scim.extension.urn}")
     private String internalScimExtensionUrn;
     
     /**
@@ -123,7 +123,7 @@ public class LostPasswordController {
      * @throws MessagingException
      */
     @RequestMapping(value = "/lost/{userId}", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> lost(@RequestHeader final String token, @PathVariable final String userId)
+    public ResponseEntity<String> lost(@RequestHeader final String authorization, @PathVariable final String userId)
             throws IOException, MessagingException {
 
         // generate one time password
@@ -133,7 +133,7 @@ public class LostPasswordController {
         User updatedUser;
         try {
             updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser,
-                    new SimpleAccessToken(token));
+                    new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization)));
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
@@ -208,7 +208,7 @@ public class LostPasswordController {
     /**
      * Method to change the users password if the preconditions are satisfied.
      * 
-     * @param token
+     * @param authorization
      *        authZ header with valid access token
      * @param oneTimePassword
      *        the previously generated one time password
@@ -218,7 +218,7 @@ public class LostPasswordController {
      * @throws IOException
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> change(@RequestHeader final String token,
+    public ResponseEntity<String> change(@RequestHeader final String authorization,
             @RequestParam String oneTimePassword,
              @RequestParam String newPassword) throws IOException {
 
@@ -231,7 +231,7 @@ public class LostPasswordController {
         User updatedUser;
         try {
 
-            SimpleAccessToken accessToken = new SimpleAccessToken(token);
+            SimpleAccessToken accessToken = new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization));
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
             // validate the oneTimePassword with the saved one from DB

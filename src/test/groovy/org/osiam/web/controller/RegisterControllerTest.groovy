@@ -31,7 +31,6 @@ import org.osiam.client.connector.OsiamConnector
 import org.osiam.client.exception.ConflictException
 import org.osiam.client.exception.NoResultException
 import org.osiam.client.exception.UnauthorizedException
-import org.osiam.helper.ObjectMapperWithExtensionConfig
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.User
@@ -40,13 +39,14 @@ import org.osiam.web.mail.SendEmail
 import org.osiam.web.service.ConnectorBuilder
 import org.osiam.web.template.EmailTemplateRenderer
 import org.osiam.web.template.RenderAndSendEmail
+import org.osiam.web.util.UserObjectMapper
 import org.springframework.http.HttpStatus
 
 import spock.lang.Specification
 
 class RegisterControllerTest extends Specification {
 
-    def mapper = new ObjectMapperWithExtensionConfig()
+    UserObjectMapper mapper = new UserObjectMapper()
 
     def contextMock = Mock(ServletContext)
 
@@ -103,7 +103,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getUser(_, _) >> user
         1 * osiamConnector.updateUser(_, _, _) >> _
         response.getStatusCode() == HttpStatus.OK
     }
@@ -118,7 +118,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> { throw new NoResultException() }
+        1 * osiamConnector.getUser(_, _) >> { throw new NoResultException() }
         response.getStatusCode() == HttpStatus.NOT_FOUND
     }
 
@@ -133,7 +133,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getUser(_, _) >> user
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> { throw new ConflictException() }
         response.getStatusCode() == HttpStatus.CONFLICT
@@ -150,7 +150,7 @@ class RegisterControllerTest extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUser(_) >> { throw new UnauthorizedException() }
+        1 * osiamConnector.getUser(_, _) >> { throw new UnauthorizedException() }
         response.getStatusCode() == HttpStatus.UNAUTHORIZED
     }
 

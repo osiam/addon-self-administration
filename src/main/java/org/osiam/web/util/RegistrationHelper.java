@@ -76,4 +76,9 @@ public class RegistrationHelper {
         link.append("&").append(parameterName).append("=");
         return link.append(parameter).toString();
     }
+    
+    public static String extractAccessToken(String authorizationHeader) {
+        int lastIndexOf = authorizationHeader.lastIndexOf(' ');
+        return authorizationHeader.substring(lastIndexOf + 1);
+    }
 }
