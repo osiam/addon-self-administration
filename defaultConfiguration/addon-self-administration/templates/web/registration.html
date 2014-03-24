@@ -22,16 +22,60 @@
 	            Error while registration process
 	        </div>
         </div>
-		<form th:action="@{/registration}" class="form-signin" method="post" role="form">
+		<form action="#" th:action="@{/registration}" th:object="${registrationUser}" class="form-signin" method="post">
+<!-- 			<ul th:if="${#fields.hasErrors('*')}"> -->
+<!-- 				<li class="alert alert-danger" th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li> -->
+<!-- 			</ul> -->
 			<fieldset>
-			  <input type="text" name="userusername"/>
-
-<!-- 				<input id="username" name="usernames" type="text" 
-					class="form-control" th:placeholder="#{registration.username}" 
-						required="required" />-->
-
-				<button class="btn btn-lg btn-primary btn-block" type="submit"
-					th:text="#{registration.form.register}">Register</button>
+				<input type="text"
+			  		   th:field="*{userName}"
+					   class="form-control"
+					   th:placeholder="#{registration.userName}"
+					   placeholder="Username"
+					   required="required"
+					   th:errorclass="alert-danger"/>
+				<input type="text"
+			  		   th:field="*{email}"
+					   class="form-control"
+					   th:placeholder="#{registration.emailAddress}"
+					   placeholder="Email address"
+					   required="required"
+					   th:errorclass="alert-danger"/>
+				<input type="text"
+					   th:field="*{honorificPrefix}"
+					   class="form-control"
+					   th:placeholder="#{registration.salutation}"
+					   placeholder="Salutation"
+					   th:errorclass="alert-danger"/>
+				<input type="text"
+					   th:field="*{givenName}"
+					   class="form-control"
+					   th:placeholder="#{registration.givenName}"
+					   placeholder="Givenname"
+					   th:errorclass="alert-danger"/>
+				<input type="text"
+					   th:field="*{familyName}"
+					   class="form-control"
+					   th:placeholder="#{registration.familyName}"
+					   placeholder="Familyname"
+					   th:errorclass="alert-danger"/>
+				<input type="password"
+					   th:field="*{password}"
+					   class="form-control"
+					   th:placeholder="#{registration.password}"
+					   placeholder="Password"
+					   required="required"
+					   th:errorclass="alert-danger"/>
+				<input type="password"
+					   th:field="*{confirmPassword}"
+					   class="form-control"
+					   th:placeholder="#{registration.confirmPassword}"
+					   placeholder="Confirm password"
+					   required="required"
+					   th:errorclass="alert-danger"/>
+				<button class="btn btn-lg btn-primary btn-block"
+						type="submit"
+					    th:text="#{registration.form.register}">Register</button>
 			</fieldset>
 		</form>
 

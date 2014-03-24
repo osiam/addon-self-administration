@@ -1,10 +1,12 @@
 package org.osiam.web.registration.controller;
 
-import java.util.Map;
+import javax.validation.Valid;
 
 import org.osiam.web.registration.RegistrationUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -19,8 +21,12 @@ public class Registration {
     }
     
     @RequestMapping(method = RequestMethod.POST)
-    public String register(Model model) {
-        Map<String, Object> modelMap = model.asMap();
+    public String register(@Valid @ModelAttribute final RegistrationUser registrationUser,
+            final BindingResult bindingResult, final Model model) {
+        if (bindingResult.hasErrors()) {
+            return "registration";
+        }
+        model.addAttribute("user", registrationUser);
         return "registrationSuccess";
     }
 }

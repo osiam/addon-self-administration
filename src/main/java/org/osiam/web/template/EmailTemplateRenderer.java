@@ -75,7 +75,7 @@ public class EmailTemplateRenderer {
     
     private OsiamTemplateResolver initializeTemplateResolver(String locale) {
         OsiamTemplateResolver emailTemplateResolver = new OsiamTemplateResolver(locale);
-        emailTemplateResolver.setPrefix("addon-self-administration/template/mail/");
+        emailTemplateResolver.setPrefix("addon-self-administration/templates/mail/");
         emailTemplateResolver.setTemplateMode("HTML5");
         emailTemplateResolver.setCharacterEncoding("UTF-8");
         emailTemplateResolver.setOrder(1);

@@ -15,7 +15,7 @@
 
 	<div class="container">
 		<div class="info-container">
-			<div class="alert alert-success" th:text="${registrationUser.userName}">
+			<div class="alert alert-success" th:text="${user.userName} + ' - ' + ${user.confirmPassword}">
 			 	SUCCESS
 		    </div>
         </div>
