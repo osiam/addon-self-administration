@@ -26,7 +26,7 @@ package org.osiam.web.template;
 import java.io.InputStream;
 import java.util.Locale;
 
-import org.osiam.web.exception.OsiamException;
+import org.osiam.web.exception.TemplateNotFoundException;
 import org.thymeleaf.TemplateProcessingParameters;
 import org.thymeleaf.resourceresolver.IResourceResolver;
 import org.thymeleaf.util.ClassLoaderUtils;
@@ -95,7 +95,7 @@ public class OsiamResourceResolver implements IResourceResolver {
             return templateFilePath;
         }
 
-        throw new OsiamException("Could not find the " + templateNamePrefix + " template.");
+        throw new TemplateNotFoundException("Could not find the " + templateNamePrefix + " template.", "exception.email.template.not.found");
     }
 
     private InputStream getTemplateInputStream(String templateNamePrefix, String locale, boolean isDefault) {

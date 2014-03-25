@@ -29,7 +29,7 @@ import org.osiam.web.mail.SendEmail
 
 import spock.lang.Specification
 
-class RenderAndSendEmailTest extends Specification {
+class RenderAndSendEmailSpec extends Specification {
     
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()

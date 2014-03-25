@@ -2,6 +2,7 @@ package org.osiam.web.service;
 
 import org.osiam.client.connector.OsiamConnector;
 import org.osiam.client.oauth.GrantType;
+import org.osiam.client.oauth.Scope;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,7 @@ public class ConnectorBuilder {
         OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
                 setAuthServiceEndpoint(buildServerBaseUri("osiam-auth-server")).
                 setResourceEndpoint(buildServerBaseUri("osiam-resource-server")).
+                setGrantType(GrantType.CLIENT_CREDENTIALS).
                 setClientId(clientId).
                 setClientSecret(clientSecret).
                 setScope(clientScope);

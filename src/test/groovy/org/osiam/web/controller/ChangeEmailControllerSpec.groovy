@@ -44,7 +44,7 @@ import org.springframework.http.HttpStatus
 
 import spock.lang.Specification
 
-class ChangeEmailControllerTest extends Specification {
+class ChangeEmailControllerSpec extends Specification {
 
     UserObjectMapper mapper = new UserObjectMapper()
 

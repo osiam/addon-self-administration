@@ -1,21 +1,14 @@
 package org.osiam.web.registration;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Email;
 
 public class RegistrationUser {
 
-    @NotNull
-    @Min(4)
     private String userName;
     
     // Name attributes
     private String familyName;
-    
-    @NotNull
-    @Min(4)
     private String givenName;
-    
     private String middleName;
     private String honorificPrefix;
     private String honorificSuffix;
@@ -29,6 +22,7 @@ public class RegistrationUser {
     private String password = "";
     private String confirmPassword;
     
+    @Email
     private String email;
     private String phoneNumber;
     private String im;

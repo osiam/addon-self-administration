@@ -26,7 +26,7 @@ package org.osiam.web.template;
 import java.util.Map;
 
 import org.osiam.resources.scim.User;
-import org.osiam.web.exception.OsiamException;
+import org.osiam.web.exception.TemplateException;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
@@ -44,9 +44,9 @@ public class EmailTemplateRenderer {
     public String renderEmailSubject(String templateName, User user, Map<String, String> variables) {
         String emailSubject = renderTemplate(templateName, "#mail-subject", user, variables);
         if (Strings.isNullOrEmpty(emailSubject)) {
-            throw new OsiamException(
+            throw new TemplateException(
                     "Could not find the mail subject in your template file '" + templateName
-                            + "'. Please provide an HTML element with the ID 'mail-subject'.");
+                            + "'. Please provide an HTML element with the ID 'mail-subject'.", "exception.email.template.malformed");
         }
         return emailSubject;
     }
@@ -54,9 +54,9 @@ public class EmailTemplateRenderer {
     public String renderEmailBody(String templateName, User user, Map<String, String> variables) {
         String emailBody = renderTemplate(templateName, "#mail-body", user, variables);
         if (Strings.isNullOrEmpty(emailBody)) {
-            throw new OsiamException(
+            throw new TemplateException(
                     "Could not find the mail body in your template file '" + templateName
-                            + "'. Please provide an HTML element with the ID 'mail-body'.");
+                            + "'. Please provide an HTML element with the ID 'mail-body'.", "exception.email.template.malformed");
         }
         return emailBody;
     }

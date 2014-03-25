@@ -32,7 +32,7 @@ import spock.lang.Ignore;
 import spock.lang.Specification
 
 
-class OsiamTemplateResolverTest extends Specification {
+class OsiamTemplateResolverSpec extends Specification {
 
     def 'could not find template by irrelevant name and throw exception'() {
         given:

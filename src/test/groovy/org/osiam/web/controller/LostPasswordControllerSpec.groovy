@@ -45,7 +45,7 @@ import spock.lang.Specification
 /**
  * Test for LostPasswordController
  */
-class LostPasswordControllerTest extends Specification {
+class LostPasswordControllerSpec extends Specification {
 
     UserObjectMapper mapper = new UserObjectMapper()
     

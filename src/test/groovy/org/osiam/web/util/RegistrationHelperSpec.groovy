@@ -7,7 +7,7 @@ import spock.lang.Specification
 
 import com.google.common.base.Optional
 
-class RegistrationHelperTest extends Specification {
+class RegistrationHelperSpec extends Specification {
 
     def 'getting primary email from user'() {
         given:

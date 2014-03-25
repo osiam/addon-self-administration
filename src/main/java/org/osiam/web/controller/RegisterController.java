@@ -117,24 +117,24 @@ public class RegisterController {
     /**
      * Generates a HTTP form with the fields for registration purpose.
      */
-    @RequestMapping(method = RequestMethod.GET)
-    public void index(HttpServletResponse response) throws IOException {
-        response.setContentType("text/html");
-
-        InputStream inputStream = context.getResourceAsStream("/WEB-INF/registration/registration.html");
-
-        // replace registration link
-        String htmlContent = IOUtils.toString(inputStream, "UTF-8");
-        String replacedHtmlContent = htmlContent.replace("$REGISTERLINK", clientRegistrationUri);
-
-        // replace all libs
-        replacedHtmlContent = replacedHtmlContent.replace("$BOOTSTRAP", bootStrapLib);
-        replacedHtmlContent = replacedHtmlContent.replace("$ANGULAR", angularLib);
-
-        InputStream in = IOUtils.toInputStream(replacedHtmlContent);
-
-        IOUtils.copy(in, response.getOutputStream());
-    }
+//    @RequestMapping(method = RequestMethod.GET)
+//    public void index(HttpServletResponse response) throws IOException {
+//        response.setContentType("text/html");
+//
+//        InputStream inputStream = context.getResourceAsStream("/WEB-INF/registration/registration.html");
+//
+//        // replace registration link
+//        String htmlContent = IOUtils.toString(inputStream, "UTF-8");
+//        String replacedHtmlContent = htmlContent.replace("$REGISTERLINK", clientRegistrationUri);
+//
+//        // replace all libs
+//        replacedHtmlContent = replacedHtmlContent.replace("$BOOTSTRAP", bootStrapLib);
+//        replacedHtmlContent = replacedHtmlContent.replace("$ANGULAR", angularLib);
+//
+//        InputStream in = IOUtils.toInputStream(replacedHtmlContent);
+//
+//        IOUtils.copy(in, response.getOutputStream());
+//    }
 
     /**
      * Creates a new User.

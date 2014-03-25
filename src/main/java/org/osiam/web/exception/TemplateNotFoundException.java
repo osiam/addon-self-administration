@@ -23,33 +23,22 @@
 
 package org.osiam.web.exception;
 
-public class OsiamException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class TemplateNotFoundException extends OsiamException {
 
     private static final long serialVersionUID = -292158452140136468L;
-    
-    private String key;
-    private int httpStatusCode;
 
-    public OsiamException() {
+    public TemplateNotFoundException() {
         super();
     }
 
-    public OsiamException(String message, Throwable cause) {
+    public TemplateNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public OsiamException(String message, String key, int httpStatusCode) {
-        super(message);
-        this.key = key;
-        this.httpStatusCode = httpStatusCode;
-    }
-    
-    public String getKey(){
-        return key;
-    }
-    
-    public int getHttpStatusCode() {
-        return httpStatusCode;
+    public TemplateNotFoundException(String message, String key) {
+        super(message, key, HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
 }
