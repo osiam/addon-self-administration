@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -18,6 +18,12 @@
 			<p class="alert alert-danger" th:text="#{${key}}">
 				There is an internal problem.
 			</p>
+		</div>
+		<div th:if="${exception}" class="info-container">
+			<p th:text="${exception.message}"/>
+			<div th:each="err:${exception.stackTrace}">
+				<span th:text="${err}"></span><br />
+			</div>
 		</div>
     </div>
 

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+    	<div class="form-group" th:fragment="textinput(attribute, type, required)">
+			<div th:if="${#fields.hasErrors(attribute)}" 
+				 th:errors="*{__${attribute}__}" 
+				 class="error-message alert-danger">
+				 Error
+			</div>
+			<input th:if="${#arrays.contains(allowedFields, attribute)}"  
+				th:type="${type}"
+				th:field="*{__${attribute}__}"
+				class="form-control"
+				th:placeholder="#{registration.__${attribute}__}"
+				th:errorclass="alert-danger"
+				th:required="${required}"
+				/>
+		</div>
+
+	</body>
+</html>

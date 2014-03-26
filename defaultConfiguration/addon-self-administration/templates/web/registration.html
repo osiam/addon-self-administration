@@ -18,60 +18,63 @@
 			<h2 class="form-signin-heading" th:text="#{registration.headline}">
 			 	Please register
 		    </h2>
-			<div th:if="${registerError}" class="alert alert-danger" th:text="#{login.error}">
-	            Error while registration process
-	        </div>
+			
         </div>
 		<form action="#" th:action="@{/registration}" th:object="${registrationUser}" class="form-signin" method="post">
-<!-- 			<ul th:if="${#fields.hasErrors('*')}"> -->
-<!-- 				<li class="alert alert-danger" th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li> -->
-<!-- 			</ul> -->
+			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" th:text="#{registration.form.error}">
+	            Error while registration process
+	        </div>
 			<fieldset>
-				<input type="text"
-			  		   th:field="*{userName}"
-					   class="form-control"
-					   th:placeholder="#{registration.userName}"
-					   placeholder="Username"
-					   th:errorclass="alert-danger"/>
-				<input type="text"
-			  		   th:field="*{email}"
-					   class="form-control"
-					   th:placeholder="#{registration.emailAddress}"
-					   placeholder="Email address"
-					   required="required"
-					   th:errorclass="alert-danger"/>
-				<input type="text"
-					   th:field="*{honorificPrefix}"
-					   class="form-control"
-					   th:placeholder="#{registration.salutation}"
-					   placeholder="Salutation"
-					   th:errorclass="alert-danger"/>
-				<input type="text"
-					   th:field="*{givenName}"
-					   class="form-control"
-					   th:placeholder="#{registration.givenName}"
-					   placeholder="Givenname"
-					   th:errorclass="alert-danger"/>
-				<input type="text"
-					   th:field="*{familyName}"
-					   class="form-control"
-					   th:placeholder="#{registration.familyName}"
-					   placeholder="Familyname"
-					   th:errorclass="alert-danger"/>
-				<input type="password"
+				<div class="form-group">
+					<div th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}" class="error-message alert-danger">Error</div>
+			    	<input type="text"
+				  		   th:field="*{userName}"
+						   class="form-control"
+						   th:placeholder="#{registration.userName}"
+						   placeholder="Username"
+						   th:errorclass="alert-danger"/>
+			  	</div>
+			  	
+			  	<div class="form-group">
+					<div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message alert-danger">Error</div>
+			    	<input type="text"
+				  		   th:field="*{email}"
+						   class="form-control"
+						   th:placeholder="#{registration.emailAddress}"
+						   placeholder="Email address"
+						   th:errorclass="alert-danger"/>
+			  	</div>
+			  	
+		    	<input type="text"
+						   th:field="*{honorificPrefix}"
+						   class="form-control"
+						   th:placeholder="#{registration.salutation}"
+						   placeholder="Salutation"
+						   th:errorclass="alert-danger"/>
+						   					   
+				<div th:replace="textinput :: textinput('givenName', 'text', true)"></div>
+				<div th:replace="textinput :: textinput('familyName', 'text', false)"></div>	   
+					   
+				<div class="form-group">
+					<div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message alert-danger">Error</div>
+			    	<input type="password"
 					   th:field="*{password}"
 					   class="form-control"
 					   th:placeholder="#{registration.password}"
 					   placeholder="Password"
-					   required="required"
 					   th:errorclass="alert-danger"/>
-				<input type="password"
+			  	</div>
+			  	
+			  	<div class="form-group">
+					<div th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error-message alert-danger">Error</div>
+			    	<input type="password"
 					   th:field="*{confirmPassword}"
 					   class="form-control"
 					   th:placeholder="#{registration.confirmPassword}"
 					   placeholder="Confirm password"
-					   required="required"
 					   th:errorclass="alert-danger"/>
+			  	</div>
+				
 				<button class="btn btn-lg btn-primary btn-block"
 						type="submit"
 					    th:text="#{registration.form.register}">Register</button>
