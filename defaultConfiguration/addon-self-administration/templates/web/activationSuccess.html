@@ -15,11 +15,8 @@
 
 	<div class="container">
 		<div class="info-container">
-			<div class="alert alert-success" th:utext="#{registration.success(${user.userName})}">
+			<div class="alert alert-success" th:utext="#{activation.success(${user.userName})}">
 			 	SUCCESS
-		    </div>
-		    <div th:text="${user.extensions['urn:scim:schemas:osiam:2.0:Self-Administration'].fields['activationToken'].value}">
-		    	EXTENSION
 		    </div>
         </div>
 	</div>

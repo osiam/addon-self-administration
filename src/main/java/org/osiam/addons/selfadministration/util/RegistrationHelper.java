@@ -26,13 +26,10 @@ package org.osiam.addons.selfadministration.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
-import org.osiam.addons.selfadministration.registration.RegistrationUser;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.User;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 
 public class RegistrationHelper {
 
@@ -74,7 +71,7 @@ public class RegistrationHelper {
     }
     
     public static String createLinkForEmail(String linkPrefix, String userId, String parameterName, String parameter) {
-        StringBuilder link = new StringBuilder(linkPrefix);
+        StringBuilder link = new StringBuilder(linkPrefix).append("?");
         link.append("userId=").append(userId);
         link.append("&").append(parameterName).append("=");
         return link.append(parameter).toString();

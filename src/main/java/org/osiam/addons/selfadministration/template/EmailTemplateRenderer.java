@@ -46,7 +46,7 @@ public class EmailTemplateRenderer {
         if (Strings.isNullOrEmpty(emailSubject)) {
             throw new TemplateException(
                     "Could not find the mail subject in your template file '" + templateName
-                            + "'. Please provide an HTML element with the ID 'mail-subject'.", "exception.email.template.malformed");
+                            + "'. Please provide an HTML element with the ID 'mail-subject'.", "template.email.exception.malformed");
         }
         return emailSubject;
     }
@@ -56,7 +56,7 @@ public class EmailTemplateRenderer {
         if (Strings.isNullOrEmpty(emailBody)) {
             throw new TemplateException(
                     "Could not find the mail body in your template file '" + templateName
-                            + "'. Please provide an HTML element with the ID 'mail-body'.", "exception.email.template.malformed");
+                            + "'. Please provide an HTML element with the ID 'mail-body'.", "template.email.exception.malformed");
         }
         return emailBody;
     }

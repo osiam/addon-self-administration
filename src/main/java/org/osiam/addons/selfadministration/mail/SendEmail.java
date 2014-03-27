@@ -23,13 +23,13 @@
 
 package org.osiam.addons.selfadministration.mail;
 
-import java.io.IOException;
 import java.util.Date;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.osiam.addons.selfadministration.exception.SendEmailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -45,13 +45,11 @@ public class SendEmail {
     @Inject
     private JavaMailSender mailSender;
 
-    public void sendPlainTextMail(String fromAddress, String toAddress, String subject, String content)
-            throws MessagingException, IOException {
+    public void sendPlainTextMail(String fromAddress, String toAddress, String subject, String content) {
         mailSender.send(getMessage(fromAddress, toAddress, subject, content));
     }
 
-    public void sendHTMLMail(String fromAddress, String toAddress, String subject, String htmlContent)
-            throws MessagingException, IOException {
+    public void sendHTMLMail(String fromAddress, String toAddress, String subject, String htmlContent) {
         mailSender.send(getMimeMessage(fromAddress, toAddress, subject, htmlContent));
     }
 
@@ -61,19 +59,23 @@ public class SendEmail {
         message.setTo(toAddress);
         message.setSubject(subject);
         message.setText(mailContent);
-        message.setSentDate(new Date(System.currentTimeMillis()));
+        message.setSentDate(new Date());
         return message;
     }
 
-    private MimeMessage getMimeMessage(String fromAddress, String toAddress, String subject, String mailContent)
-            throws MessagingException {
+    private MimeMessage getMimeMessage(String fromAddress, String toAddress, String subject, String mailContent) {
         final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
         final MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
-        message.setFrom(fromAddress);
-        message.setTo(toAddress);
-        message.setSubject(subject);
-        message.setText(mailContent, true);
-        message.setSentDate(new Date(System.currentTimeMillis()));
+        try {
+            message.setFrom(fromAddress);
+            message.setTo(toAddress);
+            message.setSubject(subject);
+            message.setText(mailContent, true);
+            message.setSentDate(new Date());
+        } catch (MessagingException e) {
+            throw new SendEmailException("Could not create metadata for email",
+                    "registration.exception.email.metadata", e);
+        }
         return mimeMessage;
     }
 }

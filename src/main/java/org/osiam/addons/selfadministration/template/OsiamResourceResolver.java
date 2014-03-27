@@ -95,7 +95,7 @@ public class OsiamResourceResolver implements IResourceResolver {
             return templateFilePath;
         }
 
-        throw new TemplateNotFoundException("Could not find the " + templateNamePrefix + " template.", "exception.email.template.not.found");
+        throw new TemplateNotFoundException("Could not find the " + templateNamePrefix + " template.", "template.email.exception.not.found");
     }
 
     private InputStream getTemplateInputStream(String templateNamePrefix, String locale, boolean isDefault) {

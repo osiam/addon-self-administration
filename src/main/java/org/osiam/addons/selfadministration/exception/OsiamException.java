@@ -38,6 +38,12 @@ public class OsiamException extends RuntimeException {
         super(message, cause);
     }
 
+    public OsiamException(String message, String key, int httpStatusCode, Throwable cause) {
+        super(message, cause);
+        this.key = key;
+        this.httpStatusCode = httpStatusCode;
+    }
+    
     public OsiamException(String message, String key, int httpStatusCode) {
         super(message);
         this.key = key;

@@ -1,29 +1,38 @@
 package org.osiam.addons.selfadministration.registration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.URL;
 
 public class RegistrationUser {
 
     private String userName;
     
     // Name attributes
+    private String formattedName;
     private String familyName;
     private String givenName;
     private String middleName;
     private String honorificPrefix;
     private String honorificSuffix;
     
-    
     private String displayName;
     private String nickName;
+    @URL
+    private String profileUrl;
     private String title;
     private String preferredLanguage;
     private String locale;
     private String timezone;
+    @NotBlank
+    @NotEmpty
+    @NotNull
     private String password = "";
     private String confirmPassword;
     
@@ -34,11 +43,14 @@ public class RegistrationUser {
     private String photo;
     
     //Address
+    private String formattedAddress;
     private String streetAddress;
     private String locality;
     private String region;
     private String postalCode;
     private String country;
+    
+    private Map<String, RegistrationExtension> extensions = new HashMap<>();
     
     public RegistrationUser() {
     }
@@ -225,5 +237,37 @@ public class RegistrationUser {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getFormattedName() {
+        return formattedName;
+    }
+
+    public void setFormattedName(String formattedName) {
+        this.formattedName = formattedName;
+    }
+
+    public String getFormattedAddress() {
+        return formattedAddress;
+    }
+
+    public void setFormattedAddress(String formattedAddress) {
+        this.formattedAddress = formattedAddress;
+    }
+
+    public String getProfileUrl() {
+        return profileUrl;
+    }
+
+    public void setProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
+    }
+
+    public Map<String, RegistrationExtension> getExtensions() {
+        return extensions;
+    }
+
+    public void setExtensions(Map<String, RegistrationExtension> extensions) {
+        this.extensions = extensions;
     }
 }

@@ -21,32 +21,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.osiam.addons.selfadministration.template;
+package org.osiam.addons.selfadministration.exception;
 
-import java.util.Map;
+import org.springframework.http.HttpStatus;
 
-import javax.inject.Inject;
+public class SendEmailException extends OsiamException {
 
-import org.osiam.addons.selfadministration.mail.SendEmail;
-import org.osiam.resources.scim.User;
-import org.springframework.stereotype.Component;
+    private static final long serialVersionUID = -292158452140136468L;
 
-@Component
-public class RenderAndSendEmail {
-
-    @Inject
-    private SendEmail sendMailService;
-
-    @Inject
-    private EmailTemplateRenderer emailTemplateRendererService;
-
-    public void renderAndSendEmail(String templateName, String fromAddress, String toAddress, User user,
-            Map<String, String> mailVariables) {
-
-        String emailSubject = emailTemplateRendererService.renderEmailSubject(templateName, user, mailVariables);
-
-        String emailBody = emailTemplateRendererService.renderEmailBody(templateName, user, mailVariables);
-
-        sendMailService.sendHTMLMail(fromAddress, toAddress, emailSubject, emailBody);
+    public SendEmailException() {
+        super();
     }
+
+    public SendEmailException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
+    public SendEmailException(String message, String key, Throwable cause) {
+        super(message, key, HttpStatus.INTERNAL_SERVER_ERROR.value(), cause);
+    }
+
+    public SendEmailException(String message, String key) {
+        super(message, key, HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
 }
