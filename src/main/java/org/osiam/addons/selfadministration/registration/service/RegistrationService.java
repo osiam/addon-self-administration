@@ -12,9 +12,8 @@ import javax.inject.Inject;
 
 import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
 import org.osiam.addons.selfadministration.exception.OsiamException;
-import org.osiam.addons.selfadministration.registration.RegistrationExtension;
 import org.osiam.addons.selfadministration.registration.RegistrationUser;
-import org.osiam.addons.selfadministration.registration.UserConverter;
+import org.osiam.addons.selfadministration.registration.validation.UserConverter;
 import org.osiam.addons.selfadministration.service.ConnectorBuilder;
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
@@ -62,6 +61,9 @@ public class RegistrationService {
 
     @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
     private boolean usernameEqualsEmail;
+    
+    @Value("${org.osiam.html.form.password.length:8}")
+    private int passwordLength;
 
     @Value("${org.osiam.html.form.fields:}")
     private void setAllowedFields(String[] allowedFields) {
@@ -198,5 +200,13 @@ public class RegistrationService {
             this.allAllowedFields = allFields.toArray(new String[allFields.size()]);
         }
         return allAllowedFields;
+    }
+
+    public int getPasswordLength() {
+        return passwordLength;
+    }
+
+    public boolean getUsernameEqualsEmail() {
+        return usernameEqualsEmail;
     }
 }

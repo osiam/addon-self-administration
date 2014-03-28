@@ -1,6 +1,5 @@
 package org.osiam.addons.selfadministration.util
 
-import org.osiam.addons.selfadministration.util.RegistrationHelper;
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.User
 

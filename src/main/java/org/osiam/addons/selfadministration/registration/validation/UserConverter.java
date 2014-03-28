@@ -1,12 +1,16 @@
-package org.osiam.addons.selfadministration.registration;
+package org.osiam.addons.selfadministration.registration.validation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
+import org.osiam.addons.selfadministration.registration.RegistrationExtension;
+import org.osiam.addons.selfadministration.registration.RegistrationUser;
 import org.osiam.resources.scim.Address;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
@@ -16,13 +20,13 @@ import org.osiam.resources.scim.PhoneNumber;
 import org.osiam.resources.scim.Photo;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 
-@Service
+@Component
 public class UserConverter {
-
+    
     @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
     private boolean usernameEqualsEmail;
 
@@ -59,33 +63,40 @@ public class UserConverter {
         }
 
         userBuilder
-        .setName(name)
-        .setDisplayName(registrationUser.getDisplayName())
-        .setNickName(registrationUser.getNickName())
-        .setProfileUrl(registrationUser.getProfileUrl())
-        .setTitle(registrationUser.getTitle())
-        .setPreferredLanguage(registrationUser.getPreferredLanguage())
-        .setLocale(registrationUser.getLocale())
-        .setTimezone(registrationUser.getTimezone())
-        .setPassword(registrationUser.getPassword())
-        .setEmails(getEmailList(registrationUser))
-        .setPhoneNumbers(getPhoneNumberList(registrationUser))
-        .setIms(getImList(registrationUser))
-        .setPhotos(getPhotoList(registrationUser))
-        .setAddresses(getAddressList(registrationUser));
+                .setName(name)
+                .setDisplayName(registrationUser.getDisplayName())
+                .setNickName(registrationUser.getNickName())
+                .setProfileUrl(registrationUser.getProfileUrl())
+                .setTitle(registrationUser.getTitle())
+                .setPreferredLanguage(registrationUser.getPreferredLanguage())
+                .setLocale(registrationUser.getLocale())
+                .setTimezone(registrationUser.getTimezone())
+                .setPassword(registrationUser.getPassword())
+                .setEmails(getEmailList(registrationUser))
+                .setPhoneNumbers(getPhoneNumberList(registrationUser))
+                .setIms(getImList(registrationUser))
+                .setPhotos(getPhotoList(registrationUser))
+                .setAddresses(getAddressList(registrationUser))
+                .addExtensions(getExtensions(registrationUser));
 
         return userBuilder.build();
     }
 
-    private void getExtensions(RegistrationUser registrationUser){
-        HashMap<String, Extension> extensionMap = new HashMap<>();
-        
-        
-        for (String key : registrationUser.getExtensions().keySet()) {
-            
+    private Set<Extension> getExtensions(RegistrationUser registrationUser) {
+        Map<String, RegistrationExtension> registrationExtensions = registrationUser.getExtensions();
+        Set<Extension> extensions = new HashSet<Extension>();
+        for (String urn : registrationExtensions.keySet()) {
+            Extension extension = new Extension(urn);
+            RegistrationExtension registrationExtension = registrationExtensions.get(urn);
+            Map<String, String> registrationFields = registrationExtension.getFields();
+            for (String field : registrationFields.keySet()) {
+                extension.addOrUpdateField(field, registrationFields.get(field));
+            }
+            extensions.add(extension);
         }
+        return extensions;
     }
-    
+
     private List<Email> getEmailList(RegistrationUser registrationUser) {
         List<Email> emails = new ArrayList<Email>();
         if (!Strings.isNullOrEmpty(registrationUser.getEmail())) {

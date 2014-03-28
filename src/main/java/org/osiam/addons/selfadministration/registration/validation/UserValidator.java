@@ -1,4 +1,4 @@
-package org.osiam.addons.selfadministration.registration.service;
+package org.osiam.addons.selfadministration.registration.validation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 import javax.inject.Inject;
 
 import org.osiam.addons.selfadministration.registration.RegistrationUser;
-import org.springframework.beans.factory.annotation.Value;
+import org.osiam.addons.selfadministration.registration.service.RegistrationService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -19,12 +19,6 @@ public class UserValidator implements Validator{
     @Inject
     private RegistrationService registrationService;
     
-    @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
-    private boolean usernameEqualsEmail;
-    
-    @Value("${org.osiam.html.form.password.length:8}")
-    private int passwordLength;
-
     @Override
     public boolean supports(Class<?> clazz) {
         return RegistrationUser.class.equals(clazz);
@@ -34,7 +28,7 @@ public class UserValidator implements Validator{
     public void validate(Object target, Errors errors) {
         RegistrationUser registrationUser = (RegistrationUser) target;
         boolean isUserNameEmpty = Strings.isNullOrEmpty(registrationUser.getUserName());
-        if (!usernameEqualsEmail && isUserNameEmpty) {
+        if (!registrationService.getUsernameEqualsEmail() && isUserNameEmpty) {
             errors.rejectValue("userName", "registration.exception.usernameEqualsEmail", "Username not set");
         }
         if(!Strings.isNullOrEmpty(registrationUser.getPhoto())){
@@ -44,8 +38,8 @@ public class UserValidator implements Validator{
                 errors.rejectValue("photo", "registration.exception.photo", "Photo is not an URI");
             }
         }
-        if(registrationUser.getPassword().length() < passwordLength){
-            String[] argument = {String.valueOf(passwordLength)}; 
+        if(registrationUser.getPassword().length() < registrationService.getPasswordLength()){
+            String[] argument = {String.valueOf(registrationService.getPasswordLength())}; 
             errors.rejectValue("password", "registration.exception.password.length", argument, "Your passwords is not long enough.");
         }
         if(!Strings.isNullOrEmpty(registrationUser.getConfirmPassword())
@@ -54,7 +48,7 @@ public class UserValidator implements Validator{
         }
         String userName;
         String field;
-        if(usernameEqualsEmail){
+        if(registrationService.getUsernameEqualsEmail()){
             userName = registrationUser.getEmail();
             field = "email";
         }else{
