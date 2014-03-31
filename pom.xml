@@ -49,7 +49,7 @@
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <!-- set path for unit tests reports -->
 
-        <org.osiam.scim-schema.version>0.40-SNAPSHOT</org.osiam.scim-schema.version>
+        <org.osiam.scim-schema.version>0.41-SNAPSHOT</org.osiam.scim-schema.version>
         <org.osiam.connector4java.version>0.14-SNAPSHOT</org.osiam.connector4java.version>
     </properties>
 
@@ -375,6 +375,13 @@
             <artifactId>mail</artifactId>
             <version>1.4.7</version>
         </dependency>
+        
+        <dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.1.0.Final</version>
+		</dependency>
+		
     </dependencies>
 
     <profiles>
