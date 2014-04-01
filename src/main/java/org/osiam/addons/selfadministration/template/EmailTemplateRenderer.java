@@ -66,15 +66,15 @@ public class EmailTemplateRenderer {
         context.setVariable("user", user);
         context.setVariables(variables);
         
-        OsiamTemplateResolver emailTemplateResolver = initializeTemplateResolver(user.getLocale());
+        OsiamClasspathTemplateResolver emailTemplateResolver = initializeTemplateResolver(user.getLocale());
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(emailTemplateResolver);
         
         return templateEngine.process(templateName, context, new DOMSelectorFragmentSpec(selectorExpression));
     }
     
-    private OsiamTemplateResolver initializeTemplateResolver(String locale) {
-        OsiamTemplateResolver emailTemplateResolver = new OsiamTemplateResolver(locale);
+    private OsiamClasspathTemplateResolver initializeTemplateResolver(String locale) {
+        OsiamClasspathTemplateResolver emailTemplateResolver = new OsiamClasspathTemplateResolver(locale);
         emailTemplateResolver.setPrefix("addon-self-administration/templates/mail/");
         emailTemplateResolver.setTemplateMode("HTML5");
         emailTemplateResolver.setCharacterEncoding("UTF-8");

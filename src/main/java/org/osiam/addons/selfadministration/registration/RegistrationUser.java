@@ -3,11 +3,8 @@ package org.osiam.addons.selfadministration.registration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;
 
 public class RegistrationUser {
@@ -24,15 +21,15 @@ public class RegistrationUser {
     
     private String displayName;
     private String nickName;
+    
     @URL
     private String profileUrl;
     private String title;
     private String preferredLanguage;
     private String locale;
     private String timezone;
+    
     @NotBlank
-    @NotEmpty
-    @NotNull
     private String password = "";
     private String confirmPassword;
     

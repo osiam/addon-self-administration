@@ -2,6 +2,7 @@ package org.osiam.addons.selfadministration.registration.controller;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.osiam.addons.selfadministration.registration.RegistrationUser;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(value = "/registration")
@@ -43,13 +43,13 @@ public class Registration {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
     public String register(@Valid @ModelAttribute final RegistrationUser registrationUser,
-            final BindingResult bindingResult, final Model model, final HttpServletRequest request) {
+            final BindingResult bindingResult, final Model model, final HttpServletRequest request, final HttpServletResponse response) {
 
         userValidator.validate(registrationUser, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return "registration";
         }
 
@@ -58,6 +58,7 @@ public class Registration {
 
         model.addAttribute("user", user);
 
+        response.setStatus(HttpStatus.CREATED.value());
         return "registrationSuccess";
     }
 

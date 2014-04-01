@@ -38,13 +38,13 @@ import com.google.common.base.Strings;
  * Osiam resource resolver for thymeleaf template engine to receive input stream of requested template
  * 
  */
-public class OsiamResourceResolver implements IResourceResolver {
+public class OsiamClasspathResourceResolver implements IResourceResolver {
 
     public static final String NAME = "OSIAM-RESOLVER";
 
     private String locale;
 
-    public OsiamResourceResolver(String locale) {
+    public OsiamClasspathResourceResolver(String locale) {
         super();
         setLocale(locale);
     }
@@ -107,7 +107,7 @@ public class OsiamResourceResolver implements IResourceResolver {
             templateName.append("-" + locale);
         }
         templateName.append(".html");
-        return ClassLoaderUtils.getClassLoader(OsiamResourceResolver.class).getResourceAsStream(
+        return ClassLoaderUtils.getClassLoader(OsiamClasspathResourceResolver.class).getResourceAsStream(
                 templateName.toString());
     }
 }

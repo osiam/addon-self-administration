@@ -25,7 +25,7 @@ package org.osiam.addons.selfadministration.template
 
 import org.apache.commons.io.IOUtils
 import org.osiam.addons.selfadministration.exception.TemplateNotFoundException
-import org.osiam.addons.selfadministration.template.OsiamResourceResolver
+import org.osiam.addons.selfadministration.template.OsiamClasspathResourceResolver
 
 import spock.lang.Specification
 
@@ -34,7 +34,7 @@ class OsiamTemplateResolverSpec extends Specification {
 
     def 'could not find template by irrelevant name and throw exception'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver()
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver()
         def templateName = 'irrelevant'
 
         when:
@@ -46,7 +46,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default registration template by existing template and irrelevant locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('irrelevant')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('irrelevant')
         def templateName = 'addon-self-administration/templates/mail/registration'
         
         when:
@@ -60,7 +60,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default registration template by existing template and de locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('de')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('de')
         def templateName = 'addon-self-administration/templates/mail/registration'
         
         when:
@@ -74,7 +74,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default changeemail template by existing template and irrelevant locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('irrelevant')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('irrelevant')
         def templateName = 'addon-self-administration/templates/mail/changeemail'
         
         when:
@@ -88,7 +88,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default changeemail template by existing template and de locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('de')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('de')
         def templateName = 'addon-self-administration/templates/mail/changeemail'
         
         when:
@@ -102,7 +102,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default lostpassword template by existing template and irrelevant locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('irrelevant')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('irrelevant')
         def templateName = 'addon-self-administration/templates/mail/lostpassword'
         
         when:
@@ -116,7 +116,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default lostpassword template by existing template and de locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('de')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('de')
         def templateName = 'addon-self-administration/templates/mail/lostpassword'
         
         when:
@@ -130,7 +130,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default changeemailinfo template by existing template and irrelevant locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('irrelevant')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('irrelevant')
         def templateName = 'addon-self-administration/templates/mail/changeemailinfo'
         
         when:
@@ -144,7 +144,7 @@ class OsiamTemplateResolverSpec extends Specification {
     
     def 'could find default changeemailinfo template by existing template and de locale'() {
         given:
-        OsiamResourceResolver resourceResolver = new OsiamResourceResolver('de')
+        OsiamClasspathResourceResolver resourceResolver = new OsiamClasspathResourceResolver('de')
         def templateName = 'addon-self-administration/templates/mail/changeemailinfo'
         
         when:
