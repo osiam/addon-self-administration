@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.osiam.addons.selfadministration.exception.TemplateException;
 import org.osiam.resources.scim.User;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
@@ -66,7 +67,8 @@ public class EmailTemplateRenderer {
         context.setVariable("user", user);
         context.setVariables(variables);
         
-        OsiamClasspathTemplateResolver emailTemplateResolver = initializeTemplateResolver(user.getLocale());
+        String locale = user.getLocale() != null ? user.getLocale() : LocaleContextHolder.getLocale().getLanguage();
+        OsiamClasspathTemplateResolver emailTemplateResolver = initializeTemplateResolver(locale);
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(emailTemplateResolver);
         
