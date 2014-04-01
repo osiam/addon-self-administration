@@ -26,13 +26,13 @@ package org.osiam.addons.selfadministration.template;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
 /**
- * Osiam template resolver for thymeleaf template engine
+ * Osiam classpath template resolver for thymeleaf template engine
  * 
  */
-public class OsiamTemplateResolver extends TemplateResolver {
+public class OsiamClasspathTemplateResolver extends TemplateResolver {
 
-    public OsiamTemplateResolver(String locale) {
+    public OsiamClasspathTemplateResolver(String locale) {
         super();
-        super.setResourceResolver(new OsiamResourceResolver(locale));
+        super.setResourceResolver(new OsiamClasspathResourceResolver(locale));
     }
 }

@@ -26,7 +26,7 @@ import com.google.common.base.Strings;
 
 @Component
 public class UserConverter {
-    
+
     @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
     private boolean usernameEqualsEmail;
 

@@ -68,6 +68,10 @@ body {
 	z-index: 2;
 }
 
+.required {
+	border: 1px solid #FF0000;
+}
+
 #confirm-container {
 	width: 450px;
 	margin: 0 auto;
