@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <div id="mail-subject" th:remove="tag" th:text="#{mail.registration.subject}">Confirmation of your registration</div>
+    	
+   		<div id="mail-body">
+        	<div th:replace="mailtextbricks :: #salutation"></div>,<br />
+        	<br />
+        	<p th:utext="#{mail.registration.body}"></p>
+        	<a th:href="@{${registrationLink}}" th:text="@{${registrationLink}}"></a><br />
+        	<p th:text="#{mail.greeting}"></p>
+        </div>
+    </body>
+</html>
