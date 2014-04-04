@@ -23,11 +23,12 @@
 
 package org.osiam.addons.selfadministration.template;
 
+import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.osiam.addons.selfadministration.exception.TemplateException;
-import org.osiam.resources.scim.User;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
@@ -42,8 +43,17 @@ import com.google.common.base.Strings;
 @Service
 public class EmailTemplateRenderer {
 
-    public String renderEmailSubject(String templateName, User user, Map<String, String> variables) {
-        String emailSubject = renderTemplate(templateName, "#mail-subject", user, variables);
+//    @Inject
+//    private ClassLoaderTemplateResolver mailTemplateResolver;
+//    
+//    @Inject
+//    private ResourceBundleMessageSource messageSource;
+    
+    @Inject
+    SpringTemplateEngine templateEngine;
+
+    public String renderEmailSubject(String templateName, Locale locale, Map<String, Object> variables) {
+        String emailSubject = renderTemplate(templateName, "#mail-subject", locale, variables);
         if (Strings.isNullOrEmpty(emailSubject)) {
             throw new TemplateException(
                     "Could not find the mail subject in your template file '" + templateName
@@ -52,8 +62,8 @@ public class EmailTemplateRenderer {
         return emailSubject;
     }
     
-    public String renderEmailBody(String templateName, User user, Map<String, String> variables) {
-        String emailBody = renderTemplate(templateName, "#mail-body", user, variables);
+    public String renderEmailBody(String templateName, Locale locale, Map<String, Object> variables) {
+        String emailBody = renderTemplate(templateName, "#mail-body", locale, variables);
         if (Strings.isNullOrEmpty(emailBody)) {
             throw new TemplateException(
                     "Could not find the mail body in your template file '" + templateName
@@ -62,25 +72,14 @@ public class EmailTemplateRenderer {
         return emailBody;
     }
     
-    private String renderTemplate(String templateName, String selectorExpression, User user, Map<String, String> variables) {
-        final Context context = new Context();
-        context.setVariable("user", user);
+    private String renderTemplate(String templateName, String selectorExpression, Locale locale, Map<String, Object> variables) {
+        Context context = new Context(locale);
         context.setVariables(variables);
         
-        String locale = user.getLocale() != null ? user.getLocale() : LocaleContextHolder.getLocale().getLanguage();
-        OsiamClasspathTemplateResolver emailTemplateResolver = initializeTemplateResolver(locale);
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        templateEngine.setTemplateResolver(emailTemplateResolver);
+        //SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        //templateEngine.setTemplateResolver(mailTemplateResolver);
+        //templateEngine.setMessageSource(messageSource);
         
-        return templateEngine.process(templateName, context, new DOMSelectorFragmentSpec(selectorExpression));
-    }
-    
-    private OsiamClasspathTemplateResolver initializeTemplateResolver(String locale) {
-        OsiamClasspathTemplateResolver emailTemplateResolver = new OsiamClasspathTemplateResolver(locale);
-        emailTemplateResolver.setPrefix("addon-self-administration/templates/mail/");
-        emailTemplateResolver.setTemplateMode("HTML5");
-        emailTemplateResolver.setCharacterEncoding("UTF-8");
-        emailTemplateResolver.setOrder(1);
-        return emailTemplateResolver;
+        return templateEngine.process(templateName + "-email", context, new DOMSelectorFragmentSpec(selectorExpression));
     }
 }

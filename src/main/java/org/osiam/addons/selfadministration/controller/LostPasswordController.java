@@ -26,6 +26,7 @@ package org.osiam.addons.selfadministration.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -154,12 +155,15 @@ public class LostPasswordController {
         String passwordLostLink = RegistrationHelper.createLinkForEmail(passwordlostLinkPrefix, updatedUser.getId(),
                 "oneTimePassword", oneTimePassword);
 
-        Map<String, String> mailVariables = new HashMap<>();
+        Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("lostpasswordlink", passwordLostLink);
+        mailVariables.put("user", updatedUser);
 
+        Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
+        
         try {
             renderAndSendEmailService.renderAndSendEmail("lostpassword", fromAddress, email.get().getValue(),
-                    updatedUser,
+                    locale,
                     mailVariables);
         } catch (OsiamException e) {
             return new ResponseEntity<>("{\"error\":\"Problems creating email for lost password: \"" + e.getMessage()

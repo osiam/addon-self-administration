@@ -1,13 +1,10 @@
-package org.osiam.addons.selfadministration.registration.controller;
+package org.osiam.addons.selfadministration.registration;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.osiam.addons.selfadministration.registration.RegistrationUser;
-import org.osiam.addons.selfadministration.registration.service.RegistrationService;
-import org.osiam.addons.selfadministration.registration.validation.UserValidator;
 import org.osiam.resources.scim.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -22,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping(value = "/registration")
-public class Registration {
+public class RegistrationController {
 
     @Inject
     private RegistrationService registrationService;
@@ -54,7 +51,7 @@ public class Registration {
         }
 
         User user = registrationService.saveRegistrationUser(registrationUser);
-        registrationService.sendRegistrationEmail(user, request.getRequestURL());
+        registrationService.sendRegistrationEmail(user, request);
 
         model.addAttribute("user", user);
 

@@ -1,7 +1,8 @@
 package org.osiam.addons.selfadministration.registration.validation
 
+import org.osiam.addons.selfadministration.registration.RegistrationService;
 import org.osiam.addons.selfadministration.registration.RegistrationUser;
-import org.osiam.addons.selfadministration.registration.service.RegistrationService;
+import org.osiam.addons.selfadministration.registration.UserValidator;
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 

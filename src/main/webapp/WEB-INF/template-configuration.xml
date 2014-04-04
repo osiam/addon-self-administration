@@ -30,18 +30,26 @@
 
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-
-    <bean id="webTemplateResolver" class="org.osiam.addons.selfadministration.template.OsiamWebContextTemplateResolver">
-        <property name="prefix" value="addon-self-administration/templates/web/" />
+	<bean id="emailTemplateResolver" class="org.thymeleaf.templateresolver.ClassLoaderTemplateResolver">
+        <property name="prefix" value="addon-self-administration/templates/mail/" />
         <property name="suffix" value=".html" />
         <property name="templateMode" value="HTML5" />
         <property name="characterEncoding" value="UTF-8" />
         <property name="order" value="1" />
     </bean>
 
+    <bean id="webTemplateResolver" class="org.osiam.addons.selfadministration.template.OsiamWebContextTemplateResolver">
+        <property name="prefix" value="addon-self-administration/templates/web/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML5" />
+        <property name="characterEncoding" value="UTF-8" />
+        <property name="order" value="2" />
+    </bean>
+
     <bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
         <property name="templateResolvers">
             <set>
+            	<ref bean="emailTemplateResolver" />
                 <ref bean="webTemplateResolver" />
             </set>
         </property>
@@ -56,6 +64,7 @@
         <property name="basenames">
             <list>
                 <value>addon-self-administration/locale/registration</value>
+                <value>addon-self-administration/locale/mail</value>
             </list>
         </property>
     </bean>

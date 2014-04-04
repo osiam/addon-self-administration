@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -170,11 +171,14 @@ public class ChangeEmailController {
                 "confirmToken", confirmationToken);
 
         // build the Map with the link for replacement
-        Map<String, String> mailVariables = new HashMap<>();
+        Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("activatelink", activateLink);
+        mailVariables.put("user", updatedUser);
 
+        Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
+        
         try {
-            renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, updatedUser,
+            renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, locale,
                     mailVariables);
         } catch (OsiamException e) {
             return new ResponseEntity<>("{\"error\":\"Problems creating email for confirming new user email: \""
@@ -251,11 +255,17 @@ public class ChangeEmailController {
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        
+        Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
+        
+        // build the Map with the link for replacement
+        Map<String, Object> mailVariables = new HashMap<>();
+        mailVariables.put("user", updatedUser);
 
         try {
             renderAndSendEmailService.renderAndSendEmail("changeemailinfo", fromAddress, oldEmail.get().getValue(),
-                    updatedUser,
-                    new HashMap<String, String>());
+                    locale,
+                    mailVariables);
         } catch (OsiamException e) {
             return new ResponseEntity<>("{\"error\":\"Problems creating email for confirming new user: \""
                     + e.getMessage() + "}",

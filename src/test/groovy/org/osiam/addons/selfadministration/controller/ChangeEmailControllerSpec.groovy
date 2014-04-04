@@ -190,6 +190,7 @@ class ChangeEmailControllerSpec extends Specification {
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(_, _) >> user
+        1 * osiamConnector.updateUser(userId, _, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
 

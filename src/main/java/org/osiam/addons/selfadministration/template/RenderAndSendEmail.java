@@ -23,12 +23,12 @@
 
 package org.osiam.addons.selfadministration.template;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.osiam.addons.selfadministration.mail.SendEmail;
-import org.osiam.resources.scim.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,12 +40,12 @@ public class RenderAndSendEmail {
     @Inject
     private EmailTemplateRenderer emailTemplateRendererService;
 
-    public void renderAndSendEmail(String templateName, String fromAddress, String toAddress, User user,
-            Map<String, String> mailVariables) {
+    public void renderAndSendEmail(String templateName, String fromAddress, String toAddress, Locale locale,
+            Map<String, Object> mailVariables) {
 
-        String emailSubject = emailTemplateRendererService.renderEmailSubject(templateName, user, mailVariables);
+        String emailSubject = emailTemplateRendererService.renderEmailSubject(templateName, locale, mailVariables);
 
-        String emailBody = emailTemplateRendererService.renderEmailBody(templateName, user, mailVariables);
+        String emailBody = emailTemplateRendererService.renderEmailBody(templateName, locale, mailVariables);
 
         sendMailService.sendHTMLMail(fromAddress, toAddress, emailSubject, emailBody);
     }

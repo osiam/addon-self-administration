@@ -1,12 +1,10 @@
-package org.osiam.addons.selfadministration.registration.validation;
+package org.osiam.addons.selfadministration.registration;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 
-import org.osiam.addons.selfadministration.registration.RegistrationUser;
-import org.osiam.addons.selfadministration.registration.service.RegistrationService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

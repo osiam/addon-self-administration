@@ -1,19 +1,19 @@
-package org.osiam.addons.selfadministration.registration.service;
+package org.osiam.addons.selfadministration.registration;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
 import org.osiam.addons.selfadministration.exception.OsiamException;
-import org.osiam.addons.selfadministration.registration.RegistrationUser;
-import org.osiam.addons.selfadministration.registration.validation.UserConverter;
 import org.osiam.addons.selfadministration.service.ConnectorBuilder;
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
@@ -132,24 +132,27 @@ public class RegistrationService {
         return completeUser;
     }
 
-    public void sendRegistrationEmail(User user, StringBuffer requestURL) {
+    public void sendRegistrationEmail(User user, HttpServletRequest request) {
         Optional<Email> email = RegistrationHelper.extractSendToEmail(user);
         if (!email.isPresent()) {
             String message = "Could not register user. No email of user " + user.getUserName() + " found!";
             throw new InvalidAttributeException(message, "registration.exception.noEmail");
         }
 
-        requestURL.append("/activation");
+        StringBuffer requestURL = request.getRequestURL().append("/activation");
 
         String activationToken = user.getExtension(internalScimExtensionUrn).getFieldAsString(activationTokenField);
 
         String registrationLink = RegistrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
                 "activationToken", activationToken);
 
-        Map<String, String> mailVariables = new HashMap<>();
+        Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("registrationLink", registrationLink);
+        mailVariables.put("user", user);
+        
+        Locale locale = RegistrationHelper.getLocale(user.getLocale());
 
-        renderAndSendEmailService.renderAndSendEmail("registration", fromAddress, email.get().getValue(), user,
+        renderAndSendEmailService.renderAndSendEmail("registration", fromAddress, email.get().getValue(), locale,
                 mailVariables);
     }
 

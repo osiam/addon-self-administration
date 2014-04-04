@@ -33,13 +33,13 @@ import org.osiam.addons.selfadministration.exception.SendEmailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * Send email service for sending an email
  * 
  */
-@Service
+@Component
 public class SendEmail {
 
     @Inject

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    
+    <body>
+    
+    	<div id="mail-subject" th:remove="tag" th:text="#{mail.changeemail.subject}">Confirm your new email address</div>
+    	
+   		<div id="mail-body">
+        	<div th:replace="mailtextbricks :: #salutation"></div>,<br />
+        	<br />
+       		<p th:text="#{mail.changeemail.body}">to change your e-mail address, please click the link below:</p>
+        	<a th:href="@{${activatelink}}" th:text="@{${activatelink}}"></a><br />
+        	<p th:text="#{mail.greeting}">Sincerely</p>
+        </div>
+        
+    </body>
+</html>
