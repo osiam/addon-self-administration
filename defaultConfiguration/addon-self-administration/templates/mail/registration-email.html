@@ -4,17 +4,14 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
-        <div id="mail-subject" th:remove="tag">Confirmation of your registration</div>
+        <div id="mail-subject" th:remove="tag" th:text="#{mail.registration.subject}">Confirmation of your registration</div>
     	
    		<div id="mail-body">
-        	<p>Dear <div th:replace="userinfos-en :: #greeting"></div><br />
+        	<div th:replace="mailtextbricks :: #salutation"></div>,<br />
         	<br />
-        	your account has been created.<br />
-        	To confirm your registration, please click the link below:</p>
+        	<p th:utext="#{mail.registration.body}"></p>
         	<a th:href="@{${registrationLink}}" th:text="@{${registrationLink}}"></a><br />
-        	<p>
-            	Sincerely
-        	</p>
+        	<p th:text="#{mail.greeting}"></p>
         </div>
     </body>
 </html>

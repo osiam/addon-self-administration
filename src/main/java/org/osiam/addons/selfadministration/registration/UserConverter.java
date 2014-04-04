@@ -1,4 +1,4 @@
-package org.osiam.addons.selfadministration.registration.validation;
+package org.osiam.addons.selfadministration.registration;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
-import org.osiam.addons.selfadministration.registration.RegistrationExtension;
-import org.osiam.addons.selfadministration.registration.RegistrationUser;
 import org.osiam.resources.scim.Address;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;

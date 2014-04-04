@@ -25,11 +25,14 @@ package org.osiam.addons.selfadministration.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.User;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 
 public class RegistrationHelper {
 
@@ -81,5 +84,14 @@ public class RegistrationHelper {
         int lastIndexOf = authorizationHeader.lastIndexOf(' ');
         return authorizationHeader.substring(lastIndexOf + 1);
     }
-    
+
+    public static Locale getLocale(String userLocale) {
+        if (!Strings.isNullOrEmpty(userLocale)) {
+            Locale locale = new Locale(userLocale);
+            if (!locale.toLanguageTag().equals("und")) { // Undetermined
+                return locale;
+            }
+        }
+        return LocaleContextHolder.getLocale();
+    }
 }
