@@ -19,6 +19,7 @@ import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
 import org.osiam.client.connector.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
+import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.Role;
@@ -133,7 +134,7 @@ public class RegistrationService {
     }
 
     public void sendRegistrationEmail(User user, HttpServletRequest request) {
-        Optional<Email> email = RegistrationHelper.extractSendToEmail(user);
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
         if (!email.isPresent()) {
             String message = "Could not register user. No email of user " + user.getUserName() + " found!";
             throw new InvalidAttributeException(message, "registration.exception.noEmail");

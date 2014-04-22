@@ -46,6 +46,7 @@ import org.osiam.addons.selfadministration.util.SimpleAccessToken;
 import org.osiam.addons.selfadministration.util.UserObjectMapper;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
+import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
@@ -144,7 +145,7 @@ public class LostPasswordController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Optional<Email> email = RegistrationHelper.extractSendToEmail(updatedUser);
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(updatedUser);
         if (!email.isPresent()) {
             LOGGER.log(Level.WARNING, "Could not change password. No email of user " + updatedUser.getUserName()
                     + " found!");

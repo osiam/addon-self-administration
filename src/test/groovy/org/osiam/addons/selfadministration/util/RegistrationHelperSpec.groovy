@@ -1,5 +1,6 @@
 package org.osiam.addons.selfadministration.util
 
+import org.osiam.resources.helper.SCIMHelper
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.User
 
@@ -17,7 +18,7 @@ class RegistrationHelperSpec extends Specification {
         User user = new User.Builder('theMan').setEmails([theEmail] as List).build()
 
         when:
-        Optional<Email> email = RegistrationHelper.extractSendToEmail(user)
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
 
         then:
         email.isPresent()
@@ -32,7 +33,7 @@ class RegistrationHelperSpec extends Specification {
         User user = new User.Builder('theMan').setEmails([theEmail] as List).build()
 
         when:
-        Optional<Email> email = RegistrationHelper.extractSendToEmail(user)
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
 
         then:
         email.isPresent()
@@ -44,7 +45,7 @@ class RegistrationHelperSpec extends Specification {
         User user = new User.Builder('theMan').build()
 
         when:
-        Optional<Email> email = RegistrationHelper.extractSendToEmail(user)
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
 
         then:
         !email.isPresent()
