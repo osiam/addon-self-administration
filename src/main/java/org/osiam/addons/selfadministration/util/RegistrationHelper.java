@@ -35,19 +35,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 public class RegistrationHelper {
-
-    public static Optional<Email> extractSendToEmail(User user) {
-        for (Email email : user.getEmails()) {
-            if (email.isPrimary()) {
-                return Optional.of(email);
-            }
-        }
-        
-        if(user.getEmails().size() > 0){
-            return Optional.of(user.getEmails().get(0));
-        }
-        return Optional.absent();
-    }
     
     public static List<Email> replaceOldPrimaryMail(String newEmail, List<Email> emails) {
 

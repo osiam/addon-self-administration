@@ -50,6 +50,7 @@ import org.osiam.client.connector.OsiamConnector;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.user.BasicUser;
+import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
@@ -242,7 +243,7 @@ public class ChangeEmailController {
             }
 
             String newEmail = extension.getField(tempEmail, ExtensionFieldType.STRING);
-            oldEmail = RegistrationHelper.extractSendToEmail(user);
+            oldEmail = SCIMHelper.getPrimaryOrFirstEmail(user);
 
             UpdateUser updateUser = getPreparedUserForEmailChange(extension, newEmail, oldEmail.get());
 
