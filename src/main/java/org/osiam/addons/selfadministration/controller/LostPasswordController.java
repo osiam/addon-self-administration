@@ -264,8 +264,9 @@ public class LostPasswordController {
     }
 
     private UpdateUser getPreparedUserForLostPassword(String oneTimePassword) {
-        Extension extension = new Extension(internalScimExtensionUrn);
-        extension.addOrUpdateField(this.oneTimePassword, oneTimePassword);
+        Extension extension = new Extension.Builder(internalScimExtensionUrn)
+        .setField(this.oneTimePassword, oneTimePassword)
+        .build();
         return new UpdateUser.Builder().updateExtension(extension).build();
     }
 

@@ -118,8 +118,9 @@ public class RegistrationService {
      */
     private User createUserForRegistration(User user) {
         String activationToken = UUID.randomUUID().toString();
-        Extension extension = new Extension(internalScimExtensionUrn);
-        extension.addOrUpdateField(activationTokenField, activationToken);
+        Extension extension = new Extension.Builder(internalScimExtensionUrn)
+        .setField(activationTokenField, activationToken)
+        .build();
         List<Role> roles = new ArrayList<Role>();
         Role role = new Role.Builder().setValue("USER").build();
         roles.add(role);

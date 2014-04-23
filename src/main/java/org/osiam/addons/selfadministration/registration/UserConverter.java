@@ -17,6 +17,7 @@ import org.osiam.resources.scim.Name;
 import org.osiam.resources.scim.PhoneNumber;
 import org.osiam.resources.scim.Photo;
 import org.osiam.resources.scim.User;
+import org.osiam.resources.scim.Extension.Builder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -84,13 +85,13 @@ public class UserConverter {
         Map<String, RegistrationExtension> registrationExtensions = registrationUser.getExtensions();
         Set<Extension> extensions = new HashSet<Extension>();
         for (String urn : registrationExtensions.keySet()) {
-            Extension extension = new Extension(urn);
+            Extension.Builder extensionBuilder = new Extension.Builder(urn);
             RegistrationExtension registrationExtension = registrationExtensions.get(urn);
             Map<String, String> registrationFields = registrationExtension.getFields();
             for (String field : registrationFields.keySet()) {
-                extension.addOrUpdateField(field, registrationFields.get(field));
+                extensionBuilder.setField(field, registrationFields.get(field));
             }
-            extensions.add(extension);
+            extensions.add(extensionBuilder.build());
         }
         return extensions;
     }

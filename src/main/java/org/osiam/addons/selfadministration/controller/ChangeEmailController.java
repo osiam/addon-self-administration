@@ -278,9 +278,10 @@ public class ChangeEmailController {
 
     private UpdateUser buildUpdateUserForEmailChange(String newEmailValue, String confirmationToken) {
 
-        Extension extension = new Extension(internalScimExtensionUrn);
-        extension.addOrUpdateField(confirmationTokenField, confirmationToken);
-        extension.addOrUpdateField(tempEmail, newEmailValue);
+        Extension extension = new Extension.Builder(internalScimExtensionUrn)
+        .setField(confirmationTokenField, confirmationToken)
+        .setField(tempEmail, newEmailValue)
+        .build();
 
         return new UpdateUser.Builder().updateExtension(extension).build();
     }
