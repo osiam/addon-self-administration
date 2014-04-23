@@ -33,7 +33,7 @@
 
     <mvc:default-servlet-handler />
 
-    <context:property-placeholder location="classpath:osiam.properties, classpath:osiam-self-administration.properties" />
+    <context:property-placeholder location="classpath:osiam-self-administration.properties" />
 
     <context:component-scan base-package="org.osiam.addons.selfadministration" />
     <context:annotation-config />

@@ -63,8 +63,8 @@
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basenames">
             <list>
-                <value>addon-self-administration/locale/registration</value>
-                <value>addon-self-administration/locale/mail</value>
+                <value>addon-self-administration/l10n/registration</value>
+                <value>addon-self-administration/l10n/mail</value>
             </list>
         </property>
     </bean>
