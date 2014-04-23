@@ -173,9 +173,9 @@ class ChangeEmailControllerSpec extends Specification {
         def authZHeader = 'abc'
         def userId = 'userId'
         def confirmToken = 'confToken'
-        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
-        extension.addOrUpdateField('emailConfirmToken', confirmToken)
-        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+            .setField('emailConfirmToken', confirmToken)
+            .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .setEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List).build()
 
@@ -202,9 +202,9 @@ class ChangeEmailControllerSpec extends Specification {
         def userId = 'userId'
         def confirmToken = 'confToken'
 
-        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
-        extension.addOrUpdateField('emailConfirmToken', 'wrong token')
-        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+            .setField('emailConfirmToken', 'wrong token')
+            .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .build()
 
