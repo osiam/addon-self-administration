@@ -27,16 +27,16 @@ import javax.servlet.ServletContext
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
-import org.osiam.addons.selfadministration.controller.ChangeEmailController
 import org.osiam.addons.selfadministration.exception.OsiamException
 import org.osiam.addons.selfadministration.mail.SendEmail
 import org.osiam.addons.selfadministration.service.ConnectorBuilder
 import org.osiam.addons.selfadministration.template.EmailTemplateRenderer
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail
-import org.osiam.addons.selfadministration.util.SimpleAccessToken
+import org.osiam.addons.selfadministration.util.RegistrationHelper
 import org.osiam.addons.selfadministration.util.UserObjectMapper
 import org.osiam.client.connector.OsiamConnector
 import org.osiam.client.exception.UnauthorizedException
+import org.osiam.client.oauth.AccessToken
 import org.osiam.client.user.BasicUser
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
@@ -157,7 +157,7 @@ class ChangeEmailControllerSpec extends Specification {
     def 'should catch UnauthorizedException and returning response with error message'(){
         given:
         def authZ = 'invalid access token'
-        SimpleAccessToken accessToken = new SimpleAccessToken('token')
+        AccessToken accessToken = AccessToken.of('token')
 
         when:
         def result = changeEmailController.change(authZ, 'some@email.de')
