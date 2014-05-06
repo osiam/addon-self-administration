@@ -3,7 +3,7 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * 'Software'), to deal in the Software without restriction, including
+ * "Software"), to deal in the Software without restriction, including
  * without limitation the rights to use, copy, modify, merge, publish,
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
@@ -12,7 +12,7 @@
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
@@ -162,9 +162,9 @@ class LostPasswordControllerSpec extends Specification {
         def otp = 'someOTP'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
-        extension.addOrUpdateField('oneTimePassword', otp)
-        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+            .setField('oneTimePassword', otp)
+            .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .setEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
@@ -203,9 +203,9 @@ class LostPasswordControllerSpec extends Specification {
         def otp = 'invalid one time password'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
-        extension.addOrUpdateField('oneTimePassword', 'someOTP')
-        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+            .setField('oneTimePassword', 'someOTP')
+            .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .setEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
@@ -228,9 +228,9 @@ class LostPasswordControllerSpec extends Specification {
         def userId = 'someId'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
-        extension.addOrUpdateField('oneTimePassword', 'someOTP')
-        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+            .setField('oneTimePassword', 'someOTP')
+            .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .setEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
@@ -275,8 +275,8 @@ class LostPasswordControllerSpec extends Specification {
     def getUserAsStringWithExtension(String otp) {
         def emails = new Email.Builder().setPrimary(true).setValue('email@example.org').build()
 
-        Extension extension = new Extension(urn)
-        extension.addOrUpdateField('oneTimePassword', otp)
+        Extension extension = new Extension.Builder(urn)
+            .setField('oneTimePassword', otp).build()
 
         def user = new User.Builder('George')
                 .setPassword('password')

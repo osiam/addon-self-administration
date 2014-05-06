@@ -42,10 +42,11 @@ import org.osiam.addons.selfadministration.exception.OsiamException;
 import org.osiam.addons.selfadministration.service.ConnectorBuilder;
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
-import org.osiam.addons.selfadministration.util.SimpleAccessToken;
 import org.osiam.addons.selfadministration.util.UserObjectMapper;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
+import org.osiam.client.oauth.AccessToken;
+import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
@@ -134,7 +135,7 @@ public class LostPasswordController {
         User updatedUser;
         try {
             updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser,
-                    new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization)));
+                    AccessToken.of(RegistrationHelper.extractAccessToken(authorization)));
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
@@ -144,7 +145,7 @@ public class LostPasswordController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Optional<Email> email = RegistrationHelper.extractSendToEmail(updatedUser);
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(updatedUser);
         if (!email.isPresent()) {
             LOGGER.log(Level.WARNING, "Could not change password. No email of user " + updatedUser.getUserName()
                     + " found!");
@@ -235,7 +236,7 @@ public class LostPasswordController {
         User updatedUser;
         try {
 
-            SimpleAccessToken accessToken = new SimpleAccessToken(RegistrationHelper.extractAccessToken(authorization));
+            AccessToken accessToken = AccessToken.of(RegistrationHelper.extractAccessToken(authorization));
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
             // validate the oneTimePassword with the saved one from DB
@@ -263,8 +264,9 @@ public class LostPasswordController {
     }
 
     private UpdateUser getPreparedUserForLostPassword(String oneTimePassword) {
-        Extension extension = new Extension(internalScimExtensionUrn);
-        extension.addOrUpdateField(this.oneTimePassword, oneTimePassword);
+        Extension extension = new Extension.Builder(internalScimExtensionUrn)
+        .setField(this.oneTimePassword, oneTimePassword)
+        .build();
         return new UpdateUser.Builder().updateExtension(extension).build();
     }
 

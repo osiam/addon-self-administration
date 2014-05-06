@@ -3,7 +3,7 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * 'Software'), to deal in the Software without restriction, including
+ * "Software"), to deal in the Software without restriction, including
  * without limitation the rights to use, copy, modify, merge, publish,
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
@@ -12,7 +12,7 @@
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
@@ -27,16 +27,16 @@ import javax.servlet.ServletContext
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
-import org.osiam.addons.selfadministration.controller.ChangeEmailController
 import org.osiam.addons.selfadministration.exception.OsiamException
 import org.osiam.addons.selfadministration.mail.SendEmail
 import org.osiam.addons.selfadministration.service.ConnectorBuilder
 import org.osiam.addons.selfadministration.template.EmailTemplateRenderer
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail
-import org.osiam.addons.selfadministration.util.SimpleAccessToken
+import org.osiam.addons.selfadministration.util.RegistrationHelper
 import org.osiam.addons.selfadministration.util.UserObjectMapper
 import org.osiam.client.connector.OsiamConnector
 import org.osiam.client.exception.UnauthorizedException
+import org.osiam.client.oauth.AccessToken
 import org.osiam.client.user.BasicUser
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
@@ -157,7 +157,7 @@ class ChangeEmailControllerSpec extends Specification {
     def 'should catch UnauthorizedException and returning response with error message'(){
         given:
         def authZ = 'invalid access token'
-        SimpleAccessToken accessToken = new SimpleAccessToken('token')
+        AccessToken accessToken = AccessToken.of('token')
 
         when:
         def result = changeEmailController.change(authZ, 'some@email.de')
@@ -173,9 +173,9 @@ class ChangeEmailControllerSpec extends Specification {
         def authZHeader = 'abc'
         def userId = 'userId'
         def confirmToken = 'confToken'
-        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
-        extension.addOrUpdateField('emailConfirmToken', confirmToken)
-        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+            .setField('emailConfirmToken', confirmToken)
+            .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .setEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List).build()
 
@@ -202,9 +202,9 @@ class ChangeEmailControllerSpec extends Specification {
         def userId = 'userId'
         def confirmToken = 'confToken'
 
-        Extension extension = new Extension('urn:scim:schemas:osiam:1.0:Registration')
-        extension.addOrUpdateField('emailConfirmToken', 'wrong token')
-        extension.addOrUpdateField('tempMail', 'my@mail.com')
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+            .setField('emailConfirmToken', 'wrong token')
+            .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .build()
 
@@ -254,7 +254,6 @@ class ChangeEmailControllerSpec extends Specification {
     def getUserWithTempEmailAsString(confToken) {
         def primary = new Email.Builder().setPrimary(true).setValue('email@example.org').build()
         def email = new Email.Builder().setPrimary(false).setValue('nonPrimary@example.org').build()
-
 
         def extension = new Extension(urn)
         extension.addOrUpdateField(confirmTokenField, confToken)
