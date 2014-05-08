@@ -199,7 +199,7 @@ public class ChangeEmailController {
      */
     private User getUpdatedUserForEmailChange(String token, String newEmail, String confirmationToken) {
         OsiamConnector connector = connectorBuilder.createConnector();
-        AccessToken accessToken = AccessToken.of(token);
+        AccessToken accessToken = new AccessToken.Builder(token).build();
         BasicUser user = connector.getCurrentUserBasic(accessToken);
         UpdateUser updateUser = buildUpdateUserForEmailChange(newEmail, confirmationToken);
         User updatedUser = connector.updateUser(user.getId(), updateUser, accessToken);
@@ -231,7 +231,7 @@ public class ChangeEmailController {
         Optional<Email> oldEmail;
 
         try {
-            AccessToken accessToken = AccessToken.of(RegistrationHelper.extractAccessToken(authorization));
+            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization)).build();
             User user = connectorBuilder.createConnector().getUser(userId, accessToken);
 
             Extension extension = user.getExtension(internalScimExtensionUrn);
