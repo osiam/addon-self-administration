@@ -157,7 +157,7 @@ class ChangeEmailControllerSpec extends Specification {
     def 'should catch UnauthorizedException and returning response with error message'(){
         given:
         def authZ = 'invalid access token'
-        AccessToken accessToken = AccessToken.of('token')
+        AccessToken accessToken = new AccessToken.Builder('token').build()
 
         when:
         def result = changeEmailController.change(authZ, 'some@email.de')
