@@ -42,15 +42,9 @@ import com.google.common.base.Strings;
  */
 @Service
 public class EmailTemplateRenderer {
-
-//    @Inject
-//    private ClassLoaderTemplateResolver mailTemplateResolver;
-//    
-//    @Inject
-//    private ResourceBundleMessageSource messageSource;
-    
+  
     @Inject
-    SpringTemplateEngine templateEngine;
+    private SpringTemplateEngine templateEngine;
 
     public String renderEmailSubject(String templateName, Locale locale, Map<String, Object> variables) {
         String emailSubject = renderTemplate(templateName, "#mail-subject", locale, variables);
@@ -75,10 +69,6 @@ public class EmailTemplateRenderer {
     private String renderTemplate(String templateName, String selectorExpression, Locale locale, Map<String, Object> variables) {
         Context context = new Context(locale);
         context.setVariables(variables);
-        
-        //SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        //templateEngine.setTemplateResolver(mailTemplateResolver);
-        //templateEngine.setMessageSource(messageSource);
         
         return templateEngine.process(templateName + "-email", context, new DOMSelectorFragmentSpec(selectorExpression));
     }

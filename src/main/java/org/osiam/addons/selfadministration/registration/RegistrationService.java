@@ -60,10 +60,10 @@ import com.google.common.base.Strings;
 public class RegistrationService {
 
     @Inject
-    UserConverter userConverter;
+    private UserConverter userConverter;
 
     @Inject
-    ConnectorBuilder connectorBuilder;
+    private ConnectorBuilder connectorBuilder;
 
     @Inject
     private RenderAndSendEmail renderAndSendEmailService;
@@ -105,10 +105,11 @@ public class RegistrationService {
             trimedFields.add("password");
         }
 
-        if (!usernameEqualsEmail && !trimedFields.contains("userName")) {
-            trimedFields.add("userName");
-        } else if (usernameEqualsEmail && trimedFields.contains("userName")) {
-            trimedFields.remove("userName");
+        String fieldUserName = "userName";
+        if (!usernameEqualsEmail && !trimedFields.contains(fieldUserName)) {
+            trimedFields.add(fieldUserName);
+        } else if (usernameEqualsEmail && trimedFields.contains(fieldUserName)) {
+            trimedFields.remove(fieldUserName);
         }
         this.allowedFields = trimedFields.toArray(new String[trimedFields.size()]);
     }
@@ -119,7 +120,7 @@ public class RegistrationService {
             query = "filter=" + URLEncoder.encode("userName eq \"" + userName + "\"", "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new OsiamException("Could not UTF-8 encode query for user search", "registration.form.error",
-                    HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
         }
         OsiamConnector osiamConnector = connectorBuilder.createConnector();
         AccessToken accessToken = osiamConnector.retrieveAccessToken();
@@ -227,7 +228,7 @@ public class RegistrationService {
 
             this.allAllowedFields = allFields.toArray(new String[allFields.size()]);
         }
-        return allAllowedFields;
+        return allAllowedFields.clone();
     }
 
     public int getPasswordLength() {
