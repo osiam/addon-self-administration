@@ -38,7 +38,7 @@ class RegistrationHelperSpec extends Specification {
         def thePrimaryMail = 'primary@mail.com'
 
         Email theEmail = new Email.Builder().setPrimary(true).setValue(thePrimaryMail).build()
-        User user = new User.Builder('theMan').setEmails([theEmail] as List).build()
+        User user = new User.Builder('theMan').addEmails([theEmail] as List).build()
 
         when:
         Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
@@ -53,7 +53,7 @@ class RegistrationHelperSpec extends Specification {
         def thePrimaryMail = 'primary@mail.com'
 
         Email theEmail = new Email.Builder().setPrimary(false).setValue(thePrimaryMail).build()
-        User user = new User.Builder('theMan').setEmails([theEmail] as List).build()
+        User user = new User.Builder('theMan').addEmails([theEmail] as List).build()
 
         when:
         Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
@@ -78,7 +78,7 @@ class RegistrationHelperSpec extends Specification {
         given:
         def newPrimaryMail = 'newprimary@mail.com'
         Email oldPrimaryEmail = new Email.Builder().setPrimary(true).setValue('primary@mail.com').build()
-        User user = new User.Builder('theMan').setEmails([oldPrimaryEmail] as List).build()
+        User user = new User.Builder('theMan').addEmails([oldPrimaryEmail] as List).build()
         
         when:
         List<Email> emails = RegistrationHelper.replaceOldPrimaryMail(newPrimaryMail, user.emails)

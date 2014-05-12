@@ -89,7 +89,7 @@ class LostPasswordControllerSpec extends Specification {
 
         def emailContent = 'nine bytes and one placeholder $PASSWORDLOSTURL and $BOOTSTRAP and $ANGULAR and $JQUERY'
         User user = new User.Builder()
-                .setEmails([
+                .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
                 .build()
 
@@ -142,7 +142,7 @@ class LostPasswordControllerSpec extends Specification {
         def userId = 'someId'
         def authZHeader = 'Bearer ACCESSTOKEN'
         User user = new User.Builder()
-                .setEmails([
+                .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
                 .build()
 
@@ -166,7 +166,7 @@ class LostPasswordControllerSpec extends Specification {
             .setField('oneTimePassword', otp)
             .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
-                .setEmails([
+                .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
                 .build()
 
@@ -207,7 +207,7 @@ class LostPasswordControllerSpec extends Specification {
             .setField('oneTimePassword', 'someOTP')
             .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
-                .setEmails([
+                .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
                 .build()
 
@@ -232,7 +232,7 @@ class LostPasswordControllerSpec extends Specification {
             .setField('oneTimePassword', 'someOTP')
             .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
-                .setEmails([
+                .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
                 .build()
 
@@ -280,7 +280,7 @@ class LostPasswordControllerSpec extends Specification {
 
         def user = new User.Builder('George')
                 .setPassword('password')
-                .setEmails([emails])
+                .addEmails([emails])
                 .addExtension(extension)
                 .setActive(false)
                 .build()
