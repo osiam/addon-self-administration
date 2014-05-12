@@ -73,7 +73,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- Configure the compiler plugin for Groovy -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -125,13 +125,13 @@
                     <additionalProjectnatures>
                         <projectnature>org.eclipse.jdt.groovy.core.groovyNature</projectnature>
                     </additionalProjectnatures>
-                        <!-- Source includes is necessary to allow groovy files in the java folder, else eclipse will throw
-                            a filtering exception -->
+                    <!-- Source includes is necessary to allow groovy files in the java folder, else eclipse will throw
+                        a filtering exception -->
                     <sourceIncludes>
                         <sourceInclude>**/*.java</sourceInclude>
                         <sourceInclude>**/*.groovy</sourceInclude>
                     </sourceIncludes>
-                        <!-- Download sources will make maven download and attach source files where available -->
+                    <!-- Download sources will make maven download and attach source files where available -->
                     <downloadSources>true</downloadSources>
                     <downloadJavadocs>true</downloadJavadocs>
                 </configuration>
@@ -194,6 +194,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -201,6 +202,25 @@
                 <configuration>
                     <warName>addon-self-administration</warName>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>distribution-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/distribution.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -213,7 +233,7 @@
             <version>${org.osiam.connector4java.version}</version>
         </dependency>
 
-            <!-- Spring -->
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -226,7 +246,7 @@
             <version>${org.springframework-version}</version>
         </dependency>
 
-            <!-- Thymeleaf Template Engine -->
+        <!-- Thymeleaf Template Engine -->
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
@@ -239,21 +259,21 @@
             <version>${org.thymeleaf-version}</version>
         </dependency>
 
-            <!-- AOP dependency -->
+        <!-- AOP dependency -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>3.1</version>
         </dependency>
 
-            <!-- @Inject -->
+        <!-- @Inject -->
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
 
-            <!-- Groovy SDK LICENSE: Apache 2.0 according to http://grepcode.com/snapshot/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/2.0.4 -->
+        <!-- Groovy SDK LICENSE: Apache 2.0 according to http://grepcode.com/snapshot/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/2.0.4 -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
@@ -261,7 +281,7 @@
             <scope>test</scope>
         </dependency>
 
-            <!-- Spock testing framework for all kinds of tests LICENSE: Apache 2.0 according to http://code.google.com/p/spock/ -->
+        <!-- Spock testing framework for all kinds of tests LICENSE: Apache 2.0 according to http://code.google.com/p/spock/ -->
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
@@ -269,7 +289,7 @@
             <scope>test</scope>
         </dependency>
 
-            <!-- Support for mocking concrete classes within Spock LICENSE: Apache 2.0 according to source package -->
+        <!-- Support for mocking concrete classes within Spock LICENSE: Apache 2.0 according to source package -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
@@ -277,7 +297,7 @@
             <scope>test</scope>
         </dependency>
 
-            <!-- Automated testing of the equals contract. LICENSE: Apache 2.0 according to source -->
+        <!-- Automated testing of the equals contract. LICENSE: Apache 2.0 according to source -->
         <dependency>
             <groupId>nl.jqno.equalsverifier</groupId>
             <artifactId>equalsverifier</artifactId>
@@ -285,7 +305,7 @@
             <scope>test</scope>
         </dependency>
 
-            <!-- Support for mocking classes without constructor within Spock LICENSE: Apache 2.0 according to http://objenesis.googlecode.com/svn/docs/license.html -->
+        <!-- Support for mocking classes without constructor within Spock LICENSE: Apache 2.0 according to http://objenesis.googlecode.com/svn/docs/license.html -->
         <dependency>
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
@@ -339,7 +359,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <!-- Servlet -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -355,7 +375,7 @@
             <version>2.3.2</version>
         </dependency>
 
-            <!-- IOUtils -->
+        <!-- IOUtils -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -367,13 +387,13 @@
             <artifactId>mail</artifactId>
             <version>1.4.7</version>
         </dependency>
-        
+
         <dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.1.0.Final</version>
-		</dependency>
-		
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.1.0.Final</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -411,7 +431,7 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <!-- ==================== Profile: build internally for integration runs ==================== -->
         <!-- Deployment needs to be run from jenkins server which has credentials to access the internal repository -->
         <profile>
