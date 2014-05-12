@@ -177,7 +177,7 @@ class ChangeEmailControllerSpec extends Specification {
             .setField('emailConfirmToken', confirmToken)
             .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
-                .setEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List).build()
+                .addEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List).build()
 
         def upatedUser = getUpdatedUser()
 
@@ -261,7 +261,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         def user = new User.Builder('Boy George')
                 .setPassword('password')
-                .setEmails([primary, email] as List)
+                .addEmails([primary, email] as List)
                 .setActive(false)
                 .addExtension(extension)
                 .build()
@@ -275,7 +275,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         def user = new User.Builder('Boy George')
                 .setPassword('password')
-                .setEmails([primary, email] as List)
+                .addEmails([primary, email] as List)
                 .setActive(false)
                 .build()
 

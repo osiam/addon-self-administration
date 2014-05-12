@@ -94,11 +94,11 @@ public class UserConverter {
                 .setLocale(registrationUser.getLocale())
                 .setTimezone(registrationUser.getTimezone())
                 .setPassword(registrationUser.getPassword())
-                .setEmails(getEmailList(registrationUser))
-                .setPhoneNumbers(getPhoneNumberList(registrationUser))
-                .setIms(getImList(registrationUser))
-                .setPhotos(getPhotoList(registrationUser))
-                .setAddresses(getAddressList(registrationUser))
+                .addEmails(getEmailList(registrationUser))
+                .addPhoneNumbers(getPhoneNumberList(registrationUser))
+                .addIms(getImList(registrationUser))
+                .addPhotos(getPhotoList(registrationUser))
+                .addAddresses(getAddressList(registrationUser))
                 .addExtensions(getExtensions(registrationUser));
 
         return userBuilder.build();

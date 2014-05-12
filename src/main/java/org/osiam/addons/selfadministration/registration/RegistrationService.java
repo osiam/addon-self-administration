@@ -150,7 +150,7 @@ public class RegistrationService {
 
         User completeUser = new User.Builder(user)
                 .setActive(false)
-                .setRoles(roles)
+                .addRoles(roles)
                 .addExtension(extension)
                 .build();
 
