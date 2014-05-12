@@ -40,5 +40,9 @@ public class InvalidAttributeException extends OsiamException {
     public InvalidAttributeException(String message, String key) {
         super(message, key, HttpStatus.BAD_REQUEST.value());
     }
+    
+    public InvalidAttributeException(String message, String key, Throwable cause) {
+        super(message, key, HttpStatus.BAD_REQUEST.value(), cause);
+    }
 
 }

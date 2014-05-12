@@ -117,9 +117,9 @@ public class LostPasswordController {
      * users primary email
      * 
      * @param authorization
-     *            authZ header with valid access token
+     *        authZ header with valid access token
      * @param userId
-     *            the user id for whom you want to change the password
+     *        the user id for whom you want to change the password
      * @return the HTTP status code
      * @throws IOException
      * @throws MessagingException
@@ -129,33 +129,31 @@ public class LostPasswordController {
             throws IOException, MessagingException {
 
         // generate one time password
-        String oneTimePassword = UUID.randomUUID().toString();
-        UpdateUser updateUser = getPreparedUserForLostPassword(oneTimePassword);
+        String newOneTimePassword = UUID.randomUUID().toString();
+        UpdateUser updateUser = getPreparedUserForLostPassword(newOneTimePassword);
 
         User updatedUser;
         try {
-            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization))
-                    .build();
+            String token = RegistrationHelper.extractAccessToken(authorization);
+            AccessToken accessToken = new AccessToken.Builder(token).build();
             updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.valueOf(e.getHttpStatusCode()));
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(updatedUser);
         if (!email.isPresent()) {
-            LOGGER.log(Level.WARNING, "Could not change password. No email of user " + updatedUser.getUserName()
-                    + " found!");
-            return new ResponseEntity<>("{\"error\":\"Could not change password. No email of user "
-                    + updatedUser.getUserName() + " found!\"}", HttpStatus.BAD_REQUEST);
+            String errorMessage = "Could not change password. No email of user " + updatedUser.getUserName()
+                    + " found!";
+            LOGGER.log(Level.WARNING, errorMessage);
+            return getErrorResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
         }
 
         String passwordLostLink = RegistrationHelper.createLinkForEmail(passwordlostLinkPrefix, updatedUser.getId(),
-                "oneTimePassword", oneTimePassword);
+                "oneTimePassword", newOneTimePassword);
 
         Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("lostpasswordlink", passwordLostLink);
@@ -168,8 +166,7 @@ public class LostPasswordController {
                     locale,
                     mailVariables);
         } catch (OsiamException e) {
-            return new ResponseEntity<>("{\"error\":\"Problems creating email for lost password: \"" + e.getMessage()
-                    + "}",
+            return getErrorResponseEntity("Problems creating email for lost password: \"" + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -181,9 +178,9 @@ public class LostPasswordController {
      * known values for userId and otp.
      * 
      * @param oneTimePassword
-     *            the one time password from confirmation email
+     *        the one time password from confirmation email
      * @param userId
-     *            the user id for whom the password change should be
+     *        the user id for whom the password change should be
      */
     @RequestMapping(value = "/lostForm", method = RequestMethod.GET)
     public void lostForm(@RequestParam String oneTimePassword, @RequestParam String userId,
@@ -215,11 +212,11 @@ public class LostPasswordController {
      * Method to change the users password if the preconditions are satisfied.
      * 
      * @param authorization
-     *            authZ header with valid access token
+     *        authZ header with valid access token
      * @param oneTimePassword
-     *            the previously generated one time password
+     *        the previously generated one time password
      * @param newPassword
-     *            the new user password
+     *        the new user password
      * @return the response with status code and the updated user if successfully
      * @throws IOException
      */
@@ -229,14 +226,15 @@ public class LostPasswordController {
             @RequestParam String newPassword) throws IOException {
 
         if (Strings.isNullOrEmpty(oneTimePassword)) {
-            LOGGER.log(Level.SEVERE, "The submitted one time password is invalid!");
-            return new ResponseEntity<>("{\"error\":\"The submitted one time password is invalid!\"}",
-                    HttpStatus.UNAUTHORIZED);
+            String errorMessage = "The submitted one time password is invalid!";
+            LOGGER.log(Level.SEVERE, errorMessage);
+            return getErrorResponseEntity(errorMessage, HttpStatus.UNAUTHORIZED);
         }
 
         User updatedUser;
         try {
-            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization)).build();
+            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization))
+                    .build();
             User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
 
             // validate the oneTimePassword with the saved one from DB
@@ -245,19 +243,16 @@ public class LostPasswordController {
 
             if (!savedOneTimePassword.equals(oneTimePassword)) {
                 LOGGER.log(Level.SEVERE, "The submitted one time password is invalid!");
-                return new ResponseEntity<>("{\"error\":\"The submitted one time password is invalid!\"}",
-                        HttpStatus.FORBIDDEN);
+                return getErrorResponseEntity("The submitted one time password is invalid!", HttpStatus.FORBIDDEN);
             }
 
             UpdateUser updateUser = getPreparedUserToChangePassword(extension, newPassword);
             updatedUser = connectorBuilder.createConnector().updateUser(user.getId(), updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.valueOf(e.getHttpStatusCode()));
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);
@@ -275,5 +270,9 @@ public class LostPasswordController {
         UpdateUser updateUser = new UpdateUser.Builder().updatePassword(newPassword)
                 .deleteExtensionField(extension.getUrn(), oneTimePassword).build();
         return updateUser;
+    }
+
+    private ResponseEntity<String> getErrorResponseEntity(String message, HttpStatus httpStatus) {
+        return new ResponseEntity<>("{\"error\":\"" + message + "\"}", httpStatus);
     }
 }

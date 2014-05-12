@@ -28,14 +28,15 @@ import java.util.List;
 import java.util.Locale;
 
 import org.osiam.resources.scim.Email;
-import org.osiam.resources.scim.User;
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 public class RegistrationHelper {
-    
+
+    private RegistrationHelper() {
+    }
+
     public static List<Email> replaceOldPrimaryMail(String newEmail, List<Email> emails) {
 
         List<Email> updatedEmailList = new ArrayList<>();
@@ -59,14 +60,14 @@ public class RegistrationHelper {
 
         return updatedEmailList;
     }
-    
+
     public static String createLinkForEmail(String linkPrefix, String userId, String parameterName, String parameter) {
         StringBuilder link = new StringBuilder(linkPrefix).append("?");
         link.append("userId=").append(userId);
         link.append("&").append(parameterName).append("=");
         return link.append(parameter).toString();
     }
-    
+
     public static String extractAccessToken(String authorizationHeader) {
         int lastIndexOf = authorizationHeader.lastIndexOf(' ');
         return authorizationHeader.substring(lastIndexOf + 1);

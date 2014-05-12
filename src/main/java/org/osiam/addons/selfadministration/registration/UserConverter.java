@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
@@ -40,7 +41,6 @@ import org.osiam.resources.scim.Name;
 import org.osiam.resources.scim.PhoneNumber;
 import org.osiam.resources.scim.Photo;
 import org.osiam.resources.scim.User;
-import org.osiam.resources.scim.Extension.Builder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -107,12 +107,13 @@ public class UserConverter {
     private Set<Extension> getExtensions(RegistrationUser registrationUser) {
         Map<String, RegistrationExtension> registrationExtensions = registrationUser.getExtensions();
         Set<Extension> extensions = new HashSet<Extension>();
-        for (String urn : registrationExtensions.keySet()) {
-            Extension.Builder extensionBuilder = new Extension.Builder(urn);
-            RegistrationExtension registrationExtension = registrationExtensions.get(urn);
-            Map<String, String> registrationFields = registrationExtension.getFields();
-            for (String field : registrationFields.keySet()) {
-                extensionBuilder.setField(field, registrationFields.get(field));
+        for (Entry<String, RegistrationExtension> extensionSet : registrationExtensions.entrySet()) {
+            Extension.Builder extensionBuilder = new Extension.Builder(extensionSet.getKey());
+
+            RegistrationExtension currentRegistrationExtension = extensionSet.getValue();
+            Map<String, String> registrationFields = currentRegistrationExtension.getFields();
+            for (Entry<String, String> fieldSet : registrationFields.entrySet()) {
+                extensionBuilder.setField(fieldSet.getKey(), fieldSet.getValue());
             }
             extensions.add(extensionBuilder.build());
         }
@@ -147,7 +148,7 @@ public class UserConverter {
                 phoenNumber = new Photo.Builder().setValue(new URI(registrationUser.getPhoto()))
                         .build();
             } catch (URISyntaxException e) {
-                throw new InvalidAttributeException("Photo is not an URI", "registration.exception.photo");
+                throw new InvalidAttributeException("Photo is not an URI", "registration.exception.photo", e);
             }
             photos.add(phoenNumber);
         }
@@ -166,13 +167,7 @@ public class UserConverter {
 
     private List<Address> getAddressList(RegistrationUser registrationUser) {
         List<Address> addresses = new ArrayList<>();
-        if (Strings.isNullOrEmpty(registrationUser.getFormattedAddress())
-                || Strings.isNullOrEmpty(registrationUser.getStreetAddress())
-                || Strings.isNullOrEmpty(registrationUser.getLocality())
-                || Strings.isNullOrEmpty(registrationUser.getRegion())
-                || Strings.isNullOrEmpty(registrationUser.getPostalCode())
-                || Strings.isNullOrEmpty(registrationUser.getCountry())) {
-
+        if (hasUserAddress(registrationUser)) {
             Address address = new Address.Builder()
                     .setFormatted(registrationUser.getFormattedAddress())
                     .setStreetAddress(registrationUser.getStreetAddress())
@@ -184,6 +179,15 @@ public class UserConverter {
             addresses.add(address);
         }
         return addresses;
+    }
+
+    private boolean hasUserAddress(RegistrationUser registrationUser) {
+        return Strings.isNullOrEmpty(registrationUser.getFormattedAddress())
+                || Strings.isNullOrEmpty(registrationUser.getStreetAddress())
+                || Strings.isNullOrEmpty(registrationUser.getLocality())
+                || Strings.isNullOrEmpty(registrationUser.getRegion())
+                || Strings.isNullOrEmpty(registrationUser.getPostalCode())
+                || Strings.isNullOrEmpty(registrationUser.getCountry());
     }
 
 }
