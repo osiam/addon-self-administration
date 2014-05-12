@@ -32,9 +32,8 @@ import org.osiam.addons.selfadministration.mail.SendEmail
 import org.osiam.addons.selfadministration.service.ConnectorBuilder
 import org.osiam.addons.selfadministration.template.EmailTemplateRenderer
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail
-import org.osiam.addons.selfadministration.util.RegistrationHelper
 import org.osiam.addons.selfadministration.util.UserObjectMapper
-import org.osiam.client.connector.OsiamConnector
+import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.UnauthorizedException
 import org.osiam.client.oauth.AccessToken
 import org.osiam.client.user.BasicUser
@@ -174,10 +173,12 @@ class ChangeEmailControllerSpec extends Specification {
         def userId = 'userId'
         def confirmToken = 'confToken'
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('emailConfirmToken', confirmToken)
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('emailConfirmToken', confirmToken)
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
-                .addEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List).build()
+                .addEmails([
+                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
 
         def upatedUser = getUpdatedUser()
 
@@ -193,7 +194,6 @@ class ChangeEmailControllerSpec extends Specification {
         1 * osiamConnector.updateUser(userId, _, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
-
     }
 
     def 'there should be an failure if confirmation token miss match'() {
@@ -203,8 +203,8 @@ class ChangeEmailControllerSpec extends Specification {
         def confirmToken = 'confToken'
 
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('emailConfirmToken', 'wrong token')
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('emailConfirmToken', 'wrong token')
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .build()
 

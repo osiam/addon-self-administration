@@ -27,14 +27,13 @@ import javax.servlet.ServletContext
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
-import org.osiam.addons.selfadministration.controller.LostPasswordController
 import org.osiam.addons.selfadministration.exception.OsiamException
 import org.osiam.addons.selfadministration.mail.SendEmail
 import org.osiam.addons.selfadministration.service.ConnectorBuilder
 import org.osiam.addons.selfadministration.template.EmailTemplateRenderer
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail
 import org.osiam.addons.selfadministration.util.UserObjectMapper
-import org.osiam.client.connector.OsiamConnector
+import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.OsiamRequestException
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
@@ -49,7 +48,7 @@ import spock.lang.Specification
 class LostPasswordControllerSpec extends Specification {
 
     UserObjectMapper mapper = new UserObjectMapper()
-    
+
     def contextMock = Mock(ServletContext)
 
     def urn = 'urn:scim:schemas:osiam:1.0:Registration'
@@ -163,8 +162,8 @@ class LostPasswordControllerSpec extends Specification {
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('oneTimePassword', otp)
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('oneTimePassword', otp)
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
@@ -204,8 +203,8 @@ class LostPasswordControllerSpec extends Specification {
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('oneTimePassword', 'someOTP')
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('oneTimePassword', 'someOTP')
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
@@ -229,8 +228,8 @@ class LostPasswordControllerSpec extends Specification {
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('oneTimePassword', 'someOTP')
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('oneTimePassword', 'someOTP')
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .addEmails([
                     new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
@@ -276,7 +275,7 @@ class LostPasswordControllerSpec extends Specification {
         def emails = new Email.Builder().setPrimary(true).setValue('email@example.org').build()
 
         Extension extension = new Extension.Builder(urn)
-            .setField('oneTimePassword', otp).build()
+                .setField('oneTimePassword', otp).build()
 
         def user = new User.Builder('George')
                 .setPassword('password')
