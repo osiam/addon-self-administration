@@ -45,7 +45,7 @@ import org.osiam.addons.selfadministration.service.ConnectorBuilder;
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
 import org.osiam.addons.selfadministration.util.UserObjectMapper;
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.oauth.AccessToken;
@@ -141,7 +141,7 @@ public class ChangeEmailController {
     /**
      * Saving the new E-Mail temporary, generating confirmation token and sending an E-Mail to the old registered
      * address.
-     * 
+     *
      * @param authorization
      *        Authorization header with HTTP Bearer authorization and a valid access token
      * @param newEmailValue
@@ -177,7 +177,7 @@ public class ChangeEmailController {
         mailVariables.put("user", updatedUser);
 
         Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
-        
+
         try {
             renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, locale,
                     mailVariables);
@@ -191,7 +191,7 @@ public class ChangeEmailController {
 
     /**
      * puts the new email an the confirmation token into the extensions of the user of the given token
-     * 
+     *
      * @param token
      * @param newEmail
      * @param confirmationToken
@@ -209,7 +209,7 @@ public class ChangeEmailController {
 
     /**
      * Validating the confirm token and saving the new email value as primary email if the validation was successful.
-     * 
+     *
      * @param authorization
      *        Authorization header with HTTP Bearer authorization and a valid access token
      * @param userId
@@ -256,9 +256,9 @@ public class ChangeEmailController {
             return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
+
         Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
-        
+
         // build the Map with the link for replacement
         Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("user", updatedUser);

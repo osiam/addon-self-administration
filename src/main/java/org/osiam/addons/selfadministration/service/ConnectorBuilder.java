@@ -23,7 +23,7 @@
 
 package org.osiam.addons.selfadministration.service;
 
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.GrantType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,7 @@ public class ConnectorBuilder {
 
     @Value("${org.osiam.addon-self-administration.client.id}")
     private String clientId;
-    
+
     @Value("${org.osiam.addon-self-administration.client.secret}")
     private String clientSecret;
 
