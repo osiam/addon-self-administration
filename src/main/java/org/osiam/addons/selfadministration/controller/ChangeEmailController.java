@@ -157,15 +157,14 @@ public class ChangeEmailController {
         User updatedUser;
         String confirmationToken = UUID.randomUUID().toString();
         try {
-            updatedUser = getUpdatedUserForEmailChange(RegistrationHelper.extractAccessToken(authorization), newEmailValue,
+            updatedUser = getUpdatedUserForEmailChange(RegistrationHelper.extractAccessToken(authorization),
+                    newEmailValue,
                     confirmationToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.valueOf(e.getHttpStatusCode()));
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         String activateLink = RegistrationHelper.createLinkForEmail(emailChangeLinkPrefix, updatedUser.getId(),
@@ -177,13 +176,13 @@ public class ChangeEmailController {
         mailVariables.put("user", updatedUser);
 
         Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
-        
+
         try {
             renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, locale,
                     mailVariables);
         } catch (OsiamException e) {
-            return new ResponseEntity<>("{\"error\":\"Problems creating email for confirming new user email: \""
-                    + e.getMessage() + "}", HttpStatus.INTERNAL_SERVER_ERROR);
+            return getErrorResponseEntity("Problems creating email for confirming new user email: \""
+                    + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);
@@ -224,14 +223,15 @@ public class ChangeEmailController {
 
         if (Strings.isNullOrEmpty(confirmToken)) {
             LOGGER.log(Level.WARNING, "Confirmation token miss match!");
-            return new ResponseEntity<>("{\"error\":\"No ongoing email change!\"}", HttpStatus.UNAUTHORIZED);
+            return getErrorResponseEntity("No ongoing email change!", HttpStatus.UNAUTHORIZED);
         }
 
         User updatedUser;
         Optional<Email> oldEmail;
 
         try {
-            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization)).build();
+            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization))
+                    .build();
             User user = connectorBuilder.createConnector().getUser(userId, accessToken);
 
             Extension extension = user.getExtension(internalScimExtensionUrn);
@@ -239,7 +239,7 @@ public class ChangeEmailController {
 
             if (!existingConfirmToken.equals(confirmToken)) {
                 LOGGER.log(Level.WARNING, "Confirmation token mismatch!");
-                return new ResponseEntity<>("{\"error\":\"No ongoing email change!\"}", HttpStatus.FORBIDDEN);
+                return getErrorResponseEntity("No ongoing email change!", HttpStatus.FORBIDDEN);
             }
 
             String newEmail = extension.getField(tempEmail, ExtensionFieldType.STRING);
@@ -250,15 +250,13 @@ public class ChangeEmailController {
             updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.valueOf(e.getHttpStatusCode()));
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
-            return new ResponseEntity<>("{\"error\":\"" + e.getMessage() + "\"}",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return getErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
+
         Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
-        
+
         // build the Map with the link for replacement
         Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("user", updatedUser);
@@ -268,9 +266,8 @@ public class ChangeEmailController {
                     locale,
                     mailVariables);
         } catch (OsiamException e) {
-            return new ResponseEntity<>("{\"error\":\"Problems creating email for confirming new user: \""
-                    + e.getMessage() + "}",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return getErrorResponseEntity("Problems creating email for confirming new user: \""
+                    + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);
@@ -279,9 +276,9 @@ public class ChangeEmailController {
     private UpdateUser buildUpdateUserForEmailChange(String newEmailValue, String confirmationToken) {
 
         Extension extension = new Extension.Builder(internalScimExtensionUrn)
-        .setField(confirmationTokenField, confirmationToken)
-        .setField(tempEmail, newEmailValue)
-        .build();
+                .setField(confirmationTokenField, confirmationToken)
+                .setField(tempEmail, newEmailValue)
+                .build();
 
         return new UpdateUser.Builder().updateExtension(extension).build();
     }
@@ -300,5 +297,9 @@ public class ChangeEmailController {
                 .deleteExtensionField(extension.getUrn(), tempEmail).build();
 
         return updateUser;
+    }
+
+    private ResponseEntity<String> getErrorResponseEntity(String message, HttpStatus httpStatus) {
+        return new ResponseEntity<>("{\"error\":\"" + message + "\"}", httpStatus);
     }
 }

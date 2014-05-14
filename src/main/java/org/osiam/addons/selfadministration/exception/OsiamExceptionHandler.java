@@ -39,8 +39,8 @@ import org.springframework.web.servlet.ModelAndView;
 public class OsiamExceptionHandler {
 
     private static final Logger LOGGER = Logger.getLogger(OsiamExceptionHandler.class.getName());
-    private static String AN_EXCEPTION_OCCURED = "An exception occurred";
-    private static String KEY = "key";
+    private static final String AN_EXCEPTION_OCCURED = "An exception occurred";
+    private static final String KEY = "key";
     private ModelAndView modelAndView = new ModelAndView("self_administration_error");
     
     @ExceptionHandler(OsiamRequestException.class)
