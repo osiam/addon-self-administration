@@ -45,7 +45,7 @@ import org.osiam.addons.selfadministration.service.ConnectorBuilder;
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
 import org.osiam.addons.selfadministration.util.UserObjectMapper;
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.oauth.AccessToken;

@@ -23,7 +23,7 @@
 
 package org.osiam.addons.selfadministration.service;
 
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.GrantType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -51,11 +51,7 @@ public class ConnectorBuilder {
                 setAuthServerEndpoint(authServerHome).
                 setResourceServerEndpoint(resourceServerHome).
                 setClientId(clientId).
-                setClientSecret(clientSecret).
-                setGrantType(GrantType.RESOURCE_OWNER_PASSWORD_CREDENTIALS).
-                setUserName(userName).
-                setPassword(password).
-                setScope(clientScope);
+                setClientSecret(clientSecret);
         return oConBuilder.build();
     }
 
@@ -63,10 +59,8 @@ public class ConnectorBuilder {
         OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
                 setAuthServerEndpoint(authServerHome).
                 setResourceServerEndpoint(resourceServerHome).
-                setGrantType(GrantType.CLIENT_CREDENTIALS).
                 setClientId(clientId).
-                setClientSecret(clientSecret).
-                setScope(clientScope);
+                setClientSecret(clientSecret);
         return oConBuilder.build();
     }
 }

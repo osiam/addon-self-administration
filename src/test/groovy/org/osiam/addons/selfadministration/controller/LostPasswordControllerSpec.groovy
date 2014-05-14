@@ -27,14 +27,13 @@ import javax.servlet.ServletContext
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
-import org.osiam.addons.selfadministration.controller.LostPasswordController
 import org.osiam.addons.selfadministration.exception.OsiamException
 import org.osiam.addons.selfadministration.mail.SendEmail
 import org.osiam.addons.selfadministration.service.ConnectorBuilder
 import org.osiam.addons.selfadministration.template.EmailTemplateRenderer
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail
 import org.osiam.addons.selfadministration.util.UserObjectMapper
-import org.osiam.client.connector.OsiamConnector
+import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.OsiamRequestException
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
