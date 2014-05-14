@@ -23,8 +23,6 @@
 
 package org.osiam.addons.selfadministration.registration;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,12 +34,13 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
-import org.osiam.addons.selfadministration.exception.OsiamException;
 import org.osiam.addons.selfadministration.service.ConnectorBuilder;
 import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
-import org.osiam.client.connector.OsiamConnector;
+import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
+import org.osiam.client.query.Query;
+import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
@@ -50,7 +49,6 @@ import org.osiam.resources.scim.SCIMSearchResult;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Optional;
@@ -85,7 +83,7 @@ public class RegistrationService {
 
     @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
     private boolean usernameEqualsEmail;
-    
+
     @Value("${org.osiam.html.form.password.length:8}")
     private int passwordLength;
 
@@ -115,13 +113,8 @@ public class RegistrationService {
     }
 
     public boolean isUsernameIsAllreadyTaken(String userName) {
-        String query = null;
-        try {
-            query = "filter=" + URLEncoder.encode("userName eq \"" + userName + "\"", "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new OsiamException("Could not UTF-8 encode query for user search", "registration.form.error",
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
-        }
+        Query query = new QueryBuilder().filter("userName eq \"" + userName + "\"").build();
+
         OsiamConnector osiamConnector = connectorBuilder.createConnector();
         AccessToken accessToken = osiamConnector.retrieveAccessToken();
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, accessToken);
@@ -143,8 +136,8 @@ public class RegistrationService {
     private User createUserForRegistration(User user) {
         String activationToken = UUID.randomUUID().toString();
         Extension extension = new Extension.Builder(internalScimExtensionUrn)
-        .setField(activationTokenField, activationToken)
-        .build();
+                .setField(activationTokenField, activationToken)
+                .build();
         List<Role> roles = new ArrayList<Role>();
         Role role = new Role.Builder().setValue("USER").build();
         roles.add(role);
@@ -175,7 +168,7 @@ public class RegistrationService {
         Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("registrationLink", registrationLink);
         mailVariables.put("user", user);
-        
+
         Locale locale = RegistrationHelper.getLocale(user.getLocale());
 
         renderAndSendEmailService.renderAndSendEmail("registration", fromAddress, email.get().getValue(), locale,
