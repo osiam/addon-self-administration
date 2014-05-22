@@ -31,8 +31,6 @@
         <format>tar.gz</format>
     </formats>
 
-    <includeBaseDirectory>false</includeBaseDirectory>
-
     <fileSets>
         <fileSet>
             <directory>src/main/deploy</directory>
@@ -45,15 +43,19 @@
     </fileSets>
 
     <files>
+    
         <file>
             <source>target/addon-self-administration.war</source>
         </file>
+        
         <file>
             <source>README.txt</source>
         </file>
+        
         <file>
             <source>RELEASE.NOTES</source>
         </file>
+        
     </files>
 
 </assembly>
