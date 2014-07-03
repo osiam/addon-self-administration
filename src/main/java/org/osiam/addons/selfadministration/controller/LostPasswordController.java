@@ -125,7 +125,7 @@ public class LostPasswordController {
      * @throws MessagingException
      */
     @RequestMapping(value = "/lost/{userId}", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> lost(@RequestHeader final String authorization, @PathVariable final String userId)
+    public ResponseEntity<String> lost(@RequestHeader("Authorization") final String authorization, @PathVariable final String userId)
             throws IOException, MessagingException {
 
         // generate one time password
@@ -221,7 +221,7 @@ public class LostPasswordController {
      * @throws IOException
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> change(@RequestHeader final String authorization,
+    public ResponseEntity<String> change(@RequestHeader("Authorization") final String authorization,
             @RequestParam String oneTimePassword,
             @RequestParam String newPassword) throws IOException {
 
