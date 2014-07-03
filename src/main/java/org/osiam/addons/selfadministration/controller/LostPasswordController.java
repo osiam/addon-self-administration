@@ -183,7 +183,8 @@ public class LostPasswordController {
      *        the user id for whom the password change should be
      */
     @RequestMapping(value = "/lostForm", method = RequestMethod.GET)
-    public void lostForm(@RequestParam String oneTimePassword, @RequestParam String userId,
+    public void lostForm(@RequestParam("oneTimePassword") String oneTimePassword, 
+            @RequestParam("userId") String userId,
             HttpServletResponse response) throws IOException {
 
         // load the html file as stream and convert to String for replacement

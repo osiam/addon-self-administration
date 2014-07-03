@@ -95,8 +95,8 @@ public class RegistrationController {
      * @return the registrationSuccess page
      */
     @RequestMapping(value = "/activation", method = RequestMethod.GET)
-    public String confirmation(@RequestParam final String userId,
-            @RequestParam final String activationToken, final Model model) {
+    public String confirmation(@RequestParam("userId") final String userId,
+            @RequestParam("activationToken") final String activationToken, final Model model) {
 
         User user = registrationService.activateUser(userId, activationToken);
 
