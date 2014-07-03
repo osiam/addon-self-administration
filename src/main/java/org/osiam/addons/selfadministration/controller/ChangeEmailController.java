@@ -151,8 +151,8 @@ public class ChangeEmailController {
      * @throws MessagingException
      */
     @RequestMapping(method = RequestMethod.POST, value = "/change", produces = "application/json")
-    public ResponseEntity<String> change(@RequestHeader final String authorization,
-            @RequestParam final String newEmailValue) throws IOException, MessagingException {
+    public ResponseEntity<String> change(@RequestHeader("Authorization") final String authorization,
+            @RequestParam("newEmailValue") final String newEmailValue) throws IOException, MessagingException {
 
         User updatedUser;
         String confirmationToken = UUID.randomUUID().toString();
@@ -218,8 +218,9 @@ public class ChangeEmailController {
      * @return The HTTP status code and the updated user if successful
      */
     @RequestMapping(method = RequestMethod.POST, value = "/confirm", produces = "application/json")
-    public ResponseEntity<String> confirm(@RequestHeader final String authorization, @RequestParam final String userId,
-            @RequestParam final String confirmToken) throws IOException, MessagingException {
+    public ResponseEntity<String> confirm(@RequestHeader("Authorization") final String authorization, 
+            @RequestParam("userId") final String userId,
+            @RequestParam("confirmToken") final String confirmToken) throws IOException, MessagingException {
 
         if (Strings.isNullOrEmpty(confirmToken)) {
             LOGGER.log(Level.WARNING, "Confirmation token miss match!");
