@@ -28,10 +28,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.osiam.addons.selfadministration.plugin.api.Plugin;
 import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
-import org.osiam.addons.selfadministration.util.PluginHandler;
 import org.osiam.resources.scim.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,21 +42,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.net.MalformedURLException;
-
 @Controller
 @RequestMapping(value = "/registration")
 public class RegistrationController {
 
-    @Value("${org.osiam.registration.precheck.plugin.enabled}")
-    private String activatePrecheckPlugin;
-
-    @Value("${org.osiam.registration.plugin.jar.path}")
-    private String pluginJarPath;
-
-    @Value("${org.osiam.registration.precheck.plugin.classname}")
-    private String pluginClass;
-
+    @Inject
+    private Plugin plugin;
+    
     @Inject
     private RegistrationService registrationService;
 
@@ -87,8 +78,11 @@ public class RegistrationController {
             return "registration";
         }
 
-        if( activatePrecheckPlugin.trim().equals("true")) {
-            performPreRegistrationCheck(registrationUser);
+        try {
+            plugin.performPreRegistrationCheck(registrationUser.getEmail());
+        } catch (RegistrationFailedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         User user = registrationService.saveRegistrationUser(registrationUser);
@@ -98,25 +92,6 @@ public class RegistrationController {
 
         response.setStatus(HttpStatus.CREATED.value());
         return "registrationSuccess";
-    }
-
-    private void performPreRegistrationCheck(RegistrationUser registrationUser) {
-        try {
-            PluginHandler pluginHandler = new PluginHandler(pluginJarPath, getClass().getClassLoader());
-            pluginHandler.callPreRegCheck(pluginClass, registrationUser.getEmail());
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (RegistrationFailedException e) {
-            // TODO: handle the error message and show it cleanly in error template
-            throw new RuntimeException(e.getErrorMessage());
-        }
     }
 
     /**
