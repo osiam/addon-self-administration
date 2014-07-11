@@ -234,6 +234,12 @@
             <version>${org.osiam.connector4java.version}</version>
         </dependency>
 
+			<dependency>
+            <groupId>org.osiam.plugins</groupId>
+            <artifactId>addon-self-administration-plugin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -391,12 +397,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>5.1.1.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osiam.plugins</groupId>
-            <artifactId>registration-plugin-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

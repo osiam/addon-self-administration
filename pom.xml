@@ -15,9 +15,9 @@
                         <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>registration-plugin-api</module>
-                <module>registration-plugin-example-impl</module>
-                <module>addon-self-administration-impl</module>
+                <module>plugin-api</module>
+                <module>plugin-example-impl</module>
+                <module>self-administration</module>
             </modules>
         </profile>
     </profiles>

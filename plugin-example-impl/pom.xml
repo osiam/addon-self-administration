@@ -10,13 +10,14 @@
     </parent>
 
     <groupId>org.osiam.plugins</groupId>
-    <artifactId>registration-plugin-example-impl</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>addon-self-administration-plugin-example-impl</artifactId>
     <name>Example plugin implementation</name>
+
     <url>http://maven.apache.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
 <!--build>
   <plugins>
     <plugin>
@@ -44,8 +45,8 @@
     </dependency>
       <dependency>
             <groupId>org.osiam.plugins</groupId>
-            <artifactId>registration-plugin-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>addon-self-administration-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
   </dependencies>
 </project>
