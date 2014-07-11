@@ -12,4 +12,12 @@
     <groupId>org.osiam.plugins</groupId>
     <artifactId>addon-self-administration-plugin-api</artifactId>
     <name>Registration Plugins</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osiam</groupId>
+            <artifactId>scim-schema</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 </project>

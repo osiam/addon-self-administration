@@ -19,7 +19,6 @@
             <groupId>org.osiam.plugins</groupId>
             <artifactId>addon-self-administration-plugin-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

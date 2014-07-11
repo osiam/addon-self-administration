@@ -78,14 +78,15 @@ public class RegistrationController {
             return "registration";
         }
 
+        User user = registrationService.saveRegistrationUser(registrationUser);
+        
         try {
-            plugin.performPreRegistrationCheck(registrationUser.getEmail());
+            plugin.performPreRegistrationCheck(user);
         } catch (RegistrationFailedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-        User user = registrationService.saveRegistrationUser(registrationUser);
+        
         registrationService.sendRegistrationEmail(user, request);
 
         model.addAttribute("user", user);
