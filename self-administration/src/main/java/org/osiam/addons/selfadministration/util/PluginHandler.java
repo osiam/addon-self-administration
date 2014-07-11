@@ -1,7 +1,7 @@
 package org.osiam.addons.selfadministration.util;
 
-import org.osiam.plugins.api.Plugin;
-import org.osiam.plugins.api.RegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.api.Plugin;
+import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
 
 import java.io.File;
 import java.net.MalformedURLException;
