@@ -12,6 +12,7 @@
     <groupId>org.osiam.plugins</groupId>
     <artifactId>addon-self-administration-plugin-example-impl</artifactId>
     <name>Example plugin implementation</name>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

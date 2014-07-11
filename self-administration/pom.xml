@@ -21,8 +21,8 @@
     ~ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
     ~ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.osiam</groupId>
     <artifactId>addon-self-administration</artifactId>
@@ -30,12 +30,12 @@
     <packaging>war</packaging>
     <name>OSIAM Self Administration</name>
 
-	<parent>
-                <artifactId>addon-self-administration-parent</artifactId>
-		<version>1.1-SNAPSHOT</version>
-                <groupId>org.osiam</groupId>
-                <relativePath>..</relativePath>
-        </parent>
+    <parent>
+        <artifactId>addon-self-administration-parent</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <groupId>org.osiam</groupId>
+        <relativePath>..</relativePath>
+    </parent>
 
 
     <properties>
@@ -59,8 +59,8 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/osiam/addon-self-administration.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/osiam/addon-self-administration.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <build>
         <plugins>
@@ -136,8 +136,8 @@
                     <additionalProjectnatures>
                         <projectnature>org.eclipse.jdt.groovy.core.groovyNature</projectnature>
                     </additionalProjectnatures>
-                    <!-- Source includes is necessary to allow groovy files in the java folder, else eclipse will throw
-                        a filtering exception -->
+                    <!-- Source includes is necessary to allow groovy files in the java folder, else eclipse will throw a 
+                        filtering exception -->
                     <sourceIncludes>
                         <sourceInclude>**/*.java</sourceInclude>
                         <sourceInclude>**/*.groovy</sourceInclude>
@@ -234,7 +234,7 @@
             <version>${org.osiam.connector4java.version}</version>
         </dependency>
 
-			<dependency>
+        <dependency>
             <groupId>org.osiam.plugins</groupId>
             <artifactId>addon-self-administration-plugin-api</artifactId>
             <version>${project.version}</version>
