@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 
 import org.osiam.addons.selfadministration.plugin.api.Plugin;
 import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
+import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,9 @@ public class PluginHandler implements Plugin {
     private Plugin plugin = null;
 
     @Override
-    public void performPreRegistrationCheck(String name) throws RegistrationFailedException {
+    public void performPreRegistrationCheck(User user) throws RegistrationFailedException {
         if(isPluginEnabled){
-            getPlugin().performPreRegistrationCheck(name);
+            getPlugin().performPreRegistrationCheck(user);
         }
     }
     

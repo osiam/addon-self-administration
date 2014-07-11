@@ -4,17 +4,26 @@ package org.osiam.addons.selfadministration.plugin.api;
  * Created by ukayan on 11/07/14.
  */
 public class RegistrationFailedException extends Exception{
-    private String errorMessage;
 
-    public RegistrationFailedException(String reason){
-        this.errorMessage = reason;
+    public RegistrationFailedException() {
+        super();
     }
 
-    public void setErrorMessage(String msg){
-        this.errorMessage = msg;
+    public RegistrationFailedException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public String getErrorMessage(){
-        return this.errorMessage;
+    public RegistrationFailedException(String message, Throwable cause) {
+        super(message, cause);
     }
+
+    public RegistrationFailedException(String message) {
+        super(message);
+    }
+
+    public RegistrationFailedException(Throwable cause) {
+        super(cause);
+    }
+
 }
