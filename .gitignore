@@ -2,4 +2,9 @@
 /.settings
 /.classpath
 /.project
+/.idea
+/addon-self-administration-impl/target
+registration-plugin-api/target
+registration-plugin-example-impl/target
+*.iml
 .DS_Store
