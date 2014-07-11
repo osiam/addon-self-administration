@@ -1,4 +1,4 @@
-package org.osiam.plugins.api;
+package org.osiam.addons.selfadministration.plugin.api;
 
 /**
  * Created by ukayan on 11/07/14.
