@@ -14,8 +14,8 @@ public class PluginImpl implements Plugin {
     public void performPreRegistrationCheck(User user) throws RegistrationFailedException{
         if(user.getEmails() != null) for(Email email : user.getEmails()){
             
-            if(!email.getValue().endsWith(".com")){
-                throw new RegistrationFailedException("The given Email '" + email.getValue() + "' must end with .com!");
+            if(!email.getValue().endsWith(".org")){
+                throw new RegistrationFailedException("The given Email '" + email.getValue() + "' must end with .org!");
             }
         }
     }
