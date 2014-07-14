@@ -24,6 +24,9 @@
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" th:text="#{registration.form.error}">
 	            Error while registration process
 	        </div>
+	        <div th:if="${errorMessage != null}" class="alert alert-danger" th:text="${errorMessage}">
+	        	Error message
+	        </div>
 			<fieldset>
 			  	<div th:replace="htmlfield :: defaultInput('userName', 'text', true)"></div>
 			  	<div th:replace="htmlfield :: defaultInput('email', 'email', true)"></div>
