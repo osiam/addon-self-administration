@@ -1,5 +1,6 @@
 package org.osiam.addons.selfadministration.plugin.impl;
 
+import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.User;
 import org.osiam.addons.selfadministration.plugin.api.Plugin;
 import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
@@ -11,7 +12,12 @@ import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedExceptio
 public class PluginImpl implements Plugin {
     
     public void performPreRegistrationCheck(User user) throws RegistrationFailedException{
-        throw new RegistrationFailedException("Email must end with .com");
+        if(user.getEmails() != null) for(Email email : user.getEmails()){
+            
+            if(!email.getValue().endsWith(".com")){
+                throw new RegistrationFailedException("The given Email '" + email.getValue() + "' must end with .com!");
+            }
+        }
     }
 
 }
