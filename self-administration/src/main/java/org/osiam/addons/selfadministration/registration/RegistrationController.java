@@ -78,14 +78,19 @@ public class RegistrationController {
             return "registration";
         }
 
-        User user = registrationService.saveRegistrationUser(registrationUser);
+        User user = registrationService.convertToScimUser(registrationUser);
         
         try {
             plugin.performPreRegistrationCheck(user);
         } catch (RegistrationFailedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
+            
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            return "registration";
         }
+        
+        user = registrationService.saveRegistrationUser(user);
         
         registrationService.sendRegistrationEmail(user, request);
 
