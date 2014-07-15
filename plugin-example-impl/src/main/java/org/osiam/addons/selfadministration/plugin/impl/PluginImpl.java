@@ -3,6 +3,7 @@ package org.osiam.addons.selfadministration.plugin.impl;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.User;
 import org.osiam.addons.selfadministration.plugin.api.Plugin;
+import org.osiam.addons.selfadministration.plugin.api.PostRegistrationFailedException;
 import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
 
 /**
@@ -20,4 +21,9 @@ public class PluginImpl implements Plugin {
         }
     }
 
+    @Override
+    public void performPostRegistrationActions(User user) throws PostRegistrationFailedException {
+        // TODO Auto-generated method stub
+        
+    }
 }

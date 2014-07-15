@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.osiam.addons.selfadministration.plugin.api.Plugin;
+import org.osiam.addons.selfadministration.plugin.api.PostRegistrationFailedException;
 import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class PluginHandler implements Plugin {
     @Value("${org.osiam.addon-self-administration.plugin.enabled}")
     private Boolean isPluginEnabled;
-    
+
     @Value("${org.osiam.addon-self-administration.plugin.jar.path}")
     private String pluginJarPath;
 
@@ -27,18 +28,18 @@ public class PluginHandler implements Plugin {
 
     @Override
     public void performPreRegistrationCheck(User user) throws RegistrationFailedException {
-        if(isPluginEnabled){
+        if (isPluginEnabled) {
             getPlugin().performPreRegistrationCheck(user);
         }
     }
-    
+
     private Plugin getPlugin() {
         if (plugin == null) {
             try {
-                
+
                 plugin = (Plugin) getClassLoader().loadClass(pluginClass).getConstructor().newInstance();
             } catch (Exception e) {
-                throw new RuntimeException(e); 
+                throw new RuntimeException(e);
             }
         }
 
@@ -46,15 +47,22 @@ public class PluginHandler implements Plugin {
     }
 
     private ClassLoader getClassLoader() {
-        if(classLoader == null){
+        if (classLoader == null) {
             try {
-                classLoader = URLClassLoader.newInstance(new URL[]{new File(pluginJarPath).toURI().toURL()}, getClass().getClassLoader());
+                classLoader = URLClassLoader.newInstance(new URL[] { new File(pluginJarPath).toURI().toURL() },
+                        getClass().getClassLoader());
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
         }
-        
+
         return classLoader;
     }
 
+    @Override
+    public void performPostRegistrationActions(User user) throws PostRegistrationFailedException {
+        if (isPluginEnabled) {
+            getPlugin().performPostRegistrationActions(user);
+        }
+    }
 }
