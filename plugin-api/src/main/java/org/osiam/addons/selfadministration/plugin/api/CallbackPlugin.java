@@ -1,7 +1,6 @@
 package org.osiam.addons.selfadministration.plugin.api;
 
-import org.osiam.addons.selfadministration.plugin.exception.PostRegistrationFailedException;
-import org.osiam.addons.selfadministration.plugin.exception.PreRegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.exception.CallbackException;
 import org.osiam.resources.scim.User;
 
 /**
@@ -17,15 +16,15 @@ public interface CallbackPlugin {
      * @throws PreRegistrationFailedException
      *         if the pre-registration checks failed
      */
-    public void performPreRegistrationActions(User user) throws PreRegistrationFailedException;
+    public void performPreRegistrationActions(User user) throws CallbackException;
 
     /**
      * Performs post-registration actions for the given {@link User}.
      * 
      * @param user
      *        the newly registered user
-     * @throws PostRegistrationFailedException
+     * @throws CallbackException
      *         if the post-registration steps failed
      */
-    public void performPostRegistrationActions(User user) throws PostRegistrationFailedException;
+    public void performPostRegistrationActions(User user) throws CallbackException;
 }
