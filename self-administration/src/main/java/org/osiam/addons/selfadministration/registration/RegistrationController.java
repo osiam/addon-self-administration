@@ -23,12 +23,16 @@
 
 package org.osiam.addons.selfadministration.registration;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.osiam.addons.selfadministration.plugin.api.Plugin;
+import org.osiam.addons.selfadministration.plugin.api.PostRegistrationFailedException;
 import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
 import org.osiam.resources.scim.User;
 import org.springframework.http.HttpStatus;
@@ -46,15 +50,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping(value = "/registration")
 public class RegistrationController {
 
+    private static final Logger LOGGER = Logger.getLogger(RegistrationController.class.getName());
+
     @Inject
     private Plugin plugin;
-    
+
     @Inject
     private RegistrationService registrationService;
 
     @Inject
     private UserValidator userValidator;
-    
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.setAllowedFields(registrationService.getAllAllowedFields());
@@ -69,7 +75,8 @@ public class RegistrationController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String register(@Valid @ModelAttribute final RegistrationUser registrationUser,
-            final BindingResult bindingResult, final Model model, final HttpServletRequest request, final HttpServletResponse response) {
+            final BindingResult bindingResult, final Model model, final HttpServletRequest request,
+            final HttpServletResponse response) {
 
         userValidator.validate(registrationUser, bindingResult);
         if (bindingResult.hasErrors()) {
@@ -79,24 +86,32 @@ public class RegistrationController {
         }
 
         User user = registrationService.convertToScimUser(registrationUser);
-        
+
         try {
             plugin.performPreRegistrationCheck(user);
         } catch (RegistrationFailedException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
-            
+
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             return "registration";
         }
-        
+
         user = registrationService.saveRegistrationUser(user);
-        
+
         registrationService.sendRegistrationEmail(user, request);
 
         model.addAttribute("user", user);
 
         response.setStatus(HttpStatus.CREATED.value());
+        try {
+            plugin.performPostRegistrationActions(user);
+        } catch (PostRegistrationFailedException p) {
+            LOGGER.log(
+                    Level.WARNING,
+                    "An exception occured while performing post registration actions for user with ID: " + user.getId(),
+                    p);
+        }
         return "registrationSuccess";
     }
 
@@ -119,7 +134,7 @@ public class RegistrationController {
         User user = registrationService.activateUser(userId, activationToken);
 
         model.addAttribute("user", user);
-        
+
         return "activationSuccess";
     }
 }
