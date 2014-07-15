@@ -31,9 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.osiam.addons.selfadministration.plugin.api.Plugin;
-import org.osiam.addons.selfadministration.plugin.api.PostRegistrationFailedException;
-import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.api.CallbackPlugin;
+import org.osiam.addons.selfadministration.plugin.exception.PostRegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.exception.PreRegistrationFailedException;
 import org.osiam.resources.scim.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -53,7 +53,7 @@ public class RegistrationController {
     private static final Logger LOGGER = Logger.getLogger(RegistrationController.class.getName());
 
     @Inject
-    private Plugin plugin;
+    private CallbackPlugin callbackPlugin;
 
     @Inject
     private RegistrationService registrationService;
@@ -88,8 +88,8 @@ public class RegistrationController {
         User user = registrationService.convertToScimUser(registrationUser);
 
         try {
-            plugin.performPreRegistrationCheck(user);
-        } catch (RegistrationFailedException e) {
+            callbackPlugin.performPreRegistrationActions(user);
+        } catch (PreRegistrationFailedException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
 
@@ -105,11 +105,11 @@ public class RegistrationController {
 
         response.setStatus(HttpStatus.CREATED.value());
         try {
-            plugin.performPostRegistrationActions(user);
+            callbackPlugin.performPostRegistrationActions(user);
         } catch (PostRegistrationFailedException p) {
             LOGGER.log(
                     Level.WARNING,
-                    "An exception occured while performing post registration actions for user with ID: " + user.getId(),
+                    "An exception occurred while performing post registration actions for user with ID: " + user.getId(),
                     p);
         }
         return "registrationSuccess";
