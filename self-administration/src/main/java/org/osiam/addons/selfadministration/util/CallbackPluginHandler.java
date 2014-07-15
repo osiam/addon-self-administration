@@ -5,15 +5,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.osiam.addons.selfadministration.plugin.api.Plugin;
-import org.osiam.addons.selfadministration.plugin.api.PostRegistrationFailedException;
-import org.osiam.addons.selfadministration.plugin.api.RegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.api.CallbackPlugin;
+import org.osiam.addons.selfadministration.plugin.exception.PostRegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.exception.PreRegistrationFailedException;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PluginHandler implements Plugin {
+public class CallbackPluginHandler implements CallbackPlugin {
     @Value("${org.osiam.addon-self-administration.plugin.enabled}")
     private Boolean isPluginEnabled;
 
@@ -24,20 +24,20 @@ public class PluginHandler implements Plugin {
     private String pluginClass;
 
     private ClassLoader classLoader = null;
-    private Plugin plugin = null;
+    private CallbackPlugin plugin = null;
 
     @Override
-    public void performPreRegistrationCheck(User user) throws RegistrationFailedException {
+    public void performPreRegistrationActions(User user) throws PreRegistrationFailedException {
         if (isPluginEnabled) {
-            getPlugin().performPreRegistrationCheck(user);
+            getPlugin().performPreRegistrationActions(user);
         }
     }
 
-    private Plugin getPlugin() {
+    private CallbackPlugin getPlugin() {
         if (plugin == null) {
             try {
 
-                plugin = (Plugin) getClassLoader().loadClass(pluginClass).getConstructor().newInstance();
+                plugin = (CallbackPlugin) getClassLoader().loadClass(pluginClass).getConstructor().newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

@@ -1,4 +1,4 @@
-package org.osiam.addons.selfadministration.plugin.api;
+package org.osiam.addons.selfadministration.plugin.exception;
 
 /**
  * Application exception indicating that post registration steps failed.
