@@ -32,8 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.osiam.addons.selfadministration.plugin.api.CallbackPlugin;
-import org.osiam.addons.selfadministration.plugin.exception.PostRegistrationFailedException;
-import org.osiam.addons.selfadministration.plugin.exception.PreRegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.exception.CallbackException;
 import org.osiam.resources.scim.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -89,7 +88,7 @@ public class RegistrationController {
 
         try {
             callbackPlugin.performPreRegistrationActions(user);
-        } catch (PreRegistrationFailedException e) {
+        } catch (CallbackException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
 
@@ -106,7 +105,7 @@ public class RegistrationController {
         response.setStatus(HttpStatus.CREATED.value());
         try {
             callbackPlugin.performPostRegistrationActions(user);
-        } catch (PostRegistrationFailedException p) {
+        } catch (CallbackException p) {
             LOGGER.log(
                     Level.WARNING,
                     "An exception occurred while performing post registration actions for user with ID: " + user.getId(),

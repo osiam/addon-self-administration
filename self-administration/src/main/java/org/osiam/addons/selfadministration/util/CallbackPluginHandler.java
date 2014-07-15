@@ -6,8 +6,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.osiam.addons.selfadministration.plugin.api.CallbackPlugin;
-import org.osiam.addons.selfadministration.plugin.exception.PostRegistrationFailedException;
-import org.osiam.addons.selfadministration.plugin.exception.PreRegistrationFailedException;
+import org.osiam.addons.selfadministration.plugin.exception.CallbackException;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,7 +26,7 @@ public class CallbackPluginHandler implements CallbackPlugin {
     private CallbackPlugin plugin = null;
 
     @Override
-    public void performPreRegistrationActions(User user) throws PreRegistrationFailedException {
+    public void performPreRegistrationActions(User user) throws CallbackException {
         if (isPluginEnabled) {
             getPlugin().performPreRegistrationActions(user);
         }
@@ -60,7 +59,7 @@ public class CallbackPluginHandler implements CallbackPlugin {
     }
 
     @Override
-    public void performPostRegistrationActions(User user) throws PostRegistrationFailedException {
+    public void performPostRegistrationActions(User user) throws CallbackException {
         if (isPluginEnabled) {
             getPlugin().performPostRegistrationActions(user);
         }
