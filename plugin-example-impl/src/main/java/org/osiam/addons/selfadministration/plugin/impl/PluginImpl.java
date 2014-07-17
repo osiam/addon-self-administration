@@ -19,13 +19,6 @@ import org.osiam.resources.scim.User;
 public class PluginImpl implements CallbackPlugin {
 
     private static final String TEST_GROUP_NAME = "Test";
-
-    private static final String OSIAM_ENDPOINT = "http://localhost:8080/";
-    private static final String CLIENT_ID = "example-client";
-    private static final String CLIENT_SECRET = "secret";
-
-    private static final String USER_NAME = "marissa";
-    private static final String USER_PASSWORD = "koala";
     
     private OsiamConnector connector;
     private AccessToken accessToken;
@@ -68,7 +61,7 @@ public class PluginImpl implements CallbackPlugin {
 
     private AccessToken getAccessToken() {
         if(accessToken == null){
-            accessToken = getOsiamConnector().retrieveAccessToken(USER_NAME, USER_PASSWORD, Scope.ALL);
+            accessToken = getOsiamConnector().retrieveAccessToken(getUserName(), getUserPassword(), Scope.ALL);
         }
         
         return accessToken;
@@ -77,12 +70,36 @@ public class PluginImpl implements CallbackPlugin {
     private OsiamConnector getOsiamConnector() {
         if(connector == null){
             connector = new OsiamConnector.Builder()
-                .setEndpoint(OSIAM_ENDPOINT)
-                .setClientId(CLIENT_ID)
-                .setClientSecret(CLIENT_SECRET)
+                .setEndpoint(getOsiamEndpoint())
+                .setClientId(getClientId())
+                .setClientSecret(getClientSecret())
                 .build();
         }
         
         return connector;
+    }
+
+    private String getProperty(String key, String defaultValue) {
+        return System.getProperty(key, defaultValue);
+    }
+    
+    private String getUserName() {
+        return getProperty("osiam.addon-selfadministration.plugin.user.name", "marissa");
+    }
+
+    private String getUserPassword() {
+        return getProperty("osiam.addon-selfadministration.plugin.user.password", "koala");
+    }
+    
+    private String getOsiamEndpoint() {
+        return getProperty("osiam.addon-selfadministration.plugin.osiam.endpoint", "http://localhost:8080/");
+    }
+
+    private String getClientId() {
+        return getProperty("osiam.addon-selfadministration.plugin.osiam.client.id", "example-client");
+    }
+
+    private String getClientSecret() {
+        return getProperty("osiam.addon-selfadministration.plugin.osiam.client.secret", "secret");
     }
 }
