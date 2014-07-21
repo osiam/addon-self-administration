@@ -14,6 +14,26 @@
     <name>Example plugin implementation</name>
     <packaging>jar</packaging>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Extension-Name>${project.artifactId}</Extension-Name>
+                            <Implementation-Description>${project.description}</Implementation-Description>
+                            <Implementation-Copyright>Copyright (c) 2010 tarent GmbH</Implementation-Copyright>
+                            <Implementation-Vendor>tarent GmbH (www.tarent.de)</Implementation-Vendor>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.osiam.plugins</groupId>
