@@ -39,10 +39,8 @@
 
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <org.hibernate-version>4.3.4.Final</org.hibernate-version>
 
-        <java.version>1.7</java.version>
         <org.springframework-version>4.0.5.RELEASE</org.springframework-version>
         <org.thymeleaf-version>2.1.3.RELEASE</org.thymeleaf-version>
         <org.aspectj-version>1.7.4</org.aspectj-version>
@@ -52,121 +50,10 @@
         <!-- force sonar to reuse reports generated during build cycle -->
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <!-- set path for unit tests reports -->
-
-        <org.osiam.connector4java.version>1.0</org.osiam.connector4java.version>
     </properties>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.3.1</version>
-                <executions>
-                    <execution>
-                        <id>enforce-versions</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>3.0.4</version>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Configure the compiler plugin for Groovy -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <compilerId>groovy-eclipse-compiler</compilerId>
-                    <verbose>false</verbose>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-eclipse-batch</artifactId>
-                        <version>2.1.8-01</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-eclipse-compiler</artifactId>
-                        <version>2.8.0-01</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <!-- Surefire: will execute all unit tests including Spock specs and will ignore system tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
-                <configuration>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
-                    <parallel>classes</parallel>
-                    <threadCount>3</threadCount>
-                    <includes>
-                        <include>**/*Spec.*</include>
-                    </includes>
-                </configuration>
-            </plugin>
-
-            <!-- Eclipse support -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <additionalProjectnatures>
-                        <projectnature>org.eclipse.jdt.groovy.core.groovyNature</projectnature>
-                    </additionalProjectnatures>
-                    <!-- Source includes is necessary to allow groovy files in the java folder, else eclipse will throw a 
-                        filtering exception -->
-                    <sourceIncludes>
-                        <sourceInclude>**/*.java</sourceInclude>
-                        <sourceInclude>**/*.groovy</sourceInclude>
-                    </sourceIncludes>
-                    <!-- Download sources will make maven download and attach source files where available -->
-                    <downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <inherited>true</inherited>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Build Helper: will add Groovy sources to path -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -424,59 +311,6 @@
                                 <configuration>
                                     <quiet>true</quiet>
                                 </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- ==================== Profile: build internally for integration runs ==================== -->
-        <!-- Deployment needs to be run from jenkins server which has credentials to access the internal repository -->
-        <profile>
-            <id>integration</id>
-
-            <distributionManagement>
-                <repository>
-                    <id>osiam-repository</id>
-                    <name>public evolvis release repository</name>
-                    <url>scpexe://maven-repo.evolvis.org:/var/www/maven_repo/releases</url>
-                </repository>
-                <snapshotRepository>
-                    <id>OSIAM-NG-SNAPSHOT-repository</id>
-                    <name>public evolvis release repository</name>
-                    <url>scpexe://maven-repo.evolvis.org:/var/www/maven_repo/snapshots/</url>
-                </snapshotRepository>
-
-            </distributionManagement>
-
-            <repositories>
-                <repository>
-                    <id>osiam releases repo</id>
-                    <url>https://maven-repo.evolvis.org/releases</url>
-                </repository>
-            </repositories>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <version>2.8.1</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.maven.wagon</groupId>
-                                <artifactId>wagon-ssh-external</artifactId>
-                                <version>2.6</version>
-                            </dependency>
-                        </dependencies>
-                        <executions>
-                            <execution>
-                                <id>default-deploy</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>deploy</goal>
-                                </goals>
                             </execution>
                         </executions>
                     </plugin>
