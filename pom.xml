@@ -11,6 +11,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    
+    <scm>
+        <connection>scm:git:ssh://git@github.com/osiam/addon-self-administration.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/osiam/addon-self-administration.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <profiles>
         <profile>
