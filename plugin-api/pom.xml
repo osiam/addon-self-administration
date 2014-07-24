@@ -6,7 +6,6 @@
         <artifactId>addon-self-administration-parent</artifactId>
         <groupId>org.osiam</groupId>
         <version>1.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
     </parent>
 
     <groupId>org.osiam.plugins</groupId>
