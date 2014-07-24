@@ -195,7 +195,6 @@
             </activation>
             <modules>
                 <module>plugin-api</module>
-                <module>plugin-example-impl</module>
                 <module>self-administration</module>
             </modules>
         </profile>
@@ -206,7 +205,6 @@
 
             <modules>
                 <module>plugin-api</module>
-                <module>plugin-example-impl</module>
                 <module>self-administration</module>
             </modules>
 
