@@ -125,8 +125,8 @@ public class RegistrationService {
         return userConverter.toScimUser(registrationUser);
     }
 
-    public User saveRegistrationUser(User registrationUser) {
-        registrationUser = createUserForRegistration(registrationUser);
+    public User saveRegistrationUser(final User user) {
+        User registrationUser = createUserForRegistration(user);
 
         OsiamConnector osiamConnector = connectorBuilder.createConnector();
         AccessToken accessToken = osiamConnector.retrieveAccessToken();
