@@ -13,7 +13,7 @@ public interface CallbackPlugin {
      * 
      * @param user
      *        the new user
-     * @throws PreRegistrationFailedException
+     * @throws CallbackException
      *         if the pre-registration checks failed
      */
     public void performPreRegistrationActions(User user) throws CallbackException;
