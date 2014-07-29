@@ -2,8 +2,6 @@ package org.osiam.addons.selfadministration.plugin.exception;
 
 /**
  * Application exception indicating that callback steps failed.
- * 
- * @author Timo Kanera, tarent solutions GmbH
  */
 public class CallbackException extends Exception {
 
