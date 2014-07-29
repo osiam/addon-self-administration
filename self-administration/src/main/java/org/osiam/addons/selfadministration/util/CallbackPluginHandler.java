@@ -32,7 +32,7 @@ public class CallbackPluginHandler implements CallbackPlugin {
         }
     }
 
-    private CallbackPlugin getPlugin() {
+    private synchronized CallbackPlugin getPlugin() {
         if (plugin == null) {
             try {
 
