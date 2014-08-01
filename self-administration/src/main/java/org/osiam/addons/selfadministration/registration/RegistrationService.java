@@ -120,14 +120,17 @@ public class RegistrationService {
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, accessToken);
         return queryResult.getTotalResults() != 0L;
     }
+    
+    public User convertToScimUser(RegistrationUser registrationUser){
+        return userConverter.toScimUser(registrationUser);
+    }
 
-    public User saveRegistrationUser(RegistrationUser registrationUser) {
-        User user = userConverter.toScimUser(registrationUser);
-        user = createUserForRegistration(user);
+    public User saveRegistrationUser(final User user) {
+        User registrationUser = createUserForRegistration(user);
 
         OsiamConnector osiamConnector = connectorBuilder.createConnector();
         AccessToken accessToken = osiamConnector.retrieveAccessToken();
-        return osiamConnector.createUser(user, accessToken);
+        return osiamConnector.createUser(registrationUser, accessToken);
     }
 
     /**
