@@ -120,8 +120,8 @@ public class RegistrationService {
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, accessToken);
         return queryResult.getTotalResults() != 0L;
     }
-    
-    public User convertToScimUser(RegistrationUser registrationUser){
+
+    public User convertToScimUser(RegistrationUser registrationUser) {
         return userConverter.toScimUser(registrationUser);
     }
 
@@ -175,6 +175,22 @@ public class RegistrationService {
         Locale locale = RegistrationHelper.getLocale(user.getLocale());
 
         renderAndSendEmailService.renderAndSendEmail("registration", fromAddress, email.get().getValue(), locale,
+                mailVariables);
+    }
+
+    public void sendDeactivationEmail(User user, HttpServletRequest request) {
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
+        if (!email.isPresent()) {
+            String message = "Could not deactivate user. No email of user " + user.getUserName() + " found!";
+            throw new InvalidAttributeException(message, "registration.exception.noEmail");
+        }
+
+        Map<String, Object> mailVariables = new HashMap<String, Object>();
+        // TODO domain
+
+        Locale locale = RegistrationHelper.getLocale(user.getLocale());
+
+        renderAndSendEmailService.renderAndSendEmail("deactivation", fromAddress, email.get().getValue(), locale,
                 mailVariables);
     }
 
