@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * A controller providing an operation for account deletion.
  */
-public class AccountDeletionController extends AccountManagementService {
+public class AccountDeletionController {
 
     @Inject
     AccountManagementService accountManagementService;
