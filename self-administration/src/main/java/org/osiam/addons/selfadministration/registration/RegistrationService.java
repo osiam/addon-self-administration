@@ -120,8 +120,8 @@ public class RegistrationService {
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, accessToken);
         return queryResult.getTotalResults() != 0L;
     }
-
-    public User convertToScimUser(RegistrationUser registrationUser) {
+    
+    public User convertToScimUser(RegistrationUser registrationUser){
         return userConverter.toScimUser(registrationUser);
     }
 

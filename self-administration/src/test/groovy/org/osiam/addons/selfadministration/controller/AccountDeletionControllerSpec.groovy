@@ -109,7 +109,7 @@ class AccountDeletionControllerSpec extends Specification {
         def authHeader = 'Bearer token'
         def userId = 'user ID'
         def userName = 'Joe Random'
-        def message = "Could not delete user. No email of user " + userName + " found!"
+        def message = "Unable to send email. No email of user " + userName + " found!"
         User user = new User.Builder(userName).build()
         AccessToken accessToken = new AccessToken.Builder('token').build()
 

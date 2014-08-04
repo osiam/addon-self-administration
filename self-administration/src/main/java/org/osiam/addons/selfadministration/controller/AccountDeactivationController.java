@@ -22,30 +22,14 @@
  */
 package org.osiam.addons.selfadministration.controller;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.osiam.addons.selfadministration.exception.InvalidAttributeException;
 import org.osiam.addons.selfadministration.exception.OsiamException;
-import org.osiam.addons.selfadministration.service.ConnectorBuilder;
-import org.osiam.addons.selfadministration.template.RenderAndSendEmail;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
-import org.osiam.client.OsiamConnector;
-import org.osiam.client.exception.NoResultException;
 import org.osiam.client.exception.OsiamClientException;
-import org.osiam.client.exception.UnauthorizedException;
 import org.osiam.client.oauth.AccessToken;
-import org.osiam.resources.helper.SCIMHelper;
-import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -54,23 +38,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.google.common.base.Optional;
-
 /**
  * A controller providing an operation for account deactivation.
  */
-public class AccountDeactivationController {
-
-    private static final Logger LOGGER = Logger.getLogger(AccountDeactivationController.class.getName());
-
-    @Inject
-    private ConnectorBuilder connectorBuilder;
-
-    @Inject
-    private RenderAndSendEmail renderAndSendEmailService;
-
-    @Value("${org.osiam.mail.from}")
-    private String fromAddress;
+public class AccountDeactivationController extends AbstractAccountController {
 
     /**
      * Deactivates the user with the given ID.
@@ -90,7 +61,7 @@ public class AccountDeactivationController {
         try {
             User user = getUser(userId, accessToken);
             deactivateUser(userId, accessToken);
-            sendDeactivationEmail(user, request);
+            sendEmail(user, "deactivation");
         } catch (OsiamClientException | OsiamException | MailException e) {
             return handleException(e);
         }
@@ -102,19 +73,8 @@ public class AccountDeactivationController {
      * Deactivates the account of the user with the given user ID.
      */
     private void deactivateUser(String userId, AccessToken token) {
-        OsiamConnector connector = connectorBuilder.createConnector();
-
         UpdateUser updateUser = getUpdateUserForDeactivation();
-        connector.updateUser(userId, updateUser, token);
-    }
-
-    /*
-     * Returns the SCIM user with the given user ID.
-     */
-    private User getUser(String userId, AccessToken token) {
-        OsiamConnector connector = connectorBuilder.createConnector();
-
-        return connector.getUser(userId, token);
+        getConnector().updateUser(userId, updateUser, token);
     }
 
     /*
@@ -122,46 +82,5 @@ public class AccountDeactivationController {
      */
     private UpdateUser getUpdateUserForDeactivation() {
         return new UpdateUser.Builder().updateActive(false).build();
-    }
-
-    /*
-     * Sends an email informing about the account deactivation.
-     */
-    private void sendDeactivationEmail(User user, HttpServletRequest request) {
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
-        if (!email.isPresent()) {
-            String message = "Could not deactivate user. No email of user " + user.getUserName() + " found!";
-            throw new InvalidAttributeException(message, "registration.exception.noEmail");
-        }
-
-        Map<String, Object> mailVariables = new HashMap<String, Object>();
-        Locale locale = RegistrationHelper.getLocale(user.getLocale());
-
-        renderAndSendEmailService.renderAndSendEmail("deactivation", fromAddress, email.get().getValue(), locale,
-                mailVariables);
-    }
-
-    /*
-     * Logs the given exception and returns a suitable response status.
-     */
-    private ResponseEntity<String> handleException(RuntimeException e) {
-        StringBuilder messageBuilder = new StringBuilder();
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-        if (e instanceof MailException) {
-            messageBuilder.append("Failed to send email: ");
-        } else if (e instanceof UnauthorizedException) {
-            messageBuilder.append("Authorization failed: ");
-            status = HttpStatus.UNAUTHORIZED;
-        } else if (e instanceof NoResultException) {
-            messageBuilder.append("No such entity: ");
-        } else {
-            messageBuilder.append("An exception occurred: ");
-        }
-        LOGGER.log(Level.WARNING, messageBuilder.toString());
-        messageBuilder.insert(0, "{\"error\":\"");
-        messageBuilder.append(e.getMessage());
-        messageBuilder.append("\"}");
-        return new ResponseEntity<String>(messageBuilder.toString(), status);
     }
 }
