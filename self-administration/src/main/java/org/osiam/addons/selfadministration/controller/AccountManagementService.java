@@ -114,6 +114,7 @@ public class AccountManagementService {
             status = HttpStatus.UNAUTHORIZED;
         } else if (e instanceof NoResultException) {
             messageBuilder.append("No such entity: ");
+            status = HttpStatus.NOT_FOUND;
         } else {
             messageBuilder.append("An exception occurred: ");
         }

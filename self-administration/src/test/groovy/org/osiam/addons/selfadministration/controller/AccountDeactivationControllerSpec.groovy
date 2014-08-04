@@ -88,7 +88,7 @@ class AccountDeactivationControllerSpec extends Specification {
         result.getBody() == '{\"error\":\"Authorization failed: ' + message + '\"}'
     }
 
-    def 'The request should return HTTP status 500 if the user was not found'() {
+    def 'The request should return HTTP status 404 if the user was not found'() {
         given:
         def authHeader = 'Bearer token'
         def userId = 'user ID'
@@ -101,7 +101,7 @@ class AccountDeactivationControllerSpec extends Specification {
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> {throw new NoResultException(message)}
-        result.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
+        result.getStatusCode() == HttpStatus.NOT_FOUND
         result.getBody() == '{\"error\":\"No such entity: ' + message + '\"}'
     }
 
