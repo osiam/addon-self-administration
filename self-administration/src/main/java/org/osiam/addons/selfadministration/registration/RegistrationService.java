@@ -178,22 +178,6 @@ public class RegistrationService {
                 mailVariables);
     }
 
-    public void sendDeactivationEmail(User user, HttpServletRequest request) {
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
-        if (!email.isPresent()) {
-            String message = "Could not deactivate user. No email of user " + user.getUserName() + " found!";
-            throw new InvalidAttributeException(message, "registration.exception.noEmail");
-        }
-
-        Map<String, Object> mailVariables = new HashMap<String, Object>();
-        // TODO domain
-
-        Locale locale = RegistrationHelper.getLocale(user.getLocale());
-
-        renderAndSendEmailService.renderAndSendEmail("deactivation", fromAddress, email.get().getValue(), locale,
-                mailVariables);
-    }
-
     public User activateUser(String userId, String activationToken) {
         if (Strings.isNullOrEmpty(userId)) {
             throw new InvalidAttributeException("Can't confirm the user. The userid is empty",
