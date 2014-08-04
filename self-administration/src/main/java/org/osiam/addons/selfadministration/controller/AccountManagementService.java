@@ -40,20 +40,23 @@ import org.osiam.client.exception.UnauthorizedException;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.stereotype.Service;
 
 import com.google.common.base.Optional;
 
 /**
- * Abstract base class for controllers dealing with account management.
+ * Service class for controllers dealing with account management.
  */
-public abstract class AbstractAccountController {
+@Service
+public class AccountManagementService {
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractAccountController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AccountManagementService.class.getName());
 
     @Inject
     protected ConnectorBuilder connectorBuilder;
@@ -65,39 +68,32 @@ public abstract class AbstractAccountController {
     protected String fromAddress;
 
     /**
-     * Returns the SCIM user with the given user ID.
+     * Deactivates the account of the user with the given user ID.
      * 
      * @param userId
-     *        the user ID
+     *        the ID of the user
      * @param token
      *        the access token
      */
-    protected User getUser(String userId, AccessToken token) {
-        OsiamConnector connector = connectorBuilder.createConnector();
-
-        return connector.getUser(userId, token);
+    public void deactivateUser(String userId, AccessToken token) {
+        User user = getUser(userId, token);
+        UpdateUser updateUser = getUpdateUserForDeactivation();
+        getConnector().updateUser(userId, updateUser, token);
+        sendEmail(user, "deactivation");
     }
 
     /**
-     * Sends an email informing about the account change.
+     * Deletes the account of the user with the given user ID.
      * 
-     * @param user
-     *        the user
-     * @param template
-     *        the email template name
+     * @param userId
+     *        the ID of the user
+     * @param token
+     *        the access token
      */
-    protected void sendEmail(User user, String template) {
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
-        if (!email.isPresent()) {
-            String message = "Unable to send email. No email of user " + user.getUserName() + " found!";
-            throw new InvalidAttributeException(message, "registration.exception.noEmail");
-        }
-
-        Map<String, Object> mailVariables = new HashMap<String, Object>();
-        Locale locale = RegistrationHelper.getLocale(user.getLocale());
-
-        renderAndSendEmailService.renderAndSendEmail(template, fromAddress, email.get().getValue(), locale,
-                mailVariables);
+    public void deleteUser(String userId, AccessToken token) {
+        User user = getUser(userId, token);
+        getConnector().deleteUser(userId, token);
+        sendEmail(user, "deletion");
     }
 
     /**
@@ -107,7 +103,7 @@ public abstract class AbstractAccountController {
      *        exception to handle
      * @param {@link ResponseEntity} with the resulting error information and status code
      */
-    protected ResponseEntity<String> handleException(RuntimeException e) {
+    public ResponseEntity<String> handleException(RuntimeException e) {
         StringBuilder messageBuilder = new StringBuilder();
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -129,11 +125,54 @@ public abstract class AbstractAccountController {
     }
 
     /**
+     * Returns the SCIM user with the given user ID.
+     * 
+     * @param userId
+     *        the user ID
+     * @param token
+     *        the access token
+     */
+    private User getUser(String userId, AccessToken token) {
+        OsiamConnector connector = connectorBuilder.createConnector();
+
+        return connector.getUser(userId, token);
+    }
+
+    /**
+     * Sends an email informing about the account change.
+     * 
+     * @param user
+     *        the user
+     * @param template
+     *        the email template name
+     */
+    private void sendEmail(User user, String template) {
+        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
+        if (!email.isPresent()) {
+            String message = "Unable to send email. No email of user " + user.getUserName() + " found!";
+            throw new InvalidAttributeException(message, "registration.exception.noEmail");
+        }
+
+        Map<String, Object> mailVariables = new HashMap<String, Object>();
+        Locale locale = RegistrationHelper.getLocale(user.getLocale());
+
+        renderAndSendEmailService.renderAndSendEmail(template, fromAddress, email.get().getValue(), locale,
+                mailVariables);
+    }
+
+    /**
      * Returns a new OSIAM connector.
      * 
      * @return {link {@link OsiamConnector}
      */
-    protected OsiamConnector getConnector() {
+    private OsiamConnector getConnector() {
         return connectorBuilder.createConnector();
+    }
+
+    /*
+     * Builds an UpdateUser for the deactivation.
+     */
+    private UpdateUser getUpdateUserForDeactivation() {
+        return new UpdateUser.Builder().updateActive(false).build();
     }
 }

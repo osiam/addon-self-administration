@@ -22,14 +22,13 @@
  */
 package org.osiam.addons.selfadministration.controller;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osiam.addons.selfadministration.exception.OsiamException;
 import org.osiam.addons.selfadministration.util.RegistrationHelper;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.oauth.AccessToken;
-import org.osiam.resources.scim.UpdateUser;
-import org.osiam.resources.scim.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -41,7 +40,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * A controller providing an operation for account deactivation.
  */
-public class AccountDeactivationController extends AbstractAccountController {
+public class AccountDeactivationController extends AccountManagementService {
+
+    @Inject
+    AccountManagementService accountManagementService;
 
     /**
      * Deactivates the user with the given ID.
@@ -59,28 +61,11 @@ public class AccountDeactivationController extends AbstractAccountController {
         AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization)).build();
 
         try {
-            User user = getUser(userId, accessToken);
-            deactivateUser(userId, accessToken);
-            sendEmail(user, "deactivation");
+            accountManagementService.deactivateUser(userId, accessToken);
         } catch (OsiamClientException | OsiamException | MailException e) {
-            return handleException(e);
+            return accountManagementService.handleException(e);
         }
 
         return new ResponseEntity<String>(HttpStatus.OK);
-    }
-
-    /*
-     * Deactivates the account of the user with the given user ID.
-     */
-    private void deactivateUser(String userId, AccessToken token) {
-        UpdateUser updateUser = getUpdateUserForDeactivation();
-        getConnector().updateUser(userId, updateUser, token);
-    }
-
-    /*
-     * Builds an UpdateUser for the deactivation.
-     */
-    private UpdateUser getUpdateUserForDeactivation() {
-        return new UpdateUser.Builder().updateActive(false).build();
     }
 }

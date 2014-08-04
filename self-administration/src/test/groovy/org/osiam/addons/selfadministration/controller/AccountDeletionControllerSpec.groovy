@@ -46,9 +46,10 @@ class AccountDeletionControllerSpec extends Specification {
     OsiamConnector osiamConnector = Mock()
     RenderAndSendEmail renderAndSendEmailService = Mock()
     HttpServletRequest servletRequest = Mock()
+    AccountManagementService accountManagementService = new AccountManagementService(connectorBuilder: connectorBuilder, renderAndSendEmailService:
+    renderAndSendEmailService)
 
-    AccountDeletionController controller = new AccountDeletionController(connectorBuilder: connectorBuilder,
-    renderAndSendEmailService: renderAndSendEmailService)
+    AccountDeletionController controller = new AccountDeletionController(accountManagementService: accountManagementService)
 
     def 'A valid request should return HTTP status 200, the user should be deactivated and an email should be sent'() {
         def authHeader = 'Bearer token'
