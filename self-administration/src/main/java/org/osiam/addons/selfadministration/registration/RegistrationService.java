@@ -191,6 +191,10 @@ public class RegistrationService {
         AccessToken accessToken = osiamConnector.retrieveAccessToken();
         User user = osiamConnector.getUser(userId, accessToken);
 
+        if(user.isActive()) {
+            return user;
+        }
+
         Extension extension = user.getExtension(internalScimExtensionUrn);
         String activationTokenFieldValue = extension.getFieldAsString(activationTokenField);
 
