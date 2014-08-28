@@ -50,7 +50,7 @@ public class UserValidator implements Validator {
         RegistrationUser registrationUser = (RegistrationUser) target;
         boolean isUserNameEmpty = Strings.isNullOrEmpty(registrationUser.getUserName());
         if (!registrationService.getUsernameEqualsEmail() && isUserNameEmpty) {
-            errors.rejectValue("userName", "registration.exception.usernameEqualsEmail", "Username not set");
+            errors.rejectValue("userName", "registration.exception.usernameEqualsEmail", "Username not set.");
         }
         if (!Strings.isNullOrEmpty(registrationUser.getPhoto())) {
             try {
@@ -62,26 +62,21 @@ public class UserValidator implements Validator {
         if (registrationUser.getPassword().length() < registrationService.getPasswordLength()) {
             String[] argument = { String.valueOf(registrationService.getPasswordLength()) };
             errors.rejectValue("password", "registration.exception.password.length", argument,
-                    "Your passwords is not long enough.");
+                    "Your password is not long enough.");
         }
         if (!Strings.isNullOrEmpty(registrationUser.getConfirmPassword())
                 && !registrationUser.getConfirmPassword().equals(registrationUser.getPassword())) {
             errors.rejectValue("confirmPassword", "registration.exception.password.equality",
                     "Your passwords don't match.");
         }
-        String userName;
-        String field;
-        if (registrationService.getUsernameEqualsEmail()) {
-            userName = registrationUser.getEmail();
-            field = "email";
-        } else {
-            userName = registrationUser.getUserName();
-            field = "userName";
-        }
-        if (registrationService.isUsernameIsAllreadyTaken(userName)) {
-            String[] argument = { field };
-            errors.rejectValue(field, "registration.exception.username.alreadytaken", argument, "Your " + field
-                    + " is already taken");
+        if (registrationService.getUsernameEqualsEmail()
+                && registrationService.isUsernameIsAllreadyTaken(registrationUser.getEmail())) {
+            errors.rejectValue("email", "registration.exception.email.alreadytaken",
+                    "Your email address is already taken.");
+        } else if (!registrationService.getUsernameEqualsEmail()
+                && registrationService.isUsernameIsAllreadyTaken(registrationUser.getUserName())) {
+            errors.rejectValue("userName", "registration.exception.username.alreadytaken",
+                    "Your username is already taken.");
         }
     }
 }
