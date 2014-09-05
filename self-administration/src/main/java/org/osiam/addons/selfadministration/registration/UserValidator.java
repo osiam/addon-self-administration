@@ -62,7 +62,8 @@ public class UserValidator implements Validator {
         if (registrationUser.getPassword().length() < registrationService.getPasswordLength()) {
             String[] argument = { String.valueOf(registrationService.getPasswordLength()) };
             errors.rejectValue("password", "registration.exception.password.length", argument,
-                    "Your password is not long enough.");
+                    "Your password is not long enough. Your password has to be at least "
+                            + registrationService.getPasswordLength() + " characters.");
         }
         if (!Strings.isNullOrEmpty(registrationUser.getConfirmPassword())
                 && !registrationUser.getConfirmPassword().equals(registrationUser.getPassword())) {
