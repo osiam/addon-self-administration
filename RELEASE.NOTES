@@ -1,4 +1,14 @@
 # OSIAM addon-self-administration
 
+## 1.1 - 2014-09-22
+- introduced the plugin-api: https://github.com/osiam/addon-self-administration-plugin-api
+- introduced AccountManagement: Added account deletion and deactivation action
+
+- added sql example script to import a client for the self-administration
+- cleanup properties
+
+- fixed BT-52: https://jira.osiam.org/browse/BT-52
+- fixed BT-53: https://jira.osiam.org/browse/BT-53
+
 ## 1.0 - 2014-05-13
 - finally released version 1.0 of the addon-self-administration together with the OSIAM server!
