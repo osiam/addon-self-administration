@@ -78,6 +78,8 @@
         <org.aspectj-version>1.7.4</org.aspectj-version>
         <org.slf4j-version>1.7.7</org.slf4j-version>
 
+        <osiam.version>1.2-SNAPSHOT</osiam.version>
+
         <sonar.core.codeCoveragePlugin>cobertura</sonar.core.codeCoveragePlugin>
         <!-- force sonar to reuse reports generated during build cycle -->
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -245,13 +247,13 @@
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>connector4java</artifactId>
-            <version>1.1</version>
+            <version>${osiam.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>addon-self-administration-plugin-api</artifactId>
-            <version>1.1</version>
+            <version>${osiam.version}</version>
         </dependency>
 
         <!-- Spring -->
