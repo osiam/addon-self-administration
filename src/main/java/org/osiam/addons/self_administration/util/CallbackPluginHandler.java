@@ -13,13 +13,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CallbackPluginHandler implements CallbackPlugin {
-    @Value("${org.osiam.addon-self-administration.plugin.enabled}")
+
+    @Value("${org.osiam.addon-self-administration.plugin.enabled:false}")
     private Boolean isPluginEnabled;
 
-    @Value("${org.osiam.addon-self-administration.plugin.jar.path}")
+    @Value("${org.osiam.addon-self-administration.plugin.jar.path:}")
     private String pluginJarPath;
 
-    @Value("${org.osiam.addon-self-administration.plugin.classname}")
+    @Value("${org.osiam.addon-self-administration.plugin.classname:}")
     private String pluginClass;
 
     private ClassLoader classLoader = null;
