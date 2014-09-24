@@ -156,21 +156,47 @@ class LostPasswordControllerSpec extends Specification {
         response.getBody() != null
     }
 
+    def 'The controller should verify the user and change its password with the client access token'() {
+        given:
+        def otp = 'someOTP'
+        def newPassword = 'newPassword'
+        def authZHeader = 'Bearer ACCESSTOKEN'
+        def userId = 'userId'
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+                .setField('oneTimePassword', otp)
+                .setField('tempMail', 'my@mail.com').build()
+        User user = new User.Builder().addExtension(extension)
+                .addEmails([
+                new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
+
+        when:
+        def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
+
+        then:
+        2 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.getUser(userId, _) >> user
+
+        result.getStatusCode() == HttpStatus.OK
+        result.getBody() != null
+    }
+
     def 'The controller should verify the user and change its password'() {
         given:
         def otp = 'someOTP'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('oneTimePassword', otp)
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('oneTimePassword', otp)
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .addEmails([
-                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
                 .build()
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, newPassword)
+        def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
@@ -181,6 +207,23 @@ class LostPasswordControllerSpec extends Specification {
         result.getBody() != null
     }
 
+    def 'If the user will not be found by the given id the response should contain the appropriate status code'() {
+        given:
+        def otp = 'someOTP'
+        def newPassword = 'newPassword'
+        def authZHeader = 'Bearer ACCESSTOKEN'
+        def userId = 'not_existing_id'
+
+        when:
+        def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
+
+        then:
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getUser(userId, _) >> {throw new OsiamRequestException(409, '')}
+
+        result.getStatusCode() == HttpStatus.CONFLICT
+    }
+
     def 'If the user will not be found by his access token the response should contain the appropriate status code'() {
         given:
         def otp = 'someOTP'
@@ -188,7 +231,7 @@ class LostPasswordControllerSpec extends Specification {
         def authZHeader = 'Bearer ACCESSTOKEN'
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, newPassword)
+        def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
@@ -197,11 +240,12 @@ class LostPasswordControllerSpec extends Specification {
         result.getStatusCode() == HttpStatus.CONFLICT
     }
 
-    def 'If the provided one time password has no match with the saved one from the database the appropriate status code will be returned and the process is stopped'() {
+    def 'when changing password with the client access token and the one time password mismatched a forbidden status returned'() {
         given:
         def otp = 'invalid one time password'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
+        def userId = 'not_existing_id'
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
             .setField('oneTimePassword', 'someOTP')
             .setField('tempMail', 'my@mail.com').build()
@@ -213,7 +257,31 @@ class LostPasswordControllerSpec extends Specification {
         def userById = getUserAsStringWithExtension('Invalid OTP')
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, newPassword)
+        def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
+
+        then:
+        1 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getUser(userId, _) >> user
+        result.getStatusCode() == HttpStatus.FORBIDDEN
+    }
+
+    def 'when changing password with the user access token and the one time password mismatched a forbidden status returned'() {
+        given:
+        def otp = 'invalid one time password'
+        def newPassword = 'newPassword'
+        def authZHeader = 'Bearer ACCESSTOKEN'
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+                .setField('oneTimePassword', 'someOTP')
+                .setField('tempMail', 'my@mail.com').build()
+        User user = new User.Builder().addExtension(extension)
+                .addEmails([
+                new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
+
+        def userById = getUserAsStringWithExtension('Invalid OTP')
+
+        when:
+        def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
@@ -221,22 +289,46 @@ class LostPasswordControllerSpec extends Specification {
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
 
-    def 'there should be a failure if the user update with extensions failed'() {
+    def 'when changing the password as client there should be a failure if the user update with extensions failed'() {
         given:
         def otp = 'someOTP'
         def userId = 'someId'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('oneTimePassword', 'someOTP')
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('oneTimePassword', 'someOTP')
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .addEmails([
-                    new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
                 .build()
 
         when:
-        def result = lostPasswordController.change(authZHeader, otp, newPassword)
+        def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
+
+        then:
+        2 * connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getUser(userId, _) >> user
+        1 * osiamConnector.updateUser(_, _, _) >> {throw new OsiamRequestException(400, '')}
+        result.getStatusCode() == HttpStatus.BAD_REQUEST
+        result.getBody() != null
+    }
+
+    def 'when changing the password as user there should be a failure if the user update with extensions failed'() {
+        given:
+        def otp = 'someOTP'
+        def newPassword = 'newPassword'
+        def authZHeader = 'Bearer ACCESSTOKEN'
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+                .setField('oneTimePassword', 'someOTP')
+                .setField('tempMail', 'my@mail.com').build()
+        User user = new User.Builder().addExtension(extension)
+                .addEmails([
+                new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
+
+        when:
+        def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
@@ -246,9 +338,17 @@ class LostPasswordControllerSpec extends Specification {
         result.getBody() != null
     }
 
-    def 'there should be a failure if the provided one time password is empty'() {
+    def 'when changing the password as client there should be a failure if the provided one time password is empty'() {
         when:
-        def result = lostPasswordController.change('authZ', '', 'newPW')
+        def result = lostPasswordController.changePasswordByClient('authZ', '', 'newPW', 'userId')
+
+        then:
+        result.getStatusCode() == HttpStatus.UNAUTHORIZED
+    }
+
+    def 'when changing the password as user there should be a failure if the provided one time password is empty'() {
+        when:
+        def result = lostPasswordController.changePasswordByUser('authZ', '', 'newPW')
 
         then:
         result.getStatusCode() == HttpStatus.UNAUTHORIZED
