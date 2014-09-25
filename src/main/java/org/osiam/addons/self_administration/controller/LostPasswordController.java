@@ -210,8 +210,8 @@ public class LostPasswordController {
     }
 
     /**
-     * Method to change the users password if the preconditions are satisfied.
-     * 
+     * Action to change the users password by himself if the preconditions are satisfied.
+     *
      * @param authorization
      *        authZ header with valid access token
      * @param oneTimePassword
@@ -222,22 +222,53 @@ public class LostPasswordController {
      * @throws IOException
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> change(@RequestHeader("Authorization") final String authorization,
+    public ResponseEntity<String> changePasswordByUser(@RequestHeader("Authorization") final String authorization,
+                                         @RequestParam String oneTimePassword,
+                                         @RequestParam String newPassword) throws IOException {
+        return changePassword(null, authorization, oneTimePassword, newPassword);
+    }
+
+    /**
+     * Action to change the users password by the client if the preconditions are satisfied.
+     *
+     * @param userId
+     *        the id of the user which password should changed
+     * @param authorization
+     *        authZ header with valid access token
+     * @param oneTimePassword
+     *        the previously generated one time password
+     * @param newPassword
+     *        the new user password
+     * @return the response with status code and the updated user if successfully
+     * @throws IOException
+     */
+    @RequestMapping(value = "/change/{userId}", method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<String> changePasswordByClient(@RequestHeader("Authorization") final String authorization,
             @RequestParam String oneTimePassword,
-            @RequestParam String newPassword) throws IOException {
+            @RequestParam String newPassword,
+            @PathVariable final String userId) throws IOException {
+        return changePassword(userId, authorization, oneTimePassword, newPassword);
+    }
+
+    private ResponseEntity<String> changePassword(String userId, String authorization, String oneTimePassword,
+                                                  String newPassword) throws IOException {
 
         if (Strings.isNullOrEmpty(oneTimePassword)) {
             String errorMessage = "The submitted one time password is invalid!";
             LOGGER.log(Level.SEVERE, errorMessage);
             return getErrorResponseEntity(errorMessage, HttpStatus.UNAUTHORIZED);
         }
-
         User updatedUser;
         try {
+
             AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization))
                     .build();
-            User user = connectorBuilder.createConnector().getCurrentUser(accessToken);
-
+            User user;
+            if(Strings.isNullOrEmpty(userId)) {
+                user = connectorBuilder.createConnector().getCurrentUser(accessToken);
+            } else {
+                user = connectorBuilder.createConnector().getUser(userId, accessToken);
+            }
             // validate the oneTimePassword with the saved one from DB
             Extension extension = user.getExtension(internalScimExtensionUrn);
             String savedOneTimePassword = extension.getField(this.oneTimePassword, ExtensionFieldType.STRING);
