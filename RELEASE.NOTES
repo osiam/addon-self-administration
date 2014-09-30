@@ -1,5 +1,14 @@
 # OSIAM addon-self-administration
 
+## 1.2 - 2014-09-30
+- [feature] the users password can also changed by clients
+  Before this feature, the password can only changed with the users access token.
+  Now it's also possible to use the addon-self-administrations as an oauth client
+  to change the password of a specified user.
+- [fix] the plugin api don't need to be configured
+  Before this fix, the system fails on startup, because the properties for the
+  plugin api need to configured also if no plugin is provided
+
 ## 1.1 - 2014-09-22
 - introduced the plugin-api: https://github.com/osiam/addon-self-administration-plugin-api
 - introduced AccountManagement: Added account deletion and deactivation action
