@@ -1,4 +1,4 @@
-package org.osiam.addons.self_administration.util;
+package org.osiam.addons.self_administration.plugin;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
