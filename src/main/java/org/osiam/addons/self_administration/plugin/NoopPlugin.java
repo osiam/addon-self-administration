@@ -1,4 +1,4 @@
-package org.osiam.addons.self_administration.util;
+package org.osiam.addons.self_administration.plugin;
 
 import org.osiam.addons.self_administration.plugin_api.CallbackException;
 import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
