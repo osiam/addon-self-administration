@@ -31,8 +31,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -56,6 +54,8 @@ import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +75,7 @@ import com.google.common.base.Strings;
 @RequestMapping(value = "/email")
 public class ChangeEmailController {
 
-    private static final Logger LOGGER = Logger.getLogger(ChangeEmailController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeEmailController.class);
 
     @Inject
     private UserObjectMapper mapper;
@@ -161,10 +161,12 @@ public class ChangeEmailController {
                     newEmailValue,
                     confirmationToken);
         } catch (OsiamRequestException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-            return getErrorResponseEntity(e.getMessage(), HttpStatus.valueOf(e.getHttpStatusCode()));
+            LOGGER.warn(e.getMessage());
+            return RegistrationHelper.createErrorResponseEntity(e.getMessage(),
+                    HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
-            return getErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.error(e.getMessage());
+            return RegistrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         String activateLink = RegistrationHelper.createLinkForEmail(emailChangeLinkPrefix, updatedUser.getId(),
@@ -181,8 +183,9 @@ public class ChangeEmailController {
             renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, locale,
                     mailVariables);
         } catch (OsiamException e) {
-            return getErrorResponseEntity("Problems creating email for confirming new user email: \""
-                    + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            String message = "Problems creating email for confirming new user: " + e.getMessage();
+            LOGGER.error(message);
+            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);
@@ -223,8 +226,9 @@ public class ChangeEmailController {
             @RequestParam("confirmToken") final String confirmToken) throws IOException, MessagingException {
 
         if (Strings.isNullOrEmpty(confirmToken)) {
-            LOGGER.log(Level.WARNING, "Confirmation token miss match!");
-            return getErrorResponseEntity("No ongoing email change!", HttpStatus.UNAUTHORIZED);
+            String message = "The submitted confirmation token is invalid!";
+            LOGGER.warn(message);
+            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
         }
 
         User updatedUser;
@@ -239,8 +243,9 @@ public class ChangeEmailController {
             String existingConfirmToken = extension.getField(confirmationTokenField, ExtensionFieldType.STRING);
 
             if (!existingConfirmToken.equals(confirmToken)) {
-                LOGGER.log(Level.WARNING, "Confirmation token mismatch!");
-                return getErrorResponseEntity("No ongoing email change!", HttpStatus.FORBIDDEN);
+                String message = "The submitted confirmation token is invalid!";
+                LOGGER.warn(message);
+                return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
             }
 
             String newEmail = extension.getField(tempEmail, ExtensionFieldType.STRING);
@@ -250,10 +255,12 @@ public class ChangeEmailController {
 
             updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser, accessToken);
         } catch (OsiamRequestException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-            return getErrorResponseEntity(e.getMessage(), HttpStatus.valueOf(e.getHttpStatusCode()));
+            LOGGER.warn(e.getMessage());
+            return RegistrationHelper.createErrorResponseEntity(e.getMessage(),
+                    HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
-            return getErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.error(e.getMessage());
+            return RegistrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
@@ -267,8 +274,9 @@ public class ChangeEmailController {
                     locale,
                     mailVariables);
         } catch (OsiamException e) {
-            return getErrorResponseEntity("Problems creating email for confirming new user: \""
-                    + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            String message = "Problems creating email for confirming new user email: " + e.getMessage();
+            LOGGER.error(message);
+            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);
@@ -298,9 +306,5 @@ public class ChangeEmailController {
                 .deleteExtensionField(extension.getUrn(), tempEmail).build();
 
         return updateUser;
-    }
-
-    private ResponseEntity<String> getErrorResponseEntity(String message, HttpStatus httpStatus) {
-        return new ResponseEntity<>("{\"error\":\"" + message + "\"}", httpStatus);
     }
 }

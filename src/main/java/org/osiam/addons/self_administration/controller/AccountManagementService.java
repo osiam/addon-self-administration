@@ -25,8 +25,6 @@ package org.osiam.addons.self_administration.controller;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
@@ -42,6 +40,8 @@ import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +56,7 @@ import com.google.common.base.Optional;
 @Service
 public class AccountManagementService {
 
-    private static final Logger LOGGER = Logger.getLogger(AccountManagementService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountManagementService.class);
 
     @Inject
     protected ConnectorBuilder connectorBuilder;
@@ -71,9 +71,9 @@ public class AccountManagementService {
      * Deactivates the account of the user with the given user ID.
      * 
      * @param userId
-     *        the ID of the user
+     *            the ID of the user
      * @param token
-     *        the access token
+     *            the access token
      */
     public void deactivateUser(String userId, AccessToken token) {
         User user = getUser(userId, token);
@@ -86,9 +86,9 @@ public class AccountManagementService {
      * Deletes the account of the user with the given user ID.
      * 
      * @param userId
-     *        the ID of the user
+     *            the ID of the user
      * @param token
-     *        the access token
+     *            the access token
      */
     public void deleteUser(String userId, AccessToken token) {
         User user = getUser(userId, token);
@@ -99,8 +99,8 @@ public class AccountManagementService {
     /**
      * Logs the given exception and returns a suitable response status.
      * 
-     * @param the
-     *        exception to handle
+     * @param e
+     *            the exception to handle
      * @param {@link ResponseEntity} with the resulting error information and status code
      */
     public ResponseEntity<String> handleException(RuntimeException e) {
@@ -118,7 +118,7 @@ public class AccountManagementService {
         } else {
             messageBuilder.append("An exception occurred: ");
         }
-        LOGGER.log(Level.WARNING, messageBuilder.toString());
+        LOGGER.error(messageBuilder.toString());
         messageBuilder.insert(0, "{\"error\":\"");
         messageBuilder.append(e.getMessage());
         messageBuilder.append("\"}");
@@ -129,9 +129,9 @@ public class AccountManagementService {
      * Returns the SCIM user with the given user ID.
      * 
      * @param userId
-     *        the user ID
+     *            the user ID
      * @param token
-     *        the access token
+     *            the access token
      */
     private User getUser(String userId, AccessToken token) {
         OsiamConnector connector = connectorBuilder.createConnector();
@@ -143,9 +143,9 @@ public class AccountManagementService {
      * Sends an email informing about the account change.
      * 
      * @param user
-     *        the user
+     *            the user
      * @param template
-     *        the email template name
+     *            the email template name
      */
     private void sendEmail(User user, String template) {
         Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);

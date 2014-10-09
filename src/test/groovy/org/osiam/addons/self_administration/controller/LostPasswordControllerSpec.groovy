@@ -343,7 +343,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient('authZ', '', 'newPW', 'userId')
 
         then:
-        result.getStatusCode() == HttpStatus.UNAUTHORIZED
+        result.getStatusCode() == HttpStatus.FORBIDDEN
     }
 
     def 'when changing the password as user there should be a failure if the provided one time password is empty'() {
@@ -351,7 +351,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser('authZ', '', 'newPW')
 
         then:
-        result.getStatusCode() == HttpStatus.UNAUTHORIZED
+        result.getStatusCode() == HttpStatus.FORBIDDEN
     }
 
     def 'The controller should provide a html form for entering the new password with already known values like otp and user id'(){

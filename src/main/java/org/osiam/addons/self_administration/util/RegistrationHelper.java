@@ -31,6 +31,8 @@ import org.osiam.resources.scim.Email;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import com.google.common.base.Strings;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class RegistrationHelper {
 
@@ -81,5 +83,9 @@ public class RegistrationHelper {
             }
         }
         return LocaleContextHolder.getLocale();
+    }
+
+    public static ResponseEntity<String> createErrorResponseEntity(String message, HttpStatus httpStatus) {
+        return new ResponseEntity<>("{\"error\":\"" + message + "\"}", httpStatus);
     }
 }
