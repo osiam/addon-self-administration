@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -39,7 +40,7 @@ import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.RegistrationHelper;
+import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
@@ -134,33 +135,33 @@ public class LostPasswordController {
 
         User updatedUser;
         try {
-            String token = RegistrationHelper.extractAccessToken(authorization);
+            String token = SelfAdministrationHelper.extractAccessToken(authorization);
             AccessToken accessToken = new AccessToken.Builder(token).build();
             updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.warn(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(),
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(),
                     HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
             LOGGER.error(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(updatedUser);
         if (!email.isPresent()) {
             String message = "Could not change password. No email of user " + updatedUser.getUserName() + " found!";
             LOGGER.error(message);
-            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.BAD_REQUEST);
+            return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.BAD_REQUEST);
         }
 
-        String passwordLostLink = RegistrationHelper.createLinkForEmail(passwordlostLinkPrefix, updatedUser.getId(),
+        String passwordLostLink = SelfAdministrationHelper.createLinkForEmail(passwordlostLinkPrefix, updatedUser.getId(),
                 "oneTimePassword", newOneTimePassword);
 
         Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("lostpasswordlink", passwordLostLink);
         mailVariables.put("user", updatedUser);
 
-        Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
+        Locale locale = SelfAdministrationHelper.getLocale(updatedUser.getLocale());
 
         try {
             renderAndSendEmailService.renderAndSendEmail("lostpassword", fromAddress, email.get().getValue(),
@@ -169,7 +170,7 @@ public class LostPasswordController {
         } catch (OsiamException e) {
             String message = "Problems creating email for lost password: " + e.getMessage();
             LOGGER.error(message);
-            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -258,12 +259,12 @@ public class LostPasswordController {
         if (Strings.isNullOrEmpty(oneTimePassword)) {
             String message = "The submitted one time password is invalid!";
             LOGGER.warn(message);
-            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
+            return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
         }
         User updatedUser;
         try {
 
-            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization))
+            AccessToken accessToken = new AccessToken.Builder(SelfAdministrationHelper.extractAccessToken(authorization))
                     .build();
             User user;
             if(Strings.isNullOrEmpty(userId)) {
@@ -273,23 +274,30 @@ public class LostPasswordController {
             }
             // validate the oneTimePassword with the saved one from DB
             Extension extension = user.getExtension(internalScimExtensionUrn);
-            String savedOneTimePassword = extension.getField(this.oneTimePassword, ExtensionFieldType.STRING);
+            String savedOneTimePassword;
+            try {
+                savedOneTimePassword = extension.getField(this.oneTimePassword, ExtensionFieldType.STRING);
+            } catch(NoSuchElementException e) {
+                String message = e.getMessage() + " - This user has no onetime password to reset their password";
+                LOGGER.warn(message);
+                return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
+            }
 
             if (!savedOneTimePassword.equals(oneTimePassword)) {
                 String message = "The submitted one time password is invalid!";
                 LOGGER.warn(message);
-                return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
+                return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
             }
 
             UpdateUser updateUser = getPreparedUserToChangePassword(extension, newPassword);
             updatedUser = connectorBuilder.createConnector().updateUser(user.getId(), updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.warn(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(),
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(),
                     HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
             LOGGER.error(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);

@@ -23,44 +23,17 @@
 
 package org.osiam.addons.self_administration.util;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
-import org.osiam.resources.scim.Email;
 import org.springframework.context.i18n.LocaleContextHolder;
-
-import com.google.common.base.Strings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class RegistrationHelper {
+import com.google.common.base.Strings;
 
-    private RegistrationHelper() {
-    }
+public class SelfAdministrationHelper {
 
-    public static List<Email> replaceOldPrimaryMail(String newEmail, List<Email> emails) {
-
-        List<Email> updatedEmailList = new ArrayList<>();
-
-        // add new primary email address
-        updatedEmailList.add(new Email.Builder()
-                .setValue(newEmail)
-                .setPrimary(true)
-                .build());
-
-        // add only non primary mails to new list and remove all primary entries
-        for (Email mail : emails) {
-            if (mail.isPrimary()) {
-                updatedEmailList.add(new Email.Builder().setType(mail.getType())
-                        .setPrimary(mail.isPrimary())
-                        .setValue(mail.getValue()).setOperation("delete").build());
-            } else {
-                updatedEmailList.add(mail);
-            }
-        }
-
-        return updatedEmailList;
+    private SelfAdministrationHelper() {
     }
 
     public static String createLinkForEmail(String linkPrefix, String userId, String parameterName, String parameter) {

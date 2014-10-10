@@ -31,7 +31,7 @@ import javax.inject.Inject;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.RegistrationHelper;
+import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.NoResultException;
 import org.osiam.client.exception.UnauthorizedException;
@@ -155,7 +155,7 @@ public class AccountManagementService {
         }
 
         Map<String, Object> mailVariables = new HashMap<String, Object>();
-        Locale locale = RegistrationHelper.getLocale(user.getLocale());
+        Locale locale = SelfAdministrationHelper.getLocale(user.getLocale());
 
         renderAndSendEmailService.renderAndSendEmail(template, fromAddress, email.get().getValue(), locale,
                 mailVariables);

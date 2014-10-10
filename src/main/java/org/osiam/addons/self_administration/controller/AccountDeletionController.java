@@ -26,7 +26,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osiam.addons.self_administration.exception.OsiamException;
-import org.osiam.addons.self_administration.util.RegistrationHelper;
+import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.oauth.AccessToken;
 import org.springframework.http.HttpStatus;
@@ -60,7 +60,7 @@ public class AccountDeletionController {
     public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") final String authorization,
             @PathVariable final String userId, final HttpServletRequest request) {
 
-        AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization)).build();
+        AccessToken accessToken = new AccessToken.Builder(SelfAdministrationHelper.extractAccessToken(authorization)).build();
 
         try {
             accountManagementService.deleteUser(userId, accessToken);
