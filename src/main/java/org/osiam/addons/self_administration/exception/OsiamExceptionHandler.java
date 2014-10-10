@@ -23,13 +23,12 @@
 
 package org.osiam.addons.self_administration.exception;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,62 +37,32 @@ import org.springframework.web.servlet.ModelAndView;
 @ControllerAdvice
 public class OsiamExceptionHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(OsiamExceptionHandler.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(OsiamExceptionHandler.class.getName());
     private static final String AN_EXCEPTION_OCCURED = "An exception occurred";
     private static final String KEY = "key";
     private ModelAndView modelAndView = new ModelAndView("self_administration_error");
-    
+
     @ExceptionHandler(OsiamRequestException.class)
     protected ModelAndView handleException(OsiamRequestException ex, HttpServletResponse response) {
-        LOGGER.log(Level.WARNING, AN_EXCEPTION_OCCURED, ex);
-        response.setStatus(ex.getHttpStatusCode());
-        modelAndView.addObject(KEY, "registration.form.error");
-        setLoggingInformation(ex);
-        return modelAndView;
+        LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
+        return createResponse(response, ex.getHttpStatusCode());
     }
-    
+
     @ExceptionHandler(OsiamClientException.class)
     protected ModelAndView handleConflict(OsiamClientException ex, HttpServletResponse response) {
-        LOGGER.log(Level.WARNING, AN_EXCEPTION_OCCURED, ex);
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        modelAndView.addObject(KEY, "registration.form.error");
-        setLoggingInformation(ex);
-        return modelAndView;
+        LOGGER.error(AN_EXCEPTION_OCCURED, ex);
+        return createResponse(response, HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @ExceptionHandler(OsiamException.class)
     protected ModelAndView handleException(OsiamException ex, HttpServletResponse response) {
-        LOGGER.log(Level.WARNING, AN_EXCEPTION_OCCURED, ex);
-        response.setStatus(ex.getHttpStatusCode());
-        modelAndView.addObject(KEY, ex.getKey());
-        setLoggingInformation(ex);
-        return modelAndView;
+        LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
+        return createResponse(response, ex.getHttpStatusCode());
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    protected ModelAndView handleException(RuntimeException ex, HttpServletResponse response) {
-        LOGGER.log(Level.WARNING, AN_EXCEPTION_OCCURED, ex);
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        modelAndView.addObject(KEY, "registration.exception.message");
-        setLoggingInformation(ex);
+    private ModelAndView createResponse(HttpServletResponse response, int httpStatus) {
+        response.setStatus(httpStatus);
+        modelAndView.addObject(KEY, "registration.form.error");
         return modelAndView;
-    }
-
-    private void setLoggingInformation(Throwable t){
-        Level level = getLogLevel(LOGGER);
-        if(level != null && level.intValue() <= Level.INFO.intValue()){
-            modelAndView.addObject("exception", t);
-        }
-    }
-    
-    private Level getLogLevel(Logger logger){
-        Level level = null;
-        if(logger != null){
-            level = logger.getLevel();
-        }
-        if(level == null){
-            level = getLogLevel(logger.getParent());
-        }
-        return level;
     }
 }

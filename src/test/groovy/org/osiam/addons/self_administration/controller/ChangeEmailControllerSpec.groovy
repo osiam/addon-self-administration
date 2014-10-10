@@ -223,7 +223,7 @@ class ChangeEmailControllerSpec extends Specification {
         def result = changeEmailController.confirm('authZ', 'userId', '')
 
         then:
-        result.getStatusCode() == HttpStatus.UNAUTHORIZED
+        result.getStatusCode() == HttpStatus.FORBIDDEN
     }
 
     def 'the controller should provide a html form for entering the new email address'() {

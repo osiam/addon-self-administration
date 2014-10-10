@@ -23,9 +23,6 @@
 
 package org.osiam.addons.self_administration.registration;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +31,8 @@ import javax.validation.Valid;
 import org.osiam.addons.self_administration.plugin_api.CallbackException;
 import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
 import org.osiam.resources.scim.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,7 +48,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping(value = "/registration")
 public class RegistrationController {
 
-    private static final Logger LOGGER = Logger.getLogger(RegistrationController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class);
 
     @Inject
     private CallbackPlugin callbackPlugin;
@@ -106,10 +105,9 @@ public class RegistrationController {
         try {
             callbackPlugin.performPostRegistrationActions(user);
         } catch (CallbackException p) {
-            LOGGER.log(
-                    Level.WARNING,
-                    "An exception occurred while performing post registration actions for user with ID: " + user.getId(),
-                    p);
+            LOGGER.error(
+                    "An exception occurred while performing post registration actions for user with ID: "
+                            + user.getId(), p);
         }
         return "registrationSuccess";
     }
@@ -120,9 +118,9 @@ public class RegistrationController {
      * After activation E-Mail arrived the activation link will point to this URI.
      * 
      * @param userId
-     *        the id of the registered user
+     *            the id of the registered user
      * @param activationToken
-     *        the user's activation token, send by E-Mail
+     *            the user's activation token, send by E-Mail
      * 
      * @return the registrationSuccess page
      */
