@@ -23,15 +23,15 @@
 
 package org.osiam.addons.self_administration.util
 
+import com.google.common.base.Optional
 import org.osiam.resources.helper.SCIMHelper
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.User
-
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 
-import com.google.common.base.Optional
-
-class RegistrationHelperSpec extends Specification {
+class SelfAdministrationHelperSpec extends Specification {
 
     def 'getting primary email from user'() {
         given:
@@ -73,20 +73,7 @@ class RegistrationHelperSpec extends Specification {
         then:
         !email.isPresent()
     }
-    
-    def 'should replace old primary email'() {
-        given:
-        def newPrimaryMail = 'newprimary@mail.com'
-        Email oldPrimaryEmail = new Email.Builder().setPrimary(true).setValue('primary@mail.com').build()
-        User user = new User.Builder('theMan').addEmails([oldPrimaryEmail] as List).build()
-        
-        when:
-        List<Email> emails = RegistrationHelper.replaceOldPrimaryMail(newPrimaryMail, user.emails)
-        
-        then:
-        emails.find { it.value == newPrimaryMail }
-    }
-    
+
     def 'should create a link'() {
         given:
         def linkPrefix = 'http://www.example.com/'
@@ -95,12 +82,25 @@ class RegistrationHelperSpec extends Specification {
         def parameter = 'parameter'
         
         when:
-        def link = RegistrationHelper.createLinkForEmail(linkPrefix, userId, parameterName, parameter)
+        def link = SelfAdministrationHelper.createLinkForEmail(linkPrefix, userId, parameterName, parameter)
         
         then:
         link.contains(linkPrefix)
         link.contains(userId)
         link.contains(parameterName)
         link.contains(parameter)
+    }
+
+    def 'should create a response error string entity'() {
+        given:
+        def message = 'error message'
+        def jsonErrorMessage = '{"error":"' + message + '"}'
+
+        when:
+        ResponseEntity<String> responseEntity = SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN)
+
+        then:
+        responseEntity.getBody() == jsonErrorMessage
+        responseEntity.getStatusCode() == HttpStatus.FORBIDDEN
     }
 }

@@ -41,7 +41,7 @@ import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.RegistrationHelper;
+import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.OsiamClientException;
@@ -157,19 +157,19 @@ public class ChangeEmailController {
         User updatedUser;
         String confirmationToken = UUID.randomUUID().toString();
         try {
-            updatedUser = getUpdatedUserForEmailChange(RegistrationHelper.extractAccessToken(authorization),
+            updatedUser = getUpdatedUserForEmailChange(SelfAdministrationHelper.extractAccessToken(authorization),
                     newEmailValue,
                     confirmationToken);
         } catch (OsiamRequestException e) {
             LOGGER.warn(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(),
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(),
                     HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
             LOGGER.error(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        String activateLink = RegistrationHelper.createLinkForEmail(emailChangeLinkPrefix, updatedUser.getId(),
+        String activateLink = SelfAdministrationHelper.createLinkForEmail(emailChangeLinkPrefix, updatedUser.getId(),
                 "confirmToken", confirmationToken);
 
         // build the Map with the link for replacement
@@ -177,7 +177,7 @@ public class ChangeEmailController {
         mailVariables.put("activatelink", activateLink);
         mailVariables.put("user", updatedUser);
 
-        Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
+        Locale locale = SelfAdministrationHelper.getLocale(updatedUser.getLocale());
 
         try {
             renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, locale,
@@ -185,7 +185,7 @@ public class ChangeEmailController {
         } catch (OsiamException e) {
             String message = "Problems creating email for confirming new user: " + e.getMessage();
             LOGGER.error(message);
-            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);
@@ -228,14 +228,14 @@ public class ChangeEmailController {
         if (Strings.isNullOrEmpty(confirmToken)) {
             String message = "The submitted confirmation token is invalid!";
             LOGGER.warn(message);
-            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
+            return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
         }
 
         User updatedUser;
         Optional<Email> oldEmail;
 
         try {
-            AccessToken accessToken = new AccessToken.Builder(RegistrationHelper.extractAccessToken(authorization))
+            AccessToken accessToken = new AccessToken.Builder(SelfAdministrationHelper.extractAccessToken(authorization))
                     .build();
             User user = connectorBuilder.createConnector().getUser(userId, accessToken);
 
@@ -245,7 +245,7 @@ public class ChangeEmailController {
             if (!existingConfirmToken.equals(confirmToken)) {
                 String message = "The submitted confirmation token is invalid!";
                 LOGGER.warn(message);
-                return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
+                return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
             }
 
             String newEmail = extension.getField(tempEmail, ExtensionFieldType.STRING);
@@ -256,14 +256,14 @@ public class ChangeEmailController {
             updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.warn(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(),
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(),
                     HttpStatus.valueOf(e.getHttpStatusCode()));
         } catch (OsiamClientException e) {
             LOGGER.error(e.getMessage());
-            return RegistrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Locale locale = RegistrationHelper.getLocale(updatedUser.getLocale());
+        Locale locale = SelfAdministrationHelper.getLocale(updatedUser.getLocale());
 
         // build the Map with the link for replacement
         Map<String, Object> mailVariables = new HashMap<>();
@@ -276,7 +276,7 @@ public class ChangeEmailController {
         } catch (OsiamException e) {
             String message = "Problems creating email for confirming new user email: " + e.getMessage();
             LOGGER.error(message);
-            return RegistrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);

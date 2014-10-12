@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.RegistrationHelper;
+import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.client.query.Query;
@@ -165,14 +165,14 @@ public class RegistrationService {
 
         String activationToken = user.getExtension(internalScimExtensionUrn).getFieldAsString(activationTokenField);
 
-        String registrationLink = RegistrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
+        String registrationLink = SelfAdministrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
                 "activationToken", activationToken);
 
         Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("registrationLink", registrationLink);
         mailVariables.put("user", user);
 
-        Locale locale = RegistrationHelper.getLocale(user.getLocale());
+        Locale locale = SelfAdministrationHelper.getLocale(user.getLocale());
 
         renderAndSendEmailService.renderAndSendEmail("registration", fromAddress, email.get().getValue(), locale,
                 mailVariables);
