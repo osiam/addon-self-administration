@@ -22,25 +22,31 @@
     ~ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <mvc:annotation-driven />
+    <bean id="validator"
+          class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="validationMessageSource" ref="messageSource"/>
+    </bean>
 
-    <mvc:default-servlet-handler />
+    <mvc:annotation-driven validator="validator"/>
 
-    <context:property-placeholder location="classpath:addon-self-administration.properties" />
+    <mvc:default-servlet-handler/>
 
-    <context:component-scan base-package="org.osiam.addons.self_administration" />
-    <context:annotation-config />
-    
+    <context:property-placeholder location="classpath:addon-self-administration.properties"/>
+
+    <context:component-scan base-package="org.osiam.addons.self_administration"/>
+
+    <context:annotation-config/>
+
     <!-- Import configuration for mail -->
     <import resource="mail-configuration.xml"/>
-    
+
     <import resource="template-configuration.xml"/>
 
 </beans>

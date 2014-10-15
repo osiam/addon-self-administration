@@ -1,41 +1,38 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    </head>
-    <body>
-    	<div class="form-group" th:fragment="defaultInput(attribute, type, required)"
-    	     th:if="${#arrays.contains(allowedFields, attribute)}">
-			<div th:if="${#fields.hasErrors(attribute)}" 
-				 th:errors="*{__${attribute}__}" 
-				 class="error-message alert-danger">
-				 Error
-			</div>
-			<input th:type="${type}"
-				th:field="*{__${attribute}__}"
-				class="form-control"
-				th:placeholder="#{registration.__${attribute}__} + (${required} ? ' *' : '')"
-				th:errorclass="alert-danger"
-				th:required="${required}"
-				th:classappend="${required}? 'required'"/>
-		</div>
-		
-		<div class="form-group" th:fragment="extensioninput(urn, field, type, required)" 
-		     th:with="attribute='extensions[\'' + ${urn} + '\'].fields[\'' + ${field} + '\']'">
-			<div th:if="${#fields.hasErrors(attribute)}" 
-				 th:errors="*{__${attribute}__}" 
-				 class="error-message alert-danger">
-				 Error
-			</div>
-			<input
-				th:type="${type}"
-				th:field="*{__${attribute}__}"
-				class="form-control"
-				th:placeholder="#{registration.__${urn}+'.'+${field}__} + (${required} ? ' *' : '')"
-				th:errorclass="alert-danger"
-				th:required="${required}"
-				th:classappend="${required}? 'required'"/>
-		</div>
-
-	</body>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<div class="form-group" th:fragment="defaultInput(attribute, type, required)"
+     th:if="${#arrays.contains(allowedFields, attribute)}">
+    <div th:if="${#fields.hasErrors(attribute)}"
+         th:errors="*{__${attribute}__}"
+         class="error-message alert-danger">
+        Error
+    </div>
+    <input th:type="${type}"
+           th:field="*{__${attribute}__}"
+           class="form-control"
+           th:placeholder="#{registration.user.__${attribute}__} + (${required} ? ' *' : '')"
+           th:errorclass="alert-danger"
+           th:required="${required}"
+           th:classappend="${required}? 'required'"/>
+</div>
+<div class="form-group" th:fragment="extensioninput(urn, field, type, required)"
+     th:with="attribute='extensions[\'' + ${urn} + '\'].fields[\'' + ${field} + '\']'">
+    <div th:if="${#fields.hasErrors(attribute)}"
+         th:errors="*{__${attribute}__}"
+         class="error-message alert-danger">
+        Error
+    </div>
+    <input th:type="${type}"
+           th:field="*{__${attribute}__}"
+           class="form-control"
+           th:placeholder="#{registration.user.__${urn}+'.'+${field}__} + (${required} ? ' *' : '')"
+           th:errorclass="alert-danger"
+           th:required="${required}"
+           th:classappend="${required}? 'required'"/>
+</div>
+</body>
 </html>

@@ -45,24 +45,24 @@ public class OsiamExceptionHandler {
     @ExceptionHandler(OsiamRequestException.class)
     protected ModelAndView handleException(OsiamRequestException ex, HttpServletResponse response) {
         LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
-        return createResponse(response, ex.getHttpStatusCode());
+        return createResponse(response, ex.getHttpStatusCode(), "registration.form.error");
     }
 
     @ExceptionHandler(OsiamClientException.class)
     protected ModelAndView handleConflict(OsiamClientException ex, HttpServletResponse response) {
         LOGGER.error(AN_EXCEPTION_OCCURED, ex);
-        return createResponse(response, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return createResponse(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "registration.form.error");
     }
 
     @ExceptionHandler(OsiamException.class)
     protected ModelAndView handleException(OsiamException ex, HttpServletResponse response) {
         LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
-        return createResponse(response, ex.getHttpStatusCode());
+        return createResponse(response, ex.getHttpStatusCode(), ex.getKey());
     }
 
-    private ModelAndView createResponse(HttpServletResponse response, int httpStatus) {
+    private ModelAndView createResponse(HttpServletResponse response, int httpStatus, String messageKey) {
         response.setStatus(httpStatus);
-        modelAndView.addObject(KEY, "registration.form.error");
+        modelAndView.addObject(KEY, messageKey);
         return modelAndView;
     }
 }

@@ -27,11 +27,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
+import org.osiam.addons.self_administration.validators.EqualPasswords;
+import org.osiam.addons.self_administration.validators.Password;
+import org.osiam.addons.self_administration.validators.Photo;
+import org.osiam.addons.self_administration.validators.RegistrationEmail;
+import org.osiam.addons.self_administration.validators.Username;
 
+@EqualPasswords
 public class RegistrationUser {
 
+    @Username
     private String userName;
     
     // Name attributes
@@ -44,22 +50,25 @@ public class RegistrationUser {
     
     private String displayName;
     private String nickName;
-    
-    @URL
+
+    @URL(message = "{registration.validation.profile.url}")
     private String profileUrl;
     private String title;
     private String preferredLanguage;
     private String locale;
     private String timezone;
-    
-    @NotBlank
+
+    @Password
     private String password = "";
     private String confirmPassword;
-    
-    @Email
+
+    @Email(message = "{registration.validation.email}")
+    @RegistrationEmail
     private String email;
     private String phoneNumber;
     private String im;
+
+    @Photo
     private String photo;
     
     //Address
