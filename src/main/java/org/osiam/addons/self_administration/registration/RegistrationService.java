@@ -87,29 +87,35 @@ public class RegistrationService {
     @Value("${org.osiam.html.form.password.length:8}")
     private int passwordLength;
 
+    private boolean confirmPasswordRequired = true;
+
     @Value("${org.osiam.html.form.fields:}")
     private void setAllowedFields(String[] allowedFields) {
-        List<String> trimedFields = new ArrayList<>();
+        List<String> trimmedFields = new ArrayList<>();
 
         for (String field : allowedFields) {
-            trimedFields.add(field.trim());
+            trimmedFields.add(field.trim());
         }
 
-        if (!trimedFields.contains("email")) {
-            trimedFields.add("email");
+        if (!trimmedFields.contains("email")) {
+            trimmedFields.add("email");
         }
 
-        if (!trimedFields.contains("password")) {
-            trimedFields.add("password");
+        if (!trimmedFields.contains("password")) {
+            trimmedFields.add("password");
+        }
+
+        if (!trimmedFields.contains("confirmPassword")) {
+            confirmPasswordRequired = false;
         }
 
         String fieldUserName = "userName";
-        if (!usernameEqualsEmail && !trimedFields.contains(fieldUserName)) {
-            trimedFields.add(fieldUserName);
-        } else if (usernameEqualsEmail && trimedFields.contains(fieldUserName)) {
-            trimedFields.remove(fieldUserName);
+        if (!usernameEqualsEmail && !trimmedFields.contains(fieldUserName)) {
+            trimmedFields.add(fieldUserName);
+        } else if (usernameEqualsEmail && trimmedFields.contains(fieldUserName)) {
+            trimmedFields.remove(fieldUserName);
         }
-        this.allowedFields = trimedFields.toArray(new String[trimedFields.size()]);
+        this.allowedFields = trimmedFields.toArray(new String[trimmedFields.size()]);
     }
 
     public boolean isUsernameIsAllreadyTaken(String userName) {
@@ -235,7 +241,11 @@ public class RegistrationService {
         return passwordLength;
     }
 
-    public boolean getUsernameEqualsEmail() {
+    public boolean isUsernameEqualsEmail() {
         return usernameEqualsEmail;
+    }
+
+    public boolean isConfirmPasswordRequired() {
+        return confirmPasswordRequired;
     }
 }

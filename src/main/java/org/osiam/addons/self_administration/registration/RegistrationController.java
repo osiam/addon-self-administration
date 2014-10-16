@@ -39,7 +39,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,9 +55,6 @@ public class RegistrationController {
     @Inject
     private RegistrationService registrationService;
 
-    @Inject
-    private UserValidator userValidator;
-
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.setAllowedFields(registrationService.getAllAllowedFields());
@@ -72,11 +68,10 @@ public class RegistrationController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String register(@Valid @ModelAttribute final RegistrationUser registrationUser,
+    public String register(@Valid final RegistrationUser registrationUser,
             final BindingResult bindingResult, final Model model, final HttpServletRequest request,
             final HttpServletResponse response) {
 
-        userValidator.validate(registrationUser, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
             response.setStatus(HttpStatus.BAD_REQUEST.value());

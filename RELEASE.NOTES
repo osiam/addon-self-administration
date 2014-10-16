@@ -1,5 +1,26 @@
 # OSIAM addon-self-administration
 
+## X.X - 2014-xx-xx
+- [fix] translation property files parsed as UTF-8
+  Before this fix, the translation messages were parsed as ISO-8859-1
+- [cleanup] cleanup logging handling in all controllers
+  Before this cleanup JUL was used to log messages, now the slf4j logger will be used.
+  The main concept is the following: When an error occurred which happen because of a
+  bad request (e.g. missing authorization token) the message will be logged as warn,
+  when it occurred because of an internal error (e.g. the mail server is not available
+  or the requested template file is missing) the message will be logged as error.
+- [fix] fixed https://github.com/osiam/addon-self-administration/issues/63
+  When the password reset was already done by the user a FORBIDDEN with an error
+  description will be returned. Before an exception occurred and it wasn't caught,
+  so an internal error/500 was returned with a servlet container specific HTML error
+  page.
+- [fix] fixed validation when register a user
+  Before this fix, the validation wasn't working for the JSR-330 Bean Validation
+  annotations, but only for the custom user validator. So an exception occurred when
+  a malformed e-mail-address was send, which response with an internal error and a
+  servlet container specific HTML error page. This fix switch to only JSR-330
+  Bean Validation annotations and returns with an error message prepared HTML form.
+
 ## 1.2 - 2014-09-30
 - [feature] the users password can also changed by clients
   Before this feature, the password can only changed with the users access token.

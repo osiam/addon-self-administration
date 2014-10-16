@@ -148,7 +148,7 @@ public class UserConverter {
                 phoenNumber = new Photo.Builder().setValue(new URI(registrationUser.getPhoto()))
                         .build();
             } catch (URISyntaxException e) {
-                throw new InvalidAttributeException("Photo is not an URI", "registration.exception.photo", e);
+                throw new InvalidAttributeException("Photo is not an URI", "registration.validation.photo", e);
             }
             photos.add(phoenNumber);
         }
