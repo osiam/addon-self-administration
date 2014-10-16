@@ -22,54 +22,53 @@
     ~ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="emailTemplateResolver" class="org.thymeleaf.templateresolver.ClassLoaderTemplateResolver">
-        <property name="prefix" value="addon-self-administration/templates/mail/" />
-        <property name="suffix" value=".html" />
-        <property name="templateMode" value="HTML5" />
-        <property name="characterEncoding" value="UTF-8" />
-        <property name="order" value="1" />
+    <bean id="emailTemplateResolver" class="org.thymeleaf.templateresolver.ClassLoaderTemplateResolver">
+        <property name="prefix" value="addon-self-administration/templates/mail/"/>
+        <property name="suffix" value=".html"/>
+        <property name="templateMode" value="HTML5"/>
+        <property name="characterEncoding" value="UTF-8"/>
+        <property name="order" value="1"/>
     </bean>
 
-    <bean id="webTemplateResolver" class="org.osiam.addons.self_administration.template.OsiamWebContextTemplateResolver">
-        <property name="prefix" value="addon-self-administration/templates/web/" />
-        <property name="suffix" value=".html" />
-        <property name="templateMode" value="HTML5" />
-        <property name="characterEncoding" value="UTF-8" />
-        <property name="order" value="2" />
+    <bean id="webTemplateResolver"
+          class="org.osiam.addons.self_administration.template.OsiamWebContextTemplateResolver">
+        <property name="prefix" value="addon-self-administration/templates/web/"/>
+        <property name="suffix" value=".html"/>
+        <property name="templateMode" value="HTML5"/>
+        <property name="characterEncoding" value="UTF-8"/>
+        <property name="order" value="2"/>
     </bean>
 
     <bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
         <property name="templateResolvers">
             <set>
-            	<ref bean="emailTemplateResolver" />
-                <ref bean="webTemplateResolver" />
+                <ref bean="emailTemplateResolver"/>
+                <ref bean="webTemplateResolver"/>
             </set>
         </property>
     </bean>
 
     <bean id="viewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
-        <property name="templateEngine" ref="templateEngine" />
-        <property name="characterEncoding" value="UTF-8" />
+        <property name="templateEngine" ref="templateEngine"/>
+        <property name="characterEncoding" value="UTF-8"/>
     </bean>
 
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="defaultEncoding" value="UTF-8"/>
         <property name="basenames">
             <list>
-                <value>addon-self-administration/l10n/registration</value>
-                <value>addon-self-administration/l10n/mail</value>
+                <value>addon-self-administration/i18n/registration</value>
+                <value>addon-self-administration/i18n/mail</value>
             </list>
         </property>
     </bean>
 
-    <mvc:resources mapping="/css/**" location="classpath:/addon-self-administration/resources/css/" />
+    <mvc:resources mapping="/css/**" location="classpath:/addon-self-administration/resources/css/"/>
 
 </beans>
