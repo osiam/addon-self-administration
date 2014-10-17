@@ -1,6 +1,6 @@
 # OSIAM addon-self-administration
 
-## X.X - 2014-xx-xx
+## 1.3 - 2014-10-17
 - [fix] translation property files parsed as UTF-8
   Before this fix, the translation messages were parsed as ISO-8859-1
 - [cleanup] cleanup logging handling in all controllers
