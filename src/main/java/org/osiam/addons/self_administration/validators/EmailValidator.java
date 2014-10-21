@@ -30,14 +30,15 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.osiam.addons.self_administration.registration.RegistrationService;
+import org.osiam.resources.exception.SCIMDataValidationException;
 
-public class RegistrationEmailValidator implements ConstraintValidator<RegistrationEmail, String> {
+public class EmailValidator implements ConstraintValidator<Email, String> {
 
     @Inject
     private RegistrationService registrationService;
 
     @Override
-    public void initialize(RegistrationEmail username) {
+    public void initialize(Email constraintAnnotation) {
     }
 
     @Override
@@ -53,6 +54,11 @@ public class RegistrationEmailValidator implements ConstraintValidator<Registrat
                         "{registration.validation.email.alreadytaken}").addConstraintViolation();
                 return false;
             }
+        }
+        try {
+            new org.osiam.resources.scim.Email.Builder().setValue(email);
+        } catch (SCIMDataValidationException e) {
+            return false;
         }
         return true;
     }

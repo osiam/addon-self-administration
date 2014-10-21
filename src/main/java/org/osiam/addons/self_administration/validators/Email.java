@@ -33,10 +33,10 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = RegistrationEmailValidator.class)
+@Constraint(validatedBy = EmailValidator.class)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RegistrationEmail {
+public @interface Email {
 
     String message() default "{registration.validation.email}";
 
