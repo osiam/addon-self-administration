@@ -116,7 +116,7 @@ public class LostPasswordController {
     /**
      * This endpoint generates an one time password and send an confirmation email including the one time password to
      * users primary email
-     * 
+     *
      * @param authorization
      *            authZ header with valid access token
      * @param userId
@@ -179,7 +179,7 @@ public class LostPasswordController {
     /**
      * Method to get an HTML form with the appropriate input fields for changing the password. Form includes the already
      * known values for userId and otp.
-     * 
+     *
      * @param oneTimePassword
      *            the one time password from confirmation email
      * @param userId
@@ -273,9 +273,10 @@ public class LostPasswordController {
                 user = connectorBuilder.createConnector().getUser(userId, accessToken);
             }
             // validate the oneTimePassword with the saved one from DB
-            Extension extension = user.getExtension(internalScimExtensionUrn);
+            Extension extension;
             String savedOneTimePassword;
             try {
+                extension = user.getExtension(internalScimExtensionUrn);
                 savedOneTimePassword = extension.getField(this.oneTimePassword, ExtensionFieldType.STRING);
             } catch(NoSuchElementException e) {
                 String message = e.getMessage() + " - This user has no onetime password to reset their password";
