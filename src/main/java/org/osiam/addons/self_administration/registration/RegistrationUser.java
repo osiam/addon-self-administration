@@ -26,12 +26,11 @@ package org.osiam.addons.self_administration.registration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.URL;
+import org.osiam.addons.self_administration.validators.Email;
 import org.osiam.addons.self_administration.validators.EqualPasswords;
 import org.osiam.addons.self_administration.validators.Password;
 import org.osiam.addons.self_administration.validators.Photo;
-import org.osiam.addons.self_administration.validators.RegistrationEmail;
 import org.osiam.addons.self_administration.validators.Username;
 
 @EqualPasswords
@@ -62,8 +61,7 @@ public class RegistrationUser {
     private String password = "";
     private String confirmPassword;
 
-    @Email(message = "{registration.validation.email}")
-    @RegistrationEmail
+    @Email
     private String email;
     private String phoneNumber;
     private String im;

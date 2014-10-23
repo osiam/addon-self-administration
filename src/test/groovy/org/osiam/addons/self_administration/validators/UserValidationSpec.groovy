@@ -37,7 +37,7 @@ class UserValidationSpec extends Specification {
     EqualPasswordValidator equalPasswordValidator = new EqualPasswordValidator(registrationService: registrationService)
     PasswordValidator passwordValidator = new PasswordValidator(registrationService: registrationService, messageSource: messageSource)
     PhotoValidator photoValidator = new PhotoValidator()
-    RegistrationEmailValidator registrationEmailValidator = new RegistrationEmailValidator(registrationService: registrationService)
+    EmailValidator registrationEmailValidator = new EmailValidator(registrationService: registrationService)
     UsernameValidator usernameValidator = new UsernameValidator(registrationService: registrationService)
 
     def 'validator should have no errors if all fields are valid'() {
