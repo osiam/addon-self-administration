@@ -42,6 +42,10 @@ public class EqualPasswordValidator implements ConstraintValidator<EqualPassword
     @Override
     public boolean isValid(final RegistrationUser user, final ConstraintValidatorContext constraintValidatorContext) {
         if (registrationService.isConfirmPasswordRequired()) {
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext
+                    .buildConstraintViolationWithTemplate("{registration.validation.password.equality}")
+                    .addPropertyNode("confirmPassword").addConstraintViolation();
             return user.getPassword() != null && user.getPassword().equals(user.getConfirmPassword());
         }
         return true;
