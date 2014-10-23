@@ -91,19 +91,4 @@ class UserValidationSpec extends Specification {
         then:
         isPasswordValid == false
     }
-
-    def 'validator should have an error if both password not match'() {
-        given:
-        RegistrationUser user = new RegistrationUser()
-        user.password = 'password'
-        user.confirmPassword = 'confirmPassword'
-
-        registrationService.isConfirmPasswordRequired() >> true
-
-        when:
-        def arePasswordsEqual = equalPasswordValidator.isValid(user, null)
-
-        then:
-        arePasswordsEqual == false
-    }
 }
