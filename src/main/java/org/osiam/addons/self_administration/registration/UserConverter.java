@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 tarent AG
+ * Copyright (C) 2013 tarent AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -43,7 +43,6 @@ import org.osiam.resources.scim.Photo;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.HtmlUtils;
 
 import com.google.common.base.Strings;
 
@@ -56,30 +55,44 @@ public class UserConverter {
     public User toScimUser(RegistrationUser registrationUser) {
 
         Name name = new Name.Builder()
-                .setFormatted(HtmlUtils.htmlEscape(registrationUser.getFormattedName()))
-                .setFamilyName(HtmlUtils.htmlEscape(registrationUser.getFamilyName()))
-                .setGivenName(HtmlUtils.htmlEscape(registrationUser.getGivenName()))
-                .setMiddleName(HtmlUtils.htmlEscape(registrationUser.getMiddleName()))
-                .setHonorificPrefix(HtmlUtils.htmlEscape(registrationUser.getHonorificPrefix()))
-                .setHonorificSuffix(HtmlUtils.htmlEscape(registrationUser.getHonorificSuffix()))
+                .setFormatted(registrationUser.getFormattedName())
+                .setFamilyName(registrationUser.getFamilyName())
+                .setGivenName(registrationUser.getGivenName())
+                .setMiddleName(registrationUser.getMiddleName())
+                .setHonorificPrefix(registrationUser.getHonorificPrefix())
+                .setHonorificSuffix(registrationUser.getHonorificSuffix())
                 .build();
+
+        List<Email> emails = new ArrayList<Email>();
+        if (!Strings.isNullOrEmpty(registrationUser.getEmail())) {
+            Email email = new Email.Builder().setValue(registrationUser.getEmail())
+                    .build();
+            emails.add(email);
+        }
+
+        List<PhoneNumber> phoneNumbers = new ArrayList<PhoneNumber>();
+        if (!Strings.isNullOrEmpty(registrationUser.getPhoneNumber())) {
+            PhoneNumber phoneNumber = new PhoneNumber.Builder().setValue(registrationUser.getPhoneNumber())
+                    .build();
+            phoneNumbers.add(phoneNumber);
+        }
 
         User.Builder userBuilder;
         if (usernameEqualsEmail) {
-            userBuilder = new User.Builder(HtmlUtils.htmlEscape(registrationUser.getEmail()));
+            userBuilder = new User.Builder(registrationUser.getEmail());
         } else {
-            userBuilder = new User.Builder(HtmlUtils.htmlEscape(registrationUser.getUserName()));
+            userBuilder = new User.Builder(registrationUser.getUserName());
         }
 
         userBuilder
                 .setName(name)
-                .setDisplayName(HtmlUtils.htmlEscape(registrationUser.getDisplayName()))
-                .setNickName(HtmlUtils.htmlEscape(registrationUser.getNickName()))
-                .setProfileUrl(HtmlUtils.htmlEscape(registrationUser.getProfileUrl()))
-                .setTitle(HtmlUtils.htmlEscape(registrationUser.getTitle()))
-                .setPreferredLanguage(HtmlUtils.htmlEscape(registrationUser.getPreferredLanguage()))
-                .setLocale(HtmlUtils.htmlEscape(registrationUser.getLocale()))
-                .setTimezone(HtmlUtils.htmlEscape(registrationUser.getTimezone()))
+                .setDisplayName(registrationUser.getDisplayName())
+                .setNickName(registrationUser.getNickName())
+                .setProfileUrl(registrationUser.getProfileUrl())
+                .setTitle(registrationUser.getTitle())
+                .setPreferredLanguage(registrationUser.getPreferredLanguage())
+                .setLocale(registrationUser.getLocale())
+                .setTimezone(registrationUser.getTimezone())
                 .setPassword(registrationUser.getPassword())
                 .addEmails(getEmailList(registrationUser))
                 .addPhoneNumbers(getPhoneNumberList(registrationUser))
@@ -100,7 +113,7 @@ public class UserConverter {
             RegistrationExtension currentRegistrationExtension = extensionSet.getValue();
             Map<String, String> registrationFields = currentRegistrationExtension.getFields();
             for (Entry<String, String> fieldSet : registrationFields.entrySet()) {
-                extensionBuilder.setField(fieldSet.getKey(), HtmlUtils.htmlEscape(fieldSet.getValue()));
+                extensionBuilder.setField(fieldSet.getKey(), fieldSet.getValue());
             }
             extensions.add(extensionBuilder.build());
         }
@@ -110,7 +123,7 @@ public class UserConverter {
     private List<Email> getEmailList(RegistrationUser registrationUser) {
         List<Email> emails = new ArrayList<Email>();
         if (!Strings.isNullOrEmpty(registrationUser.getEmail())) {
-            Email email = new Email.Builder().setValue(HtmlUtils.htmlEscape(registrationUser.getEmail()))
+            Email email = new Email.Builder().setValue(registrationUser.getEmail())
                     .build();
             emails.add(email);
         }
@@ -120,9 +133,9 @@ public class UserConverter {
     private List<Im> getImList(RegistrationUser registrationUser) {
         List<Im> ims = new ArrayList<Im>();
         if (!Strings.isNullOrEmpty(registrationUser.getIm())) {
-            Im im = new Im.Builder().setValue(HtmlUtils.htmlEscape(registrationUser.getIm()))
+            Im phoenNumber = new Im.Builder().setValue(registrationUser.getIm())
                     .build();
-            ims.add(im);
+            ims.add(phoenNumber);
         }
         return ims;
     }
@@ -130,14 +143,14 @@ public class UserConverter {
     private List<Photo> getPhotoList(RegistrationUser registrationUser) {
         List<Photo> photos = new ArrayList<Photo>();
         if (!Strings.isNullOrEmpty(registrationUser.getPhoto())) {
-            Photo photo = null;
+            Photo phoenNumber = null;
             try {
-                photo = new Photo.Builder().setValue(new URI(HtmlUtils.htmlEscape(registrationUser.getPhoto())))
+                phoenNumber = new Photo.Builder().setValue(new URI(registrationUser.getPhoto()))
                         .build();
             } catch (URISyntaxException e) {
                 throw new InvalidAttributeException("Photo is not an URI", "registration.validation.photo", e);
             }
-            photos.add(photo);
+            photos.add(phoenNumber);
         }
         return photos;
     }
@@ -145,10 +158,9 @@ public class UserConverter {
     private List<PhoneNumber> getPhoneNumberList(RegistrationUser registrationUser) {
         List<PhoneNumber> phoneNumbers = new ArrayList<PhoneNumber>();
         if (!Strings.isNullOrEmpty(registrationUser.getPhoneNumber())) {
-            PhoneNumber phoneNumber = new PhoneNumber.Builder().setValue(
-                    HtmlUtils.htmlEscape(registrationUser.getPhoneNumber()))
+            PhoneNumber phoenNumber = new PhoneNumber.Builder().setValue(registrationUser.getPhoneNumber())
                     .build();
-            phoneNumbers.add(phoneNumber);
+            phoneNumbers.add(phoenNumber);
         }
         return phoneNumbers;
     }
@@ -157,12 +169,12 @@ public class UserConverter {
         List<Address> addresses = new ArrayList<>();
         if (hasUserAddress(registrationUser)) {
             Address address = new Address.Builder()
-                    .setFormatted(HtmlUtils.htmlEscape(registrationUser.getFormattedAddress()))
-                    .setStreetAddress(HtmlUtils.htmlEscape(registrationUser.getStreetAddress()))
-                    .setLocality(HtmlUtils.htmlEscape(registrationUser.getLocality()))
-                    .setRegion(HtmlUtils.htmlEscape(registrationUser.getRegion()))
-                    .setPostalCode(HtmlUtils.htmlEscape(registrationUser.getPostalCode()))
-                    .setCountry(HtmlUtils.htmlEscape(registrationUser.getCountry()))
+                    .setFormatted(registrationUser.getFormattedAddress())
+                    .setStreetAddress(registrationUser.getStreetAddress())
+                    .setLocality(registrationUser.getLocality())
+                    .setRegion(registrationUser.getRegion())
+                    .setPostalCode(registrationUser.getPostalCode())
+                    .setCountry(registrationUser.getCountry())
                     .build();
             addresses.add(address);
         }
