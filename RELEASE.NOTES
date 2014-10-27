@@ -1,5 +1,17 @@
 # OSIAM addon-self-administration
 
+## 1.3.1 - 2014-10-27
+- [fix] using the already in scim-schema defined email validation
+- https://github.com/osiam/addon-self-administration/issues/61
+
+- [fix] fixed passwords-not-equal error-message response
+- https://github.com/osiam/addon-self-administration/issues/74
+
+- [fix] return forbidden, if you try to change the password more than one time
+- https://github.com/osiam/addon-self-administration/issues/63
+
+- [refactoring] revert the escaping for register a new user
+
 ## 1.3 - 2014-10-17
 - [fix] translation property files parsed as UTF-8
   Before this fix, the translation messages were parsed as ISO-8859-1
