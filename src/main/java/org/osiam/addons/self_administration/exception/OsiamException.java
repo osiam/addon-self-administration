@@ -51,9 +51,4 @@ public class OsiamException extends RuntimeException {
     public String getKey() {
         return key;
     }
-
-    public int getHttpStatusCode() {
-        return httpStatusCode;
-    }
-
 }

@@ -1,31 +1,68 @@
+/*
+ * Copyright (C) 2013 tarent AG
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package org.osiam.addons.self_administration;
 
-import com.google.common.base.Strings;
-import org.osiam.addons.self_administration.one_time_token.ScavengerTask;
-import org.osiam.client.OsiamConnector;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import java.util.*;
 
-import javax.servlet.Filter;
-import java.util.Properties;
+import javax.servlet.*;
+
+import org.osiam.addons.self_administration.one_time_token.*;
+import org.osiam.client.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.*;
+import org.springframework.boot.autoconfigure.*;
+import org.springframework.boot.context.web.*;
+import org.springframework.context.annotation.*;
+import org.springframework.mail.javamail.*;
+import org.springframework.scheduling.concurrent.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.filter.*;
+import org.springframework.web.servlet.config.annotation.*;
+
+import com.fasterxml.jackson.core.*;
+import com.google.common.base.*;
 
 @SpringBootApplication
 @EnableWebMvc
-@PropertySource("classpath:addon-self-administration.properties")
+@RestController
 public class SelfAdministration extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(SelfAdministration.class, args);
+    }
+
+    @RequestMapping(value = "/")
+    public ServiceInfo getServiceInfo() throws JsonProcessingException {
+        String version = getClass().getPackage().getImplementationVersion();
+        String name = getClass().getPackage().getImplementationTitle();
+        if (Strings.isNullOrEmpty(version)) {
+            version = "Version not found";
+        }
+        if (Strings.isNullOrEmpty(name)) {
+            name = "addon-self-administration";
+        }
+        return new ServiceInfo(name, version);
     }
 
     @Autowired
@@ -91,5 +128,24 @@ public class SelfAdministration extends SpringBootServletInitializer {
                 .setClientId(config.getClientId())
                 .setClientSecret(config.getClientSecret());
         return oConBuilder.build();
+    }
+
+    private static class ServiceInfo {
+
+        private String name;
+        private String version;
+
+        public ServiceInfo(String name, String version) {
+            this.name = name;
+            this.version = version;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getVersion() {
+            return version;
+        }
     }
 }

@@ -1,49 +1,85 @@
 package org.osiam.addons.self_administration.template;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import javax.annotation.*;
+
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.context.*;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.*;
+import org.springframework.validation.*;
+import org.springframework.validation.beanvalidation.*;
+import org.springframework.web.servlet.config.annotation.*;
+import org.thymeleaf.spring4.*;
+import org.thymeleaf.spring4.resourceresolver.*;
+import org.thymeleaf.templateresolver.*;
 
 @Configuration
-public class TemplateConfiguration {
+public class TemplateConfiguration extends WebMvcConfigurerAdapter {
 
-    @Bean
-    public ClassLoaderTemplateResolver defaultTemplateResolver() {
-        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-        resolver.setPrefix("addon-self-administration/templates/mail/");
-        resolver.setSuffix(".html");
-        resolver.setTemplateMode("HTML5");
-        resolver.setCharacterEncoding("UTF-8");
-        resolver.setOrder(1);
-        return resolver;
+    private static final Logger LOG = LoggerFactory.getLogger(TemplateConfiguration.class);
+
+    @Value("#{!(T(com.google.common.base.Strings).isNullOrEmpty(\"${org.osiam.external.resources.path:}\"))}")
+    private Boolean externalConfigurationEnabled;
+
+    @Value("${org.osiam.external.resources.path:}")
+    private String externalConfigPath;
+
+    @Autowired
+    private SpringTemplateEngine templateEngine;
+
+    @Autowired
+    private SpringResourceResourceResolver thymeleafResourceResolver;
+
+    @PostConstruct
+    public void configureExternalTemplateResolving() {
+        if (externalConfigurationEnabled) {
+
+            LOG.info("Using external configured resources in path {}", externalConfigPath);
+
+            final ITemplateResolver first = templateEngine.getTemplateResolvers().iterator().next();
+            TemplateResolver f = (TemplateResolver) first;
+            f.setOrder(2);
+
+            TemplateResolver externalTemplateResolver = new TemplateResolver();
+            externalTemplateResolver.setPrefix("file:" + externalConfigPath + "/templates/");
+            externalTemplateResolver.setSuffix(".html");
+            externalTemplateResolver.setTemplateMode("HTML5");
+            externalTemplateResolver.setCharacterEncoding("UTF-8");
+            externalTemplateResolver.setOrder(1);
+            externalTemplateResolver.setResourceResolver(thymeleafResourceResolver);
+            templateEngine.addTemplateResolver(externalTemplateResolver);
+        }
     }
 
     @Bean
-    public OsiamWebContextTemplateResolver webTemplateResolver() {
-        OsiamWebContextTemplateResolver resolver = new OsiamWebContextTemplateResolver();
-        resolver.setPrefix("addon-self-administration/templates/web/");
-        resolver.setSuffix(".html");
-        resolver.setTemplateMode("HTML5");
-        resolver.setCharacterEncoding("UTF-8");
-        resolver.setOrder(2);
-        return resolver;
+    public MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setDefaultEncoding("UTF-8");
+        if (externalConfigurationEnabled) {
+            messageSource.setBasenames("file:" + externalConfigPath + "/i18n/registration", "file:"
+                    + externalConfigPath + "/i18n/mail", "classpath:/i18n/registration", "classpath:/i18n/mail");
+        } else {
+            messageSource.setBasenames("classpath:/i18n/registration", "classpath:/i18n/mail");
+        }
+        return messageSource;
     }
 
-    @Bean
-    public SpringTemplateEngine templateEngine() {
-        SpringTemplateEngine engine = new SpringTemplateEngine();
-        engine.addTemplateResolver(defaultTemplateResolver());
-        engine.addTemplateResolver(webTemplateResolver());
-        return engine;
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        if (externalConfigurationEnabled) {
+            // there is not merging, so the first file found will be used
+            registry.addResourceHandler("/css/**").addResourceLocations("file:" + externalConfigPath + "/css/",
+                    "classpath:/resources/css/");
+        } else {
+            registry.addResourceHandler("/css/**").addResourceLocations("classpath:/resources/css/");
+        }
     }
 
-    @Bean
-    public ThymeleafViewResolver thymeleafViewResolver() {
-        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-        resolver.setCharacterEncoding("UTF-8");
-        resolver.setTemplateEngine(templateEngine());
-        return resolver;
+    @Override
+    public Validator getValidator() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.setValidationMessageSource(messageSource());
+        return validator;
     }
 }

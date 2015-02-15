@@ -90,7 +90,7 @@ public class ChangeEmailController {
     @RequestMapping(method = RequestMethod.GET)
     public void index(HttpServletResponse response) throws IOException {
         // load the html file as stream
-        InputStream inputStream = getClass().getResourceAsStream("/change_email.html");
+        InputStream inputStream = getClass().getResourceAsStream("/templates/web/change_email.html");
         String htmlContent = IOUtils.toString(inputStream, "UTF-8");
         // replacing the url
         String replacedAll = htmlContent.replace("$CHANGELINK", config.getClientEmailChangeUri());

@@ -43,7 +43,7 @@ public class OsiamExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(OsiamExceptionHandler.class.getName());
     private static final String AN_EXCEPTION_OCCURRED = "An exception occurred";
     private static final String KEY = "key";
-    private ModelAndView modelAndView = new ModelAndView("self_administration_error");
+    private ModelAndView modelAndView = new ModelAndView("web/self_administration_error");
 
     @ExceptionHandler(OsiamRequestException.class)
     protected ModelAndView handleException(OsiamRequestException ex, HttpServletResponse response) {

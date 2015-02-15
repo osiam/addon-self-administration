@@ -165,7 +165,7 @@ public class LostPasswordController {
             HttpServletResponse response) throws IOException {
 
         // load the html file as stream and convert to String for replacement
-        InputStream inputStream = getClass().getResourceAsStream("/change_password.html");
+        InputStream inputStream = getClass().getResourceAsStream("/templates/web/change_password.html");
         String htmlContent = IOUtils.toString(inputStream, "UTF-8");
 
         // replace all placeholders with appropriate value

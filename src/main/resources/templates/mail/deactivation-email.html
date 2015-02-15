@@ -7,7 +7,7 @@
         <div id="mail-subject" th:remove="tag" th:text="#{mail.deactivation.subject}">Deactivation of your account</div>
     	
    		<div id="mail-body">
-        	<div th:replace="mailtextbricks :: #salutation"></div>,<br />
+        	<div th:replace="mail/mailtextbricks :: #salutation"></div>,<br />
         	<br />
         	<p th:utext="#{mail.deactivation.body(${domain})}"></p>
         	<p th:text="#{mail.greeting}"></p>
