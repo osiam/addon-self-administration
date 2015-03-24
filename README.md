@@ -1,4 +1,4 @@
-add-on-self-administration
-==========================
+addon-self-administration [![Build Status](https://travis-ci.org/osiam/addon-self-administration.png?branch=master)](https://travis-ci.org/osiam/addon-self-administration)
+=========================
 
-a self administration for the OSIAM server
+A self administration for the OSIAM server
