@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.NoSuchElementException;
+
 @ControllerAdvice
 public class OsiamExceptionHandler {
 
@@ -58,6 +60,12 @@ public class OsiamExceptionHandler {
     protected ModelAndView handleException(OsiamException ex, HttpServletResponse response) {
         LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
         return createResponse(response, ex.getHttpStatusCode(), ex.getKey());
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    protected ModelAndView handleNoSuchElementException(NoSuchElementException ex, HttpServletResponse response) {
+        LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
+        return createResponse(response, 400, "activation.exception");
     }
 
     private ModelAndView createResponse(HttpServletResponse response, int httpStatus, String messageKey) {
