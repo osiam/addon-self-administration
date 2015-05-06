@@ -48,7 +48,7 @@ public class EmailValidator implements ConstraintValidator<Email, String> {
                 return false;
             }
 
-            if (registrationService.isUsernameIsAllreadyTaken(email)) {
+            if (registrationService.isUsernameIsAlreadyTaken(email)) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
                 constraintValidatorContext.buildConstraintViolationWithTemplate(
                         "{registration.validation.email.alreadytaken}").addConstraintViolation();
