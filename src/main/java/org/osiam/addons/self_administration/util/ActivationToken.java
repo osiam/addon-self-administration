@@ -50,7 +50,7 @@ public class ActivationToken {
      * @return {@code true} if this activation token is expired, otherwise {@code false}
      */
     public boolean isExpired(long timeout, TimeUnit unit) {
-        return System.currentTimeMillis() > issuedTime + unit.toMillis(timeout);
+        return System.currentTimeMillis() - unit.toMillis(timeout) > issuedTime;
     }
 
     public String getToken() {
