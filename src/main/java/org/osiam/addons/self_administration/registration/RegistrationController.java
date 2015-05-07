@@ -50,6 +50,9 @@ public class RegistrationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class);
 
     @Inject
+    private UserConverter userConverter;
+
+    @Inject
     private CallbackPlugin callbackPlugin;
 
     @Inject
@@ -78,7 +81,7 @@ public class RegistrationController {
             return "registration";
         }
 
-        User user = registrationService.convertToScimUser(registrationUser);
+        User user = userConverter.toScim(registrationUser);
 
         try {
             callbackPlugin.performPreRegistrationActions(user);
@@ -109,14 +112,14 @@ public class RegistrationController {
 
     /**
      * Activates a previously registered user.
-     * 
+     *
      * After activation E-Mail arrived the activation link will point to this URI.
-     * 
+     *
      * @param userId
      *            the id of the registered user
      * @param activationToken
      *            the user's activation token, send by E-Mail
-     * 
+     *
      * @return the registrationSuccess page
      */
     @RequestMapping(value = "/activation", method = RequestMethod.GET)

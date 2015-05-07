@@ -51,7 +51,7 @@ class UserValidationSpec extends Specification {
 
         registrationService.passwordLength >> 8
         registrationService.usernameEqualsEmail >> true
-        registrationService.isUsernameIsAllreadyTaken(_) >> false
+        registrationService.isUsernameIsAlreadyTaken(_) >> false
 
         when:
         def isEqualPasswordValid = equalPasswordValidator.isValid(user, null)

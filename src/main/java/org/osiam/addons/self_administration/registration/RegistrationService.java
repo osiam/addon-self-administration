@@ -23,12 +23,8 @@
 
 package org.osiam.addons.self_administration.registration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -36,18 +32,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
+import org.osiam.addons.self_administration.util.ActivationToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.client.query.Query;
 import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.helper.SCIMHelper;
-import org.osiam.resources.scim.Email;
-import org.osiam.resources.scim.Extension;
-import org.osiam.resources.scim.Role;
-import org.osiam.resources.scim.SCIMSearchResult;
-import org.osiam.resources.scim.UpdateUser;
-import org.osiam.resources.scim.User;
+import org.osiam.resources.scim.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -56,9 +48,6 @@ import com.google.common.base.Strings;
 
 @Service
 public class RegistrationService {
-
-    @Inject
-    private UserConverter userConverter;
 
     @Inject
     private ConnectorBuilder connectorBuilder;
@@ -118,7 +107,7 @@ public class RegistrationService {
         this.allowedFields = trimmedFields.toArray(new String[trimmedFields.size()]);
     }
 
-    public boolean isUsernameIsAllreadyTaken(String userName) {
+    public boolean isUsernameIsAlreadyTaken(String userName) {
         Query query = new QueryBuilder().filter("userName eq \"" + userName + "\"").build();
 
         OsiamConnector osiamConnector = connectorBuilder.createConnector();
@@ -126,38 +115,25 @@ public class RegistrationService {
         SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, accessToken);
         return queryResult.getTotalResults() != 0L;
     }
-    
-    public User convertToScimUser(RegistrationUser registrationUser){
-        return userConverter.toScimUser(registrationUser);
-    }
 
     public User saveRegistrationUser(final User user) {
-        User registrationUser = createUserForRegistration(user);
-
-        OsiamConnector osiamConnector = connectorBuilder.createConnector();
-        AccessToken accessToken = osiamConnector.retrieveAccessToken();
-        return osiamConnector.createUser(registrationUser, accessToken);
-    }
-
-    /**
-     * puts the activation extension and the role USER to the given User
-     */
-    private User createUserForRegistration(User user) {
-        String activationToken = UUID.randomUUID().toString();
         Extension extension = new Extension.Builder(internalScimExtensionUrn)
-                .setField(activationTokenField, activationToken)
+                .setField(activationTokenField, new ActivationToken().toString())
                 .build();
+
         List<Role> roles = new ArrayList<Role>();
         Role role = new Role.Builder().setValue("USER").build();
         roles.add(role);
 
-        User completeUser = new User.Builder(user)
+        User registrationUser = new User.Builder(user)
                 .setActive(false)
                 .addRoles(roles)
                 .addExtension(extension)
                 .build();
 
-        return completeUser;
+        OsiamConnector osiamConnector = connectorBuilder.createConnector();
+        AccessToken accessToken = osiamConnector.retrieveAccessToken();
+        return osiamConnector.createUser(registrationUser, accessToken);
     }
 
     public void sendRegistrationEmail(User user, HttpServletRequest request) {
@@ -169,10 +145,11 @@ public class RegistrationService {
 
         StringBuffer requestURL = request.getRequestURL().append("/activation");
 
-        String activationToken = user.getExtension(internalScimExtensionUrn).getFieldAsString(activationTokenField);
+        final ActivationToken activationToken = ActivationToken.fromString(user.getExtension(internalScimExtensionUrn)
+                .getFieldAsString(activationTokenField));
 
         String registrationLink = SelfAdministrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
-                "activationToken", activationToken);
+                "activationToken", activationToken.getToken());
 
         Map<String, Object> mailVariables = new HashMap<>();
         mailVariables.put("registrationLink", registrationLink);
@@ -184,41 +161,49 @@ public class RegistrationService {
                 mailVariables);
     }
 
-    public User activateUser(String userId, String activationToken) {
+    public User activateUser(String userId, String activationTokenToCheck) {
         if (Strings.isNullOrEmpty(userId)) {
-            throw new InvalidAttributeException("Can't confirm the user. The userid is empty",
-                    "activation.exception");
+            throw new InvalidAttributeException("Can't confirm the user. The userId is empty", "activation.exception");
         }
-        if (Strings.isNullOrEmpty(activationToken)) {
+        if (Strings.isNullOrEmpty(activationTokenToCheck)) {
             throw new InvalidAttributeException("Can't confirm the user " + userId + ". The activation token is empty",
                     "activation.exception");
         }
+
         OsiamConnector osiamConnector = connectorBuilder.createConnector();
         AccessToken accessToken = osiamConnector.retrieveAccessToken();
         User user = osiamConnector.getUser(userId, accessToken);
 
-        if(user.isActive()) {
+        if (user.isActive()) {
             return user;
         }
 
         Extension extension = user.getExtension(internalScimExtensionUrn);
-        String activationTokenFieldValue = extension.getFieldAsString(activationTokenField);
 
-        if (!activationTokenFieldValue.equals(activationToken)) {
-            throw new InvalidAttributeException("Activation token miss match. Given: " + activationToken + " stored: "
-                    + activationTokenFieldValue, "activation.exception");
+        final ActivationToken storedActivationToken = ActivationToken
+                .fromString(extension.getFieldAsString(activationTokenField));
+
+        if (storedActivationToken.isExpired(24, TimeUnit.HOURS)) {
+            UpdateUser updateUser = new UpdateUser.Builder()
+                    .deleteExtensionField(extension.getUrn(), activationTokenField)
+                    .build();
+            osiamConnector.updateUser(userId, updateUser, accessToken);
+
+            throw new InvalidAttributeException("Activation token is expired", "activation.exception");
         }
 
-        UpdateUser updateUser = getPreparedUserForActivation(extension);
-        return osiamConnector.updateUser(userId, updateUser, accessToken);
-    }
+        if (!storedActivationToken.getToken().equals(activationTokenToCheck)) {
+            throw new InvalidAttributeException(String.format("Activation token mismatch. Given: %s stored: %s",
+                    activationTokenToCheck, storedActivationToken.getToken()),
+                    "activation.exception");
+        }
 
-    private UpdateUser getPreparedUserForActivation(Extension extension) {
         UpdateUser updateUser = new UpdateUser.Builder()
                 .deleteExtensionField(extension.getUrn(), activationTokenField)
-                .updateActive(true).build();
+                .updateActive(true)
+                .build();
 
-        return updateUser;
+        return osiamConnector.updateUser(userId, updateUser, accessToken);
     }
 
     public String[] getAllAllowedFields() {

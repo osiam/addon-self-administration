@@ -47,7 +47,7 @@ public class UsernameValidator implements ConstraintValidator<Username, String> 
             if (isNullOrEmpty(username)) {
                 return false;
             }
-            if (registrationService.isUsernameIsAllreadyTaken(username)) {
+            if (registrationService.isUsernameIsAlreadyTaken(username)) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
                 constraintValidatorContext.buildConstraintViolationWithTemplate(
                         "{registration.validation.username.alreadytaken}").addConstraintViolation();

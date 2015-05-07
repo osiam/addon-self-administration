@@ -52,7 +52,7 @@ public class UserConverter {
     @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
     private boolean usernameEqualsEmail;
 
-    public User toScimUser(RegistrationUser registrationUser) {
+    public User toScim(RegistrationUser registrationUser) {
 
         Name name = new Name.Builder()
                 .setFormatted(registrationUser.getFormattedName())
