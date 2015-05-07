@@ -48,6 +48,7 @@ class ActivationTokenSpec extends Specification {
         where:
         issuedTime                 | expectedExpired
         System.currentTimeMillis() | false
+        Long.MAX_VALUE             | false
         1000L                      | true
     }
 }
