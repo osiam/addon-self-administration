@@ -11,7 +11,7 @@ class ActivationTokenSpec extends Specification {
     @Unroll
     def 'Activation token can be parsed from #value'() {
         when:
-        ActivationToken activationToken = ActivationToken.fromString(value)
+        OneTimeToken activationToken = OneTimeToken.fromString(value)
 
         then:
         activationToken.token == token
@@ -26,7 +26,7 @@ class ActivationTokenSpec extends Specification {
     @Unroll
     def 'Activation token cannot be parsed from #value'() {
         when:
-        ActivationToken.fromString(value)
+        OneTimeToken.fromString(value)
 
         then:
         thrown(expectedException)
@@ -40,7 +40,7 @@ class ActivationTokenSpec extends Specification {
     @Unroll
     def 'isExpired returns #expectedExpired if token has been issued on #issuedTime'() {
         given:
-        ActivationToken activationToken = new ActivationToken("token", issuedTime)
+        OneTimeToken activationToken = new OneTimeToken("token", issuedTime)
 
         expect:
         activationToken.isExpired(24, TimeUnit.HOURS) == expectedExpired
