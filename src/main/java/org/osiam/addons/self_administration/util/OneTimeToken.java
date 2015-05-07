@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * {@code ActivationToken} stores the actual token for activation and the timestamp the token has been issued in UTC.
  */
-public class ActivationToken {
+public class OneTimeToken {
 
     private final String token;
     private final long issuedTime;
@@ -14,31 +14,31 @@ public class ActivationToken {
     /**
      * Parses an activation token from the SCIM extension
      * @param activationToken The activation token as stored in the extension
-     * @return A new {@link ActivationToken} instance
+     * @return A new {@link OneTimeToken} instance
      * @throws NumberFormatException
      */
-    public static ActivationToken fromString(String activationToken) {
+    public static OneTimeToken fromString(String activationToken) {
         final int indexOfColon = activationToken.indexOf(':');
 
         if (indexOfColon == -1) {
-            return new ActivationToken(activationToken, Long.MAX_VALUE);
+            return new OneTimeToken(activationToken, Long.MAX_VALUE);
         }
 
         final String token = activationToken.substring(0, indexOfColon);
         final long issuedTime = Long.valueOf(activationToken.substring(indexOfColon + 1));
 
-        return new ActivationToken(token, issuedTime);
+        return new OneTimeToken(token, issuedTime);
     }
 
     /**
-     * Creates a new {@link ActivationToken}
+     * Creates a new {@link OneTimeToken}
      */
-    public ActivationToken() {
+    public OneTimeToken() {
         this.token = UUID.randomUUID().toString();
         this.issuedTime = System.currentTimeMillis();
     }
 
-    private ActivationToken(final String token, final long issuedTime) {
+    private OneTimeToken(final String token, final long issuedTime) {
         this.token = token;
         this.issuedTime = issuedTime;
     }

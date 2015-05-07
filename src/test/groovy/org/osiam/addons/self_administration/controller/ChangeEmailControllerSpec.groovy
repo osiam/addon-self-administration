@@ -23,17 +23,12 @@
 
 package org.osiam.addons.self_administration.controller
 
-
-
-import javax.servlet.ServletContext
-import javax.servlet.ServletOutputStream
-import javax.servlet.http.HttpServletResponse
-
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.EmailTemplateRenderer
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
+import org.osiam.addons.self_administration.util.OneTimeToken
 import org.osiam.addons.self_administration.util.UserObjectMapper
 import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.UnauthorizedException
@@ -43,8 +38,11 @@ import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.User
 import org.springframework.http.HttpStatus
-
 import spock.lang.Specification
+
+import javax.servlet.ServletContext
+import javax.servlet.ServletOutputStream
+import javax.servlet.http.HttpServletResponse
 
 class ChangeEmailControllerSpec extends Specification {
 
@@ -52,7 +50,8 @@ class ChangeEmailControllerSpec extends Specification {
 
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()
-    RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService, emailTemplateRendererService: emailTemplateRendererService)
+    RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService,
+            emailTemplateRendererService: emailTemplateRendererService)
 
     def urn = 'urn:scim:schemas:osiam:1.0:Registration'
 
@@ -61,8 +60,6 @@ class ChangeEmailControllerSpec extends Specification {
 
     def emailChangeLinkPrefix = 'http://localhost:8080/stuff'
     def emailChangeMailFrom = 'bugs@bunny.com'
-    def emailChangeMailSubject = 'email change'
-    def emailChangeInfoMailSubject = 'email change done'
     def clientEmailChangeUri = 'http://test'
 
     def bootStrapLib = 'http://bootstrap'
@@ -74,13 +71,13 @@ class ChangeEmailControllerSpec extends Specification {
     OsiamConnector osiamConnector = Mock()
 
     ChangeEmailController changeEmailController = new ChangeEmailController(confirmationTokenField: confirmTokenField,
-    tempEmail: tempMailField, context: context, emailChangeLinkPrefix: emailChangeLinkPrefix,
-    fromAddress: emailChangeMailFrom, internalScimExtensionUrn: urn,
-    mapper: mapper, clientEmailChangeUri: clientEmailChangeUri, bootStrapLib: bootStrapLib, angularLib: angularLib,
-    jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
-    connectorBuilder : connectorBuilder)
+            tempEmail: tempMailField, context: context, emailChangeLinkPrefix: emailChangeLinkPrefix,
+            fromAddress: emailChangeMailFrom, internalScimExtensionUrn: urn, mapper: mapper,
+            clientEmailChangeUri: clientEmailChangeUri, bootStrapLib: bootStrapLib, angularLib: angularLib,
+            jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
+            connectorBuilder: connectorBuilder)
 
-    def 'there should be an failure in change email if email template file was not found'() {
+    def 'there should be a failure in change email if email template file was not found'() {
         given:
         def authZHeader = 'Bearer ACCESSTOKEN'
         def newEmailValue = 'bam@boom.com'
@@ -95,10 +92,10 @@ class ChangeEmailControllerSpec extends Specification {
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
-        1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> {throw new OsiamException()}
+        1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
     }
 
-    def 'there should be an failure in change email if email body not found'() {
+    def 'there should be a failure in change email if email body not found'() {
         given:
         def authZHeader = 'Bearer ACCESSTOKEN'
         def newEmailValue = 'bam@boom.com'
@@ -113,10 +110,10 @@ class ChangeEmailControllerSpec extends Specification {
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
-        1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> {throw new OsiamException()}
+        1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
     }
 
-    def 'there should be an failure in change email if email subject not found'() {
+    def 'there should be a failure in change email if email subject not found'() {
         given:
         def authZHeader = 'Bearer ACCESSTOKEN'
         def newEmailValue = 'bam@boom.com'
@@ -130,7 +127,7 @@ class ChangeEmailControllerSpec extends Specification {
         1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> {throw new OsiamException()}
+        1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> { throw new OsiamException() }
     }
 
     def 'change email should generate a confirmation token, save the new email temporarily and send an email'() {
@@ -155,7 +152,7 @@ class ChangeEmailControllerSpec extends Specification {
         result.getStatusCode() == HttpStatus.OK
     }
 
-    def 'should catch UnauthorizedException and returning response with error message'(){
+    def 'should catch UnauthorizedException and returning response with error message'() {
         given:
         def authZ = 'invalid access token'
         AccessToken accessToken = new AccessToken.Builder('token').build()
@@ -165,7 +162,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getCurrentUserBasic(accessToken) >> {throw new UnauthorizedException('unauthorized')}
+        1 * osiamConnector.getCurrentUserBasic(accessToken) >> { throw new UnauthorizedException('unauthorized') }
         result.getBody() == '{\"error\":\"unauthorized\"}'
     }
 
@@ -173,39 +170,58 @@ class ChangeEmailControllerSpec extends Specification {
         given:
         def authZHeader = 'abc'
         def userId = 'userId'
-        def confirmToken = 'confToken'
+        OneTimeToken confirmToken = new OneTimeToken()
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('emailConfirmToken', confirmToken)
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('emailConfirmToken', confirmToken.toString())
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .addEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List).build()
 
-        def upatedUser = getUpdatedUser()
-
-        def subjectContent = 'email change done'
-        def emailContent = 'nine bytes and one placeholder'
-
         when:
-        def result = changeEmailController.confirm(authZHeader, userId, confirmToken)
+        def result = changeEmailController.confirm(authZHeader, userId, confirmToken.token)
 
         then:
-        2 * connectorBuilder.createConnector() >> osiamConnector
+        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(_, _) >> user
         1 * osiamConnector.updateUser(userId, _, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
-
     }
 
-    def 'there should be an failure if confirmation token miss match'() {
+    def 'confirm email should work with old tokens'() {
+        given:
+        def authZHeader = 'abc'
+        def userId = 'userId'
+        def oldConfirmToken = 'irrelevant'
+
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+                .setField('emailConfirmToken', oldConfirmToken)
+                .setField('tempMail', 'my@mail.com')
+                .build()
+        User user = new User.Builder()
+                .addExtension(extension)
+                .addEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List).build()
+
+        when:
+        def result = changeEmailController.confirm(authZHeader, userId, oldConfirmToken)
+
+        then:
+        connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getUser(_, _) >> user
+        1 * osiamConnector.updateUser(userId, _, _) >> user
+
+        result.getStatusCode() == HttpStatus.OK
+    }
+
+    def 'there should be a failure if confirmation token miss match'() {
         given:
         def authZHeader = 'abc'
         def userId = 'userId'
         def confirmToken = 'confToken'
 
         Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
-            .setField('emailConfirmToken', 'wrong token')
-            .setField('tempMail', 'my@mail.com').build()
+                .setField('emailConfirmToken', 'wrong token')
+                .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
                 .build()
 
@@ -240,46 +256,26 @@ class ChangeEmailControllerSpec extends Specification {
         1 * servletResponseMock.getOutputStream() >> servletOutputStream
     }
 
-    def getUserAsString() {
-        def emails = new Email.Builder().setPrimary(true).setValue('email@example.org').build()
+    def 'there should be a failure if confirmation token is expired'() {
+        given:
+        def authZHeader = 'abc'
+        def userId = 'userId'
+        def confirmToken = 'confToken'
+        def expiredToken = 'confToken:1'
 
-        def user = new User.Builder('Boy George')
-                .setPassword('password')
-                .setEmails([emails])
-                .setActive(false)
+        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+                .setField('emailConfirmToken', expiredToken)
+                .setField('tempMail', 'my@mail.com').build()
+        User user = new User.Builder().addExtension(extension)
                 .build()
 
-        return mapper.writeValueAsString(user)
+        when:
+        def response = changeEmailController.confirm(authZHeader, userId, confirmToken)
+
+        then:
+        connectorBuilder.createConnector() >> osiamConnector
+        1 * osiamConnector.getUser(_, _) >> user
+        response.getStatusCode() == HttpStatus.FORBIDDEN
     }
 
-    def getUserWithTempEmailAsString(confToken) {
-        def primary = new Email.Builder().setPrimary(true).setValue('email@example.org').build()
-        def email = new Email.Builder().setPrimary(false).setValue('nonPrimary@example.org').build()
-
-        def extension = new Extension(urn)
-        extension.addOrUpdateField(confirmTokenField, confToken)
-        extension.addOrUpdateField(tempMailField, 'newemail@example.org')
-
-        def user = new User.Builder('Boy George')
-                .setPassword('password')
-                .addEmails([primary, email] as List)
-                .setActive(false)
-                .addExtension(extension)
-                .build()
-
-        return mapper.writeValueAsString(user)
-    }
-
-    def getUpdatedUser() {
-        def primary = new Email.Builder().setPrimary(true).setValue('newemail@example.org').build()
-        def email = new Email.Builder().setPrimary(false).setValue('nonPrimary@example.org').build()
-
-        def user = new User.Builder('Boy George')
-                .setPassword('password')
-                .addEmails([primary, email] as List)
-                .setActive(false)
-                .build()
-
-        return mapper.writeValueAsString(user)
-    }
 }

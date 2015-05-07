@@ -45,15 +45,6 @@ public class ConnectorBuilder {
     @Value("${org.osiam.addon-self-administration.client.scope}")
     private String clientScope;
 
-    public OsiamConnector createConnector(String userName, String password) {
-        OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
-                setAuthServerEndpoint(authServerHome).
-                setResourceServerEndpoint(resourceServerHome).
-                setClientId(clientId).
-                setClientSecret(clientSecret);
-        return oConBuilder.build();
-    }
-
     public OsiamConnector createConnector() {
         OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
                 setAuthServerEndpoint(authServerHome).

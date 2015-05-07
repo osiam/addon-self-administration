@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.ActivationToken;
+import org.osiam.addons.self_administration.util.OneTimeToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
@@ -118,7 +118,7 @@ public class RegistrationService {
 
     public User saveRegistrationUser(final User user) {
         Extension extension = new Extension.Builder(internalScimExtensionUrn)
-                .setField(activationTokenField, new ActivationToken().toString())
+                .setField(activationTokenField, new OneTimeToken().toString())
                 .build();
 
         List<Role> roles = new ArrayList<Role>();
@@ -145,7 +145,7 @@ public class RegistrationService {
 
         StringBuffer requestURL = request.getRequestURL().append("/activation");
 
-        final ActivationToken activationToken = ActivationToken.fromString(user.getExtension(internalScimExtensionUrn)
+        final OneTimeToken activationToken = OneTimeToken.fromString(user.getExtension(internalScimExtensionUrn)
                 .getFieldAsString(activationTokenField));
 
         String registrationLink = SelfAdministrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
@@ -180,7 +180,7 @@ public class RegistrationService {
 
         Extension extension = user.getExtension(internalScimExtensionUrn);
 
-        final ActivationToken storedActivationToken = ActivationToken
+        final OneTimeToken storedActivationToken = OneTimeToken
                 .fromString(extension.getFieldAsString(activationTokenField));
 
         if (storedActivationToken.isExpired(24, TimeUnit.HOURS)) {
