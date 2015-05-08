@@ -24,12 +24,13 @@
 package org.osiam.addons.self_administration.controller
 
 import org.joda.time.Duration
+import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.EmailTemplateRenderer
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
-import org.osiam.addons.self_administration.util.OneTimeToken
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken
 import org.osiam.addons.self_administration.util.UserObjectMapper
 import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.OsiamRequestException
@@ -73,12 +74,21 @@ class LostPasswordControllerSpec extends Specification {
     ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
 
-    LostPasswordController lostPasswordController = new LostPasswordController(
-            oneTimePasswordField: oneTimePasswordField, passwordlostLinkPrefix: passwordLostLinkPrefix,
-            fromAddress: passwordLostMailFrom, context: contextMock, internalScimExtensionUrn: urn,
-            clientPasswordChangeUri: clientPasswordChangeUri, mapper: mapper, bootStrapLib: bootStrapLib,
-            angularLib: angularLib, jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
-            connectorBuilder: connectorBuilder, oneTimePasswordTimeout: Duration.standardHours(24))
+    Config config = new Config(oneTimePasswordTimeout: Duration.standardHours(24).millis,
+            oneTimePasswordField: oneTimePasswordField,
+            fromAddress: passwordLostMailFrom,
+            extensionUrn: urn,
+            bootStrapLib: bootStrapLib,
+            angularLib: angularLib,
+            jqueryLib: jqueryLib)
+
+    LostPasswordController lostPasswordController = new LostPasswordController(context: contextMock,
+            clientPasswordChangeUri: clientPasswordChangeUri,
+            passwordLostLinkPrefix: passwordLostLinkPrefix,
+            mapper: mapper,
+            renderAndSendEmailService: renderAndSendEmailService,
+            connectorBuilder: connectorBuilder,
+            config: config)
 
     def 'The controller should start the flow by generating a one time password and send an email to the user'() {
         given:

@@ -23,23 +23,32 @@
 
 package org.osiam.addons.self_administration.registration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.joda.time.Duration;
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.OneTimeToken;
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.client.query.Query;
 import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.helper.SCIMHelper;
-import org.osiam.resources.scim.*;
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.Extension;
+import org.osiam.resources.scim.Role;
+import org.osiam.resources.scim.SCIMSearchResult;
+import org.osiam.resources.scim.UpdateUser;
+import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -55,18 +64,8 @@ public class RegistrationService {
     @Inject
     private RenderAndSendEmail renderAndSendEmailService;
 
-    @Value("${org.osiam.mail.from}")
-    private String fromAddress;
-
-    @Value("${org.osiam.scim.extension.urn}")
-    private String internalScimExtensionUrn;
-
-    @Value("${org.osiam.scim.extension.field.activationtoken}")
-    private String activationTokenField;
-
-    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
-            "\"${org.osiam.addon-self-administration.registration.activation-token-timeout:24h}\")}")
-    private Duration activationTokenTimeout;
+    @Inject
+    private Config config;
 
     private String[] allowedFields;
     private String[] allAllowedFields;
@@ -121,8 +120,8 @@ public class RegistrationService {
     }
 
     public User saveRegistrationUser(final User user) {
-        Extension extension = new Extension.Builder(internalScimExtensionUrn)
-                .setField(activationTokenField, new OneTimeToken().toString())
+        Extension extension = new Extension.Builder(config.getExtensionUrn())
+                .setField(config.getActivationTokenField(), new OneTimeToken().toString())
                 .build();
 
         List<Role> roles = new ArrayList<Role>();
@@ -149,8 +148,8 @@ public class RegistrationService {
 
         StringBuffer requestURL = request.getRequestURL().append("/activation");
 
-        final OneTimeToken activationToken = OneTimeToken.fromString(user.getExtension(internalScimExtensionUrn)
-                .getFieldAsString(activationTokenField));
+        final OneTimeToken activationToken = OneTimeToken.fromString(user.getExtension(config.getExtensionUrn())
+                .getFieldAsString(config.getActivationTokenField()));
 
         String registrationLink = SelfAdministrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
                 "activationToken", activationToken.getToken());
@@ -161,7 +160,8 @@ public class RegistrationService {
 
         Locale locale = SelfAdministrationHelper.getLocale(user.getLocale());
 
-        renderAndSendEmailService.renderAndSendEmail("registration", fromAddress, email.get().getValue(), locale,
+        renderAndSendEmailService.renderAndSendEmail("registration", config.getFromAddress(), email.get().getValue(),
+                locale,
                 mailVariables);
     }
 
@@ -182,14 +182,14 @@ public class RegistrationService {
             return user;
         }
 
-        Extension extension = user.getExtension(internalScimExtensionUrn);
+        Extension extension = user.getExtension(config.getExtensionUrn());
 
         final OneTimeToken storedActivationToken = OneTimeToken
-                .fromString(extension.getFieldAsString(activationTokenField));
+                .fromString(extension.getFieldAsString(config.getActivationTokenField()));
 
-        if (storedActivationToken.isExpired(activationTokenTimeout)) {
+        if (storedActivationToken.isExpired(config.getActivationTokenTimeout())) {
             UpdateUser updateUser = new UpdateUser.Builder()
-                    .deleteExtensionField(extension.getUrn(), activationTokenField)
+                    .deleteExtensionField(extension.getUrn(), config.getActivationTokenField())
                     .build();
             osiamConnector.updateUser(userId, updateUser, accessToken);
 
@@ -203,7 +203,7 @@ public class RegistrationService {
         }
 
         UpdateUser updateUser = new UpdateUser.Builder()
-                .deleteExtensionField(extension.getUrn(), activationTokenField)
+                .deleteExtensionField(extension.getUrn(), config.getActivationTokenField())
                 .updateActive(true)
                 .build();
 

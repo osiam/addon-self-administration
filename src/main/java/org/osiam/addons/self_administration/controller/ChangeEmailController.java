@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -37,11 +36,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.joda.time.Duration;
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.OneTimeToken;
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
 import org.osiam.client.OsiamConnector;
@@ -50,7 +49,11 @@ import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.client.user.BasicUser;
 import org.osiam.resources.helper.SCIMHelper;
-import org.osiam.resources.scim.*;
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.Extension;
+import org.osiam.resources.scim.ExtensionFieldType;
+import org.osiam.resources.scim.UpdateUser;
+import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,36 +89,15 @@ public class ChangeEmailController {
     @Inject
     private ConnectorBuilder connectorBuilder;
 
-    /* Extension configuration */
-    @Value("${org.osiam.scim.extension.field.tempemail}")
-    private String tempEmail;
-    @Value("${org.osiam.scim.extension.field.emailconfirmtoken}")
-    private String confirmationTokenField;
-    @Value("${org.osiam.mail.from}")
-    private String fromAddress;
+    @Inject
+    private Config config;
 
-    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
-            "\"${org.osiam.addon-self-administration.change-email.confirmation-token-timeout:24h}\")}")
-    private Duration confirmationTokenTimeout;
-
-    /* Change email configuration */
     @Value("${org.osiam.mail.emailchange.linkprefix}")
     private String emailChangeLinkPrefix;
 
     /* URI for the change email call from JavaScript */
     @Value("${org.osiam.html.emailchange.url}")
     private String clientEmailChangeUri;
-
-    // css and js libs
-    @Value("${org.osiam.html.dependencies.bootstrap}")
-    private String bootStrapLib;
-    @Value("${org.osiam.html.dependencies.angular}")
-    private String angularLib;
-    @Value("${org.osiam.html.dependencies.jquery}")
-    private String jqueryLib;
-
-    @Value("${org.osiam.scim.extension.urn}")
-    private String internalScimExtensionUrn;
 
     /**
      * Generates a HTTP form with the fields for change email purpose.
@@ -129,9 +111,9 @@ public class ChangeEmailController {
         String replacedAll = htmlContent.replace("$CHANGELINK", clientEmailChangeUri);
 
         // replace all lib links
-        replacedAll = replacedAll.replace("$BOOTSTRAP", bootStrapLib);
-        replacedAll = replacedAll.replace("$ANGULAR", angularLib);
-        replacedAll = replacedAll.replace("$JQUERY", jqueryLib);
+        replacedAll = replacedAll.replace("$BOOTSTRAP", config.getBootStrapLib());
+        replacedAll = replacedAll.replace("$ANGULAR", config.getAngularLib());
+        replacedAll = replacedAll.replace("$JQUERY", config.getJqueryLib());
 
         InputStream in = IOUtils.toInputStream(replacedAll);
         // set the content type
@@ -144,9 +126,9 @@ public class ChangeEmailController {
      * address.
      *
      * @param authorization
-     *        Authorization header with HTTP Bearer authorization and a valid access token
+     *            Authorization header with HTTP Bearer authorization and a valid access token
      * @param newEmailValue
-     *        The new email address value
+     *            The new email address value
      * @return The HTTP status code
      * @throws IOException
      * @throws MessagingException
@@ -169,7 +151,8 @@ public class ChangeEmailController {
             return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        String activateLink = SelfAdministrationHelper.createLinkForEmail(emailChangeLinkPrefix, updatedUser.getId(),
+        String activateLink = SelfAdministrationHelper.createLinkForEmail(emailChangeLinkPrefix,
+                updatedUser.getId(),
                 "confirmToken", confirmationToken.getToken());
 
         // build the Map with the link for replacement
@@ -180,7 +163,7 @@ public class ChangeEmailController {
         Locale locale = SelfAdministrationHelper.getLocale(updatedUser.getLocale());
 
         try {
-            renderAndSendEmailService.renderAndSendEmail("changeemail", fromAddress, newEmailValue, locale,
+            renderAndSendEmailService.renderAndSendEmail("changeemail", config.getFromAddress(), newEmailValue, locale,
                     mailVariables);
         } catch (OsiamException e) {
             String message = "Problems creating email for confirming new user: " + e.getMessage();
@@ -204,9 +187,9 @@ public class ChangeEmailController {
         final AccessToken accessToken = new AccessToken.Builder(token).build();
         final BasicUser user = connector.getCurrentUserBasic(accessToken);
 
-        final Extension extension = new Extension.Builder(internalScimExtensionUrn)
-                .setField(confirmationTokenField, confirmationToken.toString())
-                .setField(tempEmail, newEmail)
+        final Extension extension = new Extension.Builder(config.getExtensionUrn())
+                .setField(config.getConfirmationTokenField(), confirmationToken.toString())
+                .setField(config.getTempEmailField(), newEmail)
                 .build();
 
         final UpdateUser updateUser = new UpdateUser.Builder()
@@ -220,11 +203,11 @@ public class ChangeEmailController {
      * Validating the confirm token and saving the new email value as primary email if the validation was successful.
      *
      * @param authorization
-     *        Authorization header with HTTP Bearer authorization and a valid access token
+     *            Authorization header with HTTP Bearer authorization and a valid access token
      * @param userId
-     *        The user id for the user whom email address should be changed
+     *            The user id for the user whom email address should be changed
      * @param confirmationToken
-     *        The previously generated confirmation token from the confirmation email
+     *            The previously generated confirmation token from the confirmation email
      * @return The HTTP status code and the updated user if successful
      */
     @RequestMapping(method = RequestMethod.POST, value = "/confirm", produces = "application/json")
@@ -247,14 +230,14 @@ public class ChangeEmailController {
                     SelfAdministrationHelper.extractAccessToken(authorization)).build();
             User user = osiamConnector.getUser(userId, accessToken);
 
-            Extension extension = user.getExtension(internalScimExtensionUrn);
+            Extension extension = user.getExtension(config.getExtensionUrn());
             final OneTimeToken storedConfirmationToken = OneTimeToken.fromString(extension
-                    .getFieldAsString(confirmationTokenField));
+                    .getFieldAsString(config.getConfirmationTokenField()));
 
-            if (storedConfirmationToken.isExpired(confirmationTokenTimeout)) {
+            if (storedConfirmationToken.isExpired(config.getConfirmationTokenTimeout())) {
                 UpdateUser updateUser = new UpdateUser.Builder()
-                        .deleteExtensionField(extension.getUrn(), confirmationTokenField)
-                        .deleteExtensionField(extension.getUrn(), tempEmail)
+                        .deleteExtensionField(extension.getUrn(), config.getConfirmationTokenField())
+                        .deleteExtensionField(extension.getUrn(), config.getTempEmailField())
                         .build();
                 osiamConnector.updateUser(userId, updateUser, accessToken);
 
@@ -269,7 +252,7 @@ public class ChangeEmailController {
                 return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
             }
 
-            String newEmail = extension.getField(tempEmail, ExtensionFieldType.STRING);
+            String newEmail = extension.getField(config.getTempEmailField(), ExtensionFieldType.STRING);
             oldEmail = SCIMHelper.getPrimaryOrFirstEmail(user);
 
             UpdateUser updateUser = getPreparedUserForEmailChange(extension, newEmail, oldEmail.get());
@@ -295,7 +278,8 @@ public class ChangeEmailController {
         mailVariables.put("user", updatedUser);
 
         try {
-            renderAndSendEmailService.renderAndSendEmail("changeemailinfo", fromAddress, oldEmail.get().getValue(),
+            renderAndSendEmailService.renderAndSendEmail("changeemailinfo", config.getFromAddress(), oldEmail.get()
+                    .getValue(),
                     locale, mailVariables);
         } catch (OsiamException e) {
             String message = "Problems creating email for confirming new user email: " + e.getMessage();
@@ -312,8 +296,8 @@ public class ChangeEmailController {
         return new UpdateUser.Builder()
                 .addEmail(email)
                 .deleteEmail(oldEmail)
-                .deleteExtensionField(extension.getUrn(), confirmationTokenField)
-                .deleteExtensionField(extension.getUrn(), tempEmail)
+                .deleteExtensionField(extension.getUrn(), config.getConfirmationTokenField())
+                .deleteExtensionField(extension.getUrn(), config.getTempEmailField())
                 .build();
     }
 }

@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -37,11 +36,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.joda.time.Duration;
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.util.OneTimeToken;
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
 import org.osiam.client.OsiamConnector;
@@ -59,7 +58,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
@@ -85,43 +88,25 @@ public class LostPasswordController {
     @Inject
     private ConnectorBuilder connectorBuilder;
 
-    /* Extension configuration */
-    @Value("${org.osiam.scim.extension.field.onetimepassword}")
-    private String oneTimePasswordField;
-
-    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
-            "\"${org.osiam.addon-self-administration.lost-password.one-time-password-timeout:24h}\")}")
-    private Duration oneTimePasswordTimeout;
+    @Inject
+    private Config config;
 
     /* Password lost email configuration */
     @Value("${org.osiam.mail.passwordlost.linkprefix}")
-    private String passwordlostLinkPrefix;
-    @Value("${org.osiam.mail.from}")
-    private String fromAddress;
+    private String passwordLostLinkPrefix;
 
     /* URI for the change password call from JavaScript */
     @Value("${org.osiam.html.passwordlost.url}")
     private String clientPasswordChangeUri;
-
-    // css and js libs
-    @Value("${org.osiam.html.dependencies.bootstrap}")
-    private String bootStrapLib;
-    @Value("${org.osiam.html.dependencies.angular}")
-    private String angularLib;
-    @Value("${org.osiam.html.dependencies.jquery}")
-    private String jqueryLib;
-
-    @Value("${org.osiam.scim.extension.urn}")
-    private String internalScimExtensionUrn;
 
     /**
      * This endpoint generates an one time password and send an confirmation email including the one time password to
      * users primary email
      *
      * @param authorization
-     *        authZ header with valid access token
+     *            authZ header with valid access token
      * @param userId
-     *        the user id for whom you want to change the password
+     *            the user id for whom you want to change the password
      * @return the HTTP status code
      * @throws IOException
      * @throws MessagingException
@@ -132,8 +117,8 @@ public class LostPasswordController {
 
         final OneTimeToken newOneTimePassword = new OneTimeToken();
 
-        final Extension extension = new Extension.Builder(internalScimExtensionUrn)
-                .setField(oneTimePasswordField, newOneTimePassword.toString())
+        final Extension extension = new Extension.Builder(config.getExtensionUrn())
+                .setField(config.getOneTimePasswordField(), newOneTimePassword.toString())
                 .build();
         final UpdateUser updateUser = new UpdateUser.Builder().updateExtension(extension).build();
 
@@ -158,7 +143,7 @@ public class LostPasswordController {
             return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.BAD_REQUEST);
         }
 
-        String passwordLostLink = SelfAdministrationHelper.createLinkForEmail(passwordlostLinkPrefix,
+        String passwordLostLink = SelfAdministrationHelper.createLinkForEmail(passwordLostLinkPrefix,
                 updatedUser.getId(), "oneTimePassword", newOneTimePassword.getToken());
 
         Map<String, Object> mailVariables = new HashMap<>();
@@ -168,7 +153,8 @@ public class LostPasswordController {
         Locale locale = SelfAdministrationHelper.getLocale(updatedUser.getLocale());
 
         try {
-            renderAndSendEmailService.renderAndSendEmail("lostpassword", fromAddress, email.get().getValue(), locale,
+            renderAndSendEmailService.renderAndSendEmail("lostpassword", config.getFromAddress(), email.get()
+                    .getValue(), locale,
                     mailVariables);
         } catch (OsiamException e) {
             String message = "Problems creating email for lost password: " + e.getMessage();
@@ -184,9 +170,9 @@ public class LostPasswordController {
      * known values for userId and otp.
      *
      * @param oneTimePassword
-     *        the one time password from confirmation email
+     *            the one time password from confirmation email
      * @param userId
-     *        the user id for whom the password change should be
+     *            the user id for whom the password change should be
      */
     @RequestMapping(value = "/lostForm", method = RequestMethod.GET)
     public void lostForm(@RequestParam("oneTimePassword") String oneTimePassword,
@@ -203,9 +189,9 @@ public class LostPasswordController {
         String replacedAll = replacedOtp.replace("$USERID", userId);
 
         // replace all lib links
-        replacedAll = replacedAll.replace("$BOOTSTRAP", bootStrapLib);
-        replacedAll = replacedAll.replace("$ANGULAR", angularLib);
-        replacedAll = replacedAll.replace("$JQUERY", jqueryLib);
+        replacedAll = replacedAll.replace("$BOOTSTRAP", config.getBootStrapLib());
+        replacedAll = replacedAll.replace("$ANGULAR", config.getAngularLib());
+        replacedAll = replacedAll.replace("$JQUERY", config.getJqueryLib());
 
         // convert the String to stream
         InputStream in = IOUtils.toInputStream(replacedAll);
@@ -219,11 +205,11 @@ public class LostPasswordController {
      * Action to change the users password by himself if the preconditions are satisfied.
      *
      * @param authorization
-     *        authZ header with valid access token
+     *            authZ header with valid access token
      * @param oneTimePassword
-     *        the previously generated one time password
+     *            the previously generated one time password
      * @param newPassword
-     *        the new user password
+     *            the new user password
      * @return the response with status code and the updated user if successfully
      * @throws IOException
      */
@@ -238,13 +224,13 @@ public class LostPasswordController {
      * Action to change the users password by the client if the preconditions are satisfied.
      *
      * @param userId
-     *        the id of the user which password should changed
+     *            the id of the user which password should changed
      * @param authorization
-     *        authZ header with valid access token
+     *            authZ header with valid access token
      * @param oneTimePassword
-     *        the previously generated one time password
+     *            the previously generated one time password
      * @param newPassword
-     *        the new user password
+     *            the new user password
      * @return the response with status code and the updated user if successfully
      * @throws IOException
      */
@@ -278,13 +264,13 @@ public class LostPasswordController {
                 user = osiamConnector.getUser(userId, accessToken);
             }
 
-            Extension extension = user.getExtension(internalScimExtensionUrn);
+            Extension extension = user.getExtension(config.getExtensionUrn());
             final OneTimeToken storedOneTimePassword = OneTimeToken.fromString(extension
-                    .getFieldAsString(oneTimePasswordField));
+                    .getFieldAsString(config.getOneTimePasswordField()));
 
-            if (storedOneTimePassword.isExpired(oneTimePasswordTimeout)) {
+            if (storedOneTimePassword.isExpired(config.getOneTimePasswordTimeout())) {
                 UpdateUser updateUser = new UpdateUser.Builder()
-                        .deleteExtensionField(extension.getUrn(), oneTimePasswordField)
+                        .deleteExtensionField(extension.getUrn(), config.getOneTimePasswordField())
                         .build();
                 osiamConnector.updateUser(userId, updateUser, accessToken);
 
@@ -301,7 +287,7 @@ public class LostPasswordController {
 
             UpdateUser updateUser = new UpdateUser.Builder()
                     .updatePassword(newPassword)
-                    .deleteExtensionField(extension.getUrn(), oneTimePasswordField)
+                    .deleteExtensionField(extension.getUrn(), config.getOneTimePasswordField())
                     .build();
 
             User updatedUser = osiamConnector.updateUser(user.getId(), updateUser, accessToken);

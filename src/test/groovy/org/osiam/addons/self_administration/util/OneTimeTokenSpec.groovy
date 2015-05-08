@@ -1,11 +1,9 @@
 package org.osiam.addons.self_administration.util
 
 import org.joda.time.Duration
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken
 import spock.lang.Specification
 import spock.lang.Unroll
-
-import java.util.concurrent.TimeUnit
-
 
 class OneTimeTokenSpec extends Specification {
 
@@ -41,7 +39,7 @@ class OneTimeTokenSpec extends Specification {
     @Unroll
     def 'isExpired returns #expectedExpired if token has been issued on #issuedTime'() {
         given:
-        Duration tokenTimeout = Duration.standardHours(24)
+        long tokenTimeout = Duration.standardHours(24).millis
         OneTimeToken activationToken = new OneTimeToken("token", issuedTime)
 
         expect:

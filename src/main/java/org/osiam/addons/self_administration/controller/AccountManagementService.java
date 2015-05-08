@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
@@ -42,7 +43,6 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -59,13 +59,13 @@ public class AccountManagementService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountManagementService.class);
 
     @Inject
-    protected ConnectorBuilder connectorBuilder;
+    private ConnectorBuilder connectorBuilder;
 
     @Inject
-    protected RenderAndSendEmail renderAndSendEmailService;
+    private RenderAndSendEmail renderAndSendEmailService;
 
-    @Value("${org.osiam.mail.from}")
-    protected String fromAddress;
+    @Inject
+    private Config config;
 
     /**
      * Deactivates the account of the user with the given user ID.
@@ -157,7 +157,7 @@ public class AccountManagementService {
         Map<String, Object> mailVariables = new HashMap<String, Object>();
         Locale locale = SelfAdministrationHelper.getLocale(user.getLocale());
 
-        renderAndSendEmailService.renderAndSendEmail(template, fromAddress, email.get().getValue(), locale,
+        renderAndSendEmailService.renderAndSendEmail(template, config.getFromAddress(), email.get().getValue(), locale,
                 mailVariables);
     }
 
