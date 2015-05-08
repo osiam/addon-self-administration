@@ -1,5 +1,7 @@
 package org.osiam.addons.self_administration.util;
 
+import org.joda.time.Duration;
+
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -45,12 +47,11 @@ public class OneTimeToken {
 
     /**
      * Checks if this activation token is expired regarding the given timeout
-     * @param timeout The timeout value
-     * @param unit The unit of time of the timeout value
+     * @param timeout The timeout as a {@link Duration}
      * @return {@code true} if this activation token is expired, otherwise {@code false}
      */
-    public boolean isExpired(long timeout, TimeUnit unit) {
-        return System.currentTimeMillis() - unit.toMillis(timeout) > issuedTime;
+    public boolean isExpired(Duration timeout) {
+        return System.currentTimeMillis() - timeout.getMillis() > issuedTime;
     }
 
     public String getToken() {

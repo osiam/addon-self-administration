@@ -23,6 +23,7 @@
 
 package org.osiam.addons.self_administration.controller
 
+import org.joda.time.Duration
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.service.ConnectorBuilder
@@ -77,7 +78,7 @@ class LostPasswordControllerSpec extends Specification {
             fromAddress: passwordLostMailFrom, context: contextMock, internalScimExtensionUrn: urn,
             clientPasswordChangeUri: clientPasswordChangeUri, mapper: mapper, bootStrapLib: bootStrapLib,
             angularLib: angularLib, jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
-            connectorBuilder: connectorBuilder)
+            connectorBuilder: connectorBuilder, oneTimePasswordTimeout: Duration.standardHours(24))
 
     def 'The controller should start the flow by generating a one time password and send an email to the user'() {
         given:

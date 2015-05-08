@@ -37,6 +37,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.joda.time.Duration;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
@@ -87,6 +88,10 @@ public class LostPasswordController {
     /* Extension configuration */
     @Value("${org.osiam.scim.extension.field.onetimepassword}")
     private String oneTimePasswordField;
+
+    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
+            "\"${org.osiam.addon-self-administration.lost-password.one-time-password-timeout:24h}\")}")
+    private Duration oneTimePasswordTimeout;
 
     /* Password lost email configuration */
     @Value("${org.osiam.mail.passwordlost.linkprefix}")
@@ -277,7 +282,7 @@ public class LostPasswordController {
             final OneTimeToken storedOneTimePassword = OneTimeToken.fromString(extension
                     .getFieldAsString(oneTimePasswordField));
 
-            if (storedOneTimePassword.isExpired(24, TimeUnit.HOURS)) {
+            if (storedOneTimePassword.isExpired(oneTimePasswordTimeout)) {
                 UpdateUser updateUser = new UpdateUser.Builder()
                         .deleteExtensionField(extension.getUrn(), oneTimePasswordField)
                         .build();
