@@ -71,7 +71,7 @@ public class SelfAdministrationHelper {
                 .appendDays().appendSuffix("d").appendSeparator(" ")
                 .appendHours().appendSuffix("h").appendSeparator(" ")
                 .appendMinutes().appendSuffix("m").appendSeparator(" ")
-                .appendSeconds().appendSuffix("s").appendSeparator(" ")
+                .appendSeconds().appendSuffix("s")
                 .toFormatter();
 
         return periodFormatter.parsePeriod(value).toStandardDuration();
