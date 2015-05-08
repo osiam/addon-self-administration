@@ -23,6 +23,7 @@
 
 package org.osiam.addons.self_administration.controller
 
+import org.joda.time.Duration
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.service.ConnectorBuilder
@@ -75,7 +76,7 @@ class ChangeEmailControllerSpec extends Specification {
             fromAddress: emailChangeMailFrom, internalScimExtensionUrn: urn, mapper: mapper,
             clientEmailChangeUri: clientEmailChangeUri, bootStrapLib: bootStrapLib, angularLib: angularLib,
             jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
-            connectorBuilder: connectorBuilder)
+            connectorBuilder: connectorBuilder, confirmationTokenTimeout: Duration.standardHours(24))
 
     def 'there should be a failure in change email if email template file was not found'() {
         given:

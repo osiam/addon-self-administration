@@ -37,6 +37,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.joda.time.Duration;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
@@ -92,6 +93,10 @@ public class ChangeEmailController {
     private String confirmationTokenField;
     @Value("${org.osiam.mail.from}")
     private String fromAddress;
+
+    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
+            "\"${org.osiam.addon-self-administration.change-email.confirmation-token-timeout:24h}\")}")
+    private Duration confirmationTokenTimeout;
 
     /* Change email configuration */
     @Value("${org.osiam.mail.emailchange.linkprefix}")
@@ -246,7 +251,7 @@ public class ChangeEmailController {
             final OneTimeToken storedConfirmationToken = OneTimeToken.fromString(extension
                     .getFieldAsString(confirmationTokenField));
 
-            if (storedConfirmationToken.isExpired(24, TimeUnit.HOURS)) {
+            if (storedConfirmationToken.isExpired(confirmationTokenTimeout)) {
                 UpdateUser updateUser = new UpdateUser.Builder()
                         .deleteExtensionField(extension.getUrn(), confirmationTokenField)
                         .deleteExtensionField(extension.getUrn(), tempEmail)

@@ -25,6 +25,10 @@ package org.osiam.addons.self_administration.util;
 
 import java.util.Locale;
 
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +64,16 @@ public class SelfAdministrationHelper {
 
     public static ResponseEntity<String> createErrorResponseEntity(String message, HttpStatus httpStatus) {
         return new ResponseEntity<>("{\"error\":\"" + message + "\"}", httpStatus);
+    }
+
+    public static Duration makeDuration(String value) {
+        PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
+                .appendDays().appendSuffix("d").appendSeparator(" ")
+                .appendHours().appendSuffix("h").appendSeparator(" ")
+                .appendMinutes().appendSuffix("m").appendSeparator(" ")
+                .appendSeconds().appendSuffix("s").appendSeparator(" ")
+                .toFormatter();
+
+        return periodFormatter.parsePeriod(value).toStandardDuration();
     }
 }

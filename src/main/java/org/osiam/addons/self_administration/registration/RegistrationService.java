@@ -24,11 +24,11 @@
 package org.osiam.addons.self_administration.registration;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.Duration;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
@@ -63,6 +63,10 @@ public class RegistrationService {
 
     @Value("${org.osiam.scim.extension.field.activationtoken}")
     private String activationTokenField;
+
+    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
+            "\"${org.osiam.addon-self-administration.registration.activation-token-timeout:24h}\")}")
+    private Duration activationTokenTimeout;
 
     private String[] allowedFields;
     private String[] allAllowedFields;
@@ -183,7 +187,7 @@ public class RegistrationService {
         final OneTimeToken storedActivationToken = OneTimeToken
                 .fromString(extension.getFieldAsString(activationTokenField));
 
-        if (storedActivationToken.isExpired(24, TimeUnit.HOURS)) {
+        if (storedActivationToken.isExpired(activationTokenTimeout)) {
             UpdateUser updateUser = new UpdateUser.Builder()
                     .deleteExtensionField(extension.getUrn(), activationTokenField)
                     .build();
