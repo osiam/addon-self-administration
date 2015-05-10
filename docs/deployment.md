@@ -12,7 +12,7 @@ We recommend to choose the latest OSIAM addon-self-administration release versio
 The setup of the addon-self-administration is really easy with the distribution .zip or .tar.gz, which you can find here:
 `http://maven-repo.evolvis.org/releases/org/osiam/addon-self-administration/<VERSION>/addon-self-administration-<VERSION>.zip or .tar.gz`
 
-Unpack the distribution and copy the war file to you application server (e.g. Tomcat). All files and folders inside the /configuration folder have to copy to the shared loader folder of your app server, like like described [here](https://github.com/osiam/server/wiki/detailed_reference_installation-1.0#deployment-into-the-application-server). The sql file in the /sql folder have be to imported before you start you server, please check also the migration files, if you already installed the self-administration before.
+Unpack the distribution and copy the war file to you application server (e.g. Tomcat). All files and folders inside the /configuration folder have to copy to the shared loader folder of your app server, like like described [here](https://github.com/osiam/server/wiki/detailed_reference_installation#deployment-into-the-application-server). The sql file in the /sql folder have be to imported before you start you server, please check also the migration files, if you already installed the self-administration before. It is highly recommended to update the [example_data.sql](https://github.com/osiam/addon-self-administration/blob/master/src/main/sql/example_data.sql)!
 
 If you like to check the sources, you download and unpack the sources:
 
@@ -29,4 +29,4 @@ To deploy the addon-self-administration into your Tomcat the downloaded .war fil
 
 `$ sudo mv addon-self-administration-<VERSION>.war /var/lib/tomcat7/webapps/addon-self-administration.war`
 
-For further information on Tomcat's configuration and how to add the /etc/osiam folder to the classpath, [read this section](https://github.com/osiam/server/wiki/detailed_reference_installation-1.0#wiki-deployment-into-the-application-server):
+For further information on Tomcat's configuration and how to add the /etc/osiam folder to the classpath, [read this section](https://github.com/osiam/server/wiki/detailed_reference_installation#wiki-deployment-into-the-application-server):

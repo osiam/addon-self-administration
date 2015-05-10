@@ -4,7 +4,7 @@ creating email templates. Thymeleaf has a great integration with the actual vers
 
 ## Template resolving
 
-For the three mechanisms mentioned below, we created default templates in english and german as HTML files. The default template language is english. You can have a look to the templates in the [resources folder](https://github.com/osiam/server/tree/v1.0/registration-module/src/main/resources/registration-module/template/mail).
+For the three mechanisms mentioned below, we created default templates in english and german as HTML files. The default template language is english. You can have a look to the templates in the [resources folder](https://github.com/osiam/server/tree/5eab9fc54e2327b58f4a15673a79d66419bea511/registration-module/src/main/resources/registration-module/template/mail).
 
 The template file retrieving will be explained by the example of the registration email. First we check the classpath for template files resolved by the following order:
  * **registration-*.html**: Your registration email template with a specified language. You have to set the language code in the locale of the SCIM User Object and choose a standard language code (e.g. 'en') which is listed here: [Supported Locales](http://www.oracle.com/technetwork/java/javase/javase7locales-334809.html) e.g. registration-en.html

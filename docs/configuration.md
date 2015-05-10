@@ -20,18 +20,22 @@
 **PRECONDITION**
 You need to import the sql script into your postgres database which you will find in the OSIAM resource server project!
 
-For the registration you need to add some extension fields into the database otherwise it will not work.
-The extension is configured with it's own namespace and will not conflict user defined extensions.
+For the self-administration you need to add some extension fields into the database otherwise it will not work.
+The extension is configured with it's own namespace and will not conflict user defined extensions (init_data.sql). You need also to add a specific client for self-administration in the auth-servers database (example_data.sql).
 
 Start the database commandline:
 
 `$ sudo -u postgres psql`
 
-Now insert it as user osiam by calling
+Now insert it as user osiam while being in the directory where you unpacked the sources by calling
 
-`$ psql -f ./sql/registration_extension.sql -U osiam`
+`$ psql -f ./sql/init_data.sql -U osiam`
 
-while being in the directory where you unpacked the sources.
+and
+
+`$ psql -f ./sql/example_data.sql -U osiam`
+
+but update the example_data.sql before you import it and sync the data with the addon-self-administration.properties!
 
 ## Configuring OSIAM
 
@@ -39,7 +43,7 @@ This add-on needs some configuration values. Create the file
 
 `/etc/osiam/addon-self-administration.properties`
 
-with content based on this [example](https://github.com/osiam/addon-self-administration/blob/1.0/src/main/deploy/addon-self-administration.properties)
+with content based on this [example](https://github.com/osiam/addon-self-administration/blob/master/src/main/deploy/addon-self-administration.properties)
 
 ### Configuration values
 
@@ -111,5 +115,5 @@ For the standard example installation it is 'secret'
 The needed scopes of the self administration client:
 For the standard example installation you can put in 'GET,POST,PUT,PATCH,DELETE'
 -> Actually the scopes are just granulated as the known HTTP-Methods and effective for all resources<br />
-More information on scopes which are configured in the OSIAM server, please click [here](https://github.com/osiam/server/wiki/api_documentation-1.0#scopes)
+More information on scopes which are configured in the OSIAM server, please click [here](https://github.com/osiam/server/wiki/api_documentation#scopes)
 

@@ -7,6 +7,7 @@
     - [org.osiam.html.form.fields](#orgosiamhtmlformfields)
     - [org.osiam.html.form.extensions](#orgosiamhtmlformextensions)
 - [Default Files](#default-files)
+- [Callback plugin](#callback-plugin)
 
 # User registration
 The registration will be done via a double opt in mechanism.
@@ -129,7 +130,7 @@ If you don't have 'confirmPassword' as part of the configuration the user only h
 
 ####org.osiam.html.form.extensions
 
-I you wan't to show own extension fields in the self administration you have to do 3 things (besides from [registering](https://github.com/osiam/server/wiki/detailed_reference_installation-1.0#configuring-scim-extension) them in the database)
+I you wan't to show own extension fields in the self administration you have to do 3 things (besides from [registering](https://github.com/osiam/server/wiki/detailed_reference_installation#configuring-scim-extension) them in the database)
 
 First you have to add them to the register.html file
 
@@ -216,3 +217,20 @@ This page will be called if an internal error happens. If your Log Level is INFO
 **addon-self-administration/templates/web/htmlfields.html**
 
 In normal cases you don't have to change this html page. It is used from the registration.html to create all default and extension input fields dynamically.
+
+# Callback plugin
+The callback mechanism provides the possibility to extend the registration process. You can:
+* add your own pre-registration check  
+* add your own post-registration steps
+
+### Implement a Callback plugin
+If you'd like to implement your own plugin, you have to create a little java-project and package it as a jar file. The plugin needs to provide a class that implements the CallbackPlugin interface. We provided a little Plugin-Example-Project that you can find [here](https://github.com/osiam/addon-self-administration/tree/master/plugin-example-impl).
+
+### Provide and enable the Callback plugin
+To enable your plugin you have to configure some properties in _addon-self-administration.properties_ 
+
+```
+org.osiam.addon-self-administration.plugin.enabled=true #to enable the pluign
+org.osiam.addon-self-administration.plugin.jar.path=<path_to_char> #The absolute path to the jar-file
+org.osiam.addon-self-administration.plugin.classname=<full_qualified_class_name> #The full qualified class name
+```
