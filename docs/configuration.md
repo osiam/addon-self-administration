@@ -10,11 +10,15 @@
     - [org.osiam.auth.client.id](#orgosiamauthclientid)
     - [org.osiam.auth.client.secret](#orgosiamauthclientsecret)
     - [org.osiam.auth.client.scope](#orgosiamauthclientscope)
+    - [org.osiam.addon-self-administration.registration.activation-token-timeout](#orgosiamaddon-self-administrationregistrationactivation-token-timeout)
+    - [org.osiam.addon-self-administration.change-email.confirmation-token-timeout](#orgosiamaddon-self-administrationchange-emailconfirmation-token-timeout)
+    - [org.osiam.addon-self-administration.lost-password.one-time-password-timeout](#orgosiamaddon-self-administrationlost-passwordone-time-password-timeout)
+    - [org.osiam.addon-self-administration.one-time-token-scavenger.enabled](#orgosiamaddon-self-administrationone-time-token-scavengerenabled)
     - [org.osiam.html.form.usernameEqualsEmail](user-registration.md#orgosiamhtmlformusernameequalsemail)
     - [org.osiam.html.form.password.length](user-registration.md#orgosiamhtmlformpasswordlength)
     - [org.osiam.html.form.fields](user-registration.md#orgosiamhtmlformfields)
     - [org.osiam.html.form.extensions](user-registration.md#orgosiamhtmlformextensions)
-    
+
 ## Database setup
 
 **PRECONDITION**
@@ -47,7 +51,7 @@ with content based on this [example](https://github.com/osiam/addon-self-adminis
 
 ### Configuration values
 
-###org.osiam.auth-server.home
+### org.osiam.auth-server.home
 
 The home location of the auth server e.g. http://localhost:8080/osiam-auth-server
 
@@ -55,11 +59,11 @@ The home location of the auth server e.g. http://localhost:8080/osiam-auth-serve
 
 The home location of the resource server e.g. http://localhost:8080/osiam-resource-server
 
-####org.osiam.mail.from
+#### org.osiam.mail.from
 
 The sender address from where the emails will be send to the user.
 
-####org.osiam.mail.*.linkprefix####
+#### org.osiam.mail.*.linkprefix####
 (*changeemail, *lostpassword)
 
 The controller action URL on the client side where the link will point to.
@@ -73,17 +77,17 @@ Here some examples:
  * http://localhost:1234/client/action?
  * http://localhost:1234/client/action?someParameter=value&
 
-####org.osiam.html.*.url
+#### org.osiam.html.*.url
 (*changeemail, *lostpassword)
 
 The controller action URL on the client side where the call arrives, submitted by the HTML from.
 This must be a URL on client side and should not point directly to the osiam registration module due to security issues.
 
-####org.osiam.scim.extension.urn
+#### org.osiam.scim.extension.urn
 
 The urn which should used e.g. urn:scim:schemas:osiam:2.0:Registration
 
-####org.osiam.scim.extension.field.*
+#### org.osiam.scim.extension.field.*
 
 The name of the extension field for the specific field.
 * *activationtoken: The token field for the registration activation
@@ -91,7 +95,7 @@ The name of the extension field for the specific field.
 * *emailconfirmtoken: The field which will be used to save the token, to confirm the email change request
 * *tempemail: This extension field used for temporally save the new email until this email is confirmed
 
-####org.osiam.mail.server.* (with examples, mostly self explained
+#### org.osiam.mail.server.* (with examples, mostly self explained
 * *.smtp.port=25
 * *.host.name=http://www.example.org
 * *.username=username
@@ -100,20 +104,80 @@ The name of the extension field for the specific field.
 * *.smtp.auth=true
 * *.transport.protocol=smtp
 
-####org.osiam.auth.client.id
+#### org.osiam.auth.client.id
 
 The id of the self administration client.
 For the standard example installation it is 'example-client'
 
-####org.osiam.auth.client.secret
+#### org.osiam.auth.client.secret
 
 The secret of the self administration client:
 For the standard example installation it is 'secret'
 
-####org.osiam.auth.client.scope
+#### org.osiam.auth.client.scope
 
 The needed scopes of the self administration client:
 For the standard example installation you can put in 'GET,POST,PUT,PATCH,DELETE'
 -> Actually the scopes are just granulated as the known HTTP-Methods and effective for all resources<br />
 More information on scopes which are configured in the OSIAM server, please click [here](https://github.com/osiam/server/wiki/api_documentation#scopes)
 
+#### org.osiam.addon-self-administration.registration.activation-token-timeout
+
+Specify how long the activation token is valid before the user has to request
+a new one. Also using this property to configure the delay to perform the
+cleanup task of the expired activation tokens. For example, when setting this
+property to `24h` the scavenger task runs on startup and every 24 hours.
+
+The timeout can be configured with the following time units:
+
+- d: days
+- h: hours
+- m: minutes
+- s: seconds
+
+Example: 2d 12h 30m 5s
+
+Default: 24h
+
+#### org.osiam.addon-self-administration.change-email.confirmation-token-timeout
+
+Specify how long the confirmation token is valid before the user has to request
+a new one. Also using this property to configure the delay to perform the
+cleanup task of the expired confirmation tokens. For example, when setting this
+property to `24h` the scavenger task runs on startup and every 24 hours.
+
+The timeout can be configured with the following time units:
+
+- d: days
+- h: hours
+- m: minutes
+- s: seconds
+
+Example: 2d 12h 30m 5s
+
+Default: 24h
+
+#### org.osiam.addon-self-administration.lost-password.one-time-password-timeout
+
+Specify how long the one time password is valid before the user has to request
+a new one. Also using this property to configure the delay to perform the
+cleanup of the expired one time passwords. For example, when setting this
+property to `24h` the scavenger task runs on startup and every 24 hours.
+
+The timeout can be configured with the following time units:
+
+- d: days
+- h: hours
+- m: minutes
+- s: seconds
+
+Example: 2d 12h 30m 5s
+
+Default: 24h
+
+#### org.osiam.addon-self-administration.one-time-token-scavenger.enabled
+
+Enable the scavenging of expired one time tokens. Affects all three kinds of
+tokens, i.e. change email, activation after registration, and lost password.
+
+Default: true
