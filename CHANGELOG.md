@@ -1,5 +1,28 @@
 # OSIAM addon-self-administration
 
+## 1.4 - 2015-05-11
+
+### Features
+
+This is a full feature set to handle the expiration of all tokens. For more
+information have a look at the [configuration]
+(docs/configuration.md#orgosiamaddon-self-administrationregistrationactivation-token-timeout).
+
+- expiration of one time passwords
+- expiration of confirmation tokens
+- expiration of activation tokens
+- scavenge expired tokens
+
+### Changes
+- use latest plugin api release: Version 1.3.2
+- switch to latest connector release: Version 1.4
+- bump dependencies and cleanup pom
+- move documentation from wiki to repo
+
+### Fixes
+- handle missing extension field gracefully
+- client database id may lead to problems with other clients
+
 ## 1.3.2 - 2014-11-24
 - release because of fixes in addon-administration
 
