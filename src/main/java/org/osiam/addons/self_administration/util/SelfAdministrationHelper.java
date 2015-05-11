@@ -74,6 +74,6 @@ public class SelfAdministrationHelper {
                 .appendSeconds().appendSuffix("s")
                 .toFormatter();
 
-        return periodFormatter.parsePeriod(value).toStandardDuration();
+        return periodFormatter.parsePeriod(value.trim()).toStandardDuration();
     }
 }

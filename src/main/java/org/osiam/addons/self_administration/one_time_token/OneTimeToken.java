@@ -1,9 +1,6 @@
-package org.osiam.addons.self_administration.util;
-
-import org.joda.time.Duration;
+package org.osiam.addons.self_administration.one_time_token;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * {@code ActivationToken} stores the actual token for activation and the timestamp the token has been issued in UTC.
@@ -47,11 +44,11 @@ public class OneTimeToken {
 
     /**
      * Checks if this activation token is expired regarding the given timeout
-     * @param timeout The timeout as a {@link Duration}
+     * @param timeout The timeout in milliseconds as a long
      * @return {@code true} if this activation token is expired, otherwise {@code false}
      */
-    public boolean isExpired(Duration timeout) {
-        return System.currentTimeMillis() - timeout.getMillis() > issuedTime;
+    public boolean isExpired(long timeout) {
+        return System.currentTimeMillis() - timeout > issuedTime;
     }
 
     public String getToken() {

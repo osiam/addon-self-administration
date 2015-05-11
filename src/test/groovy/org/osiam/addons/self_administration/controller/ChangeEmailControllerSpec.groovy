@@ -24,12 +24,13 @@
 package org.osiam.addons.self_administration.controller
 
 import org.joda.time.Duration
+import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.EmailTemplateRenderer
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
-import org.osiam.addons.self_administration.util.OneTimeToken
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken
 import org.osiam.addons.self_administration.util.UserObjectMapper
 import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.UnauthorizedException
@@ -67,16 +68,25 @@ class ChangeEmailControllerSpec extends Specification {
     def angularLib = 'http://angular'
     def jqueryLib = 'http://jquery'
 
-    def context = Mock(ServletContext)
+    ServletContext context = Mock()
     ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
+    Config config = new Config(confirmationTokenTimeout: Duration.standardHours(24).millis,
+            confirmationTokenField: confirmTokenField,
+            tempEmailField: tempMailField,
+            fromAddress: emailChangeMailFrom,
+            extensionUrn: urn,
+            bootStrapLib: bootStrapLib,
+            angularLib: angularLib,
+            jqueryLib: jqueryLib)
 
-    ChangeEmailController changeEmailController = new ChangeEmailController(confirmationTokenField: confirmTokenField,
-            tempEmail: tempMailField, context: context, emailChangeLinkPrefix: emailChangeLinkPrefix,
-            fromAddress: emailChangeMailFrom, internalScimExtensionUrn: urn, mapper: mapper,
-            clientEmailChangeUri: clientEmailChangeUri, bootStrapLib: bootStrapLib, angularLib: angularLib,
-            jqueryLib: jqueryLib, renderAndSendEmailService: renderAndSendEmailService,
-            connectorBuilder: connectorBuilder, confirmationTokenTimeout: Duration.standardHours(24))
+    ChangeEmailController changeEmailController = new ChangeEmailController(context: context,
+            emailChangeLinkPrefix: emailChangeLinkPrefix,
+            mapper: mapper,
+            clientEmailChangeUri: clientEmailChangeUri,
+            renderAndSendEmailService: renderAndSendEmailService,
+            connectorBuilder: connectorBuilder,
+            config: config)
 
     def 'there should be a failure in change email if email template file was not found'() {
         given:
@@ -278,5 +288,4 @@ class ChangeEmailControllerSpec extends Specification {
         1 * osiamConnector.getUser(_, _) >> user
         response.getStatusCode() == HttpStatus.FORBIDDEN
     }
-
 }

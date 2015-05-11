@@ -23,6 +23,8 @@
 
 package org.osiam.addons.self_administration.controller
 
+import org.osiam.addons.self_administration.Config
+
 import javax.servlet.http.HttpServletRequest
 
 import org.osiam.addons.self_administration.service.ConnectorBuilder
@@ -45,8 +47,9 @@ class AccountDeactivationControllerSpec extends Specification {
     OsiamConnector osiamConnector = Mock()
     RenderAndSendEmail renderAndSendEmailService = Mock()
     HttpServletRequest servletRequest = Mock()
+    Config config = new Config()
     AccountManagementService accountManagementService = new AccountManagementService(connectorBuilder: connectorBuilder, renderAndSendEmailService:
-    renderAndSendEmailService)
+    renderAndSendEmailService, config: config)
 
     AccountDeactivationController controller = new AccountDeactivationController(accountManagementService: accountManagementService)
 
