@@ -27,13 +27,13 @@ import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.osiam.addons.self_administration.registration.RegistrationService;
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationUser;
 
 public class EqualPasswordValidator implements ConstraintValidator<EqualPasswords, RegistrationUser> {
 
     @Inject
-    private RegistrationService registrationService;
+    private Config config;
 
     @Override
     public void initialize(final EqualPasswords constraintAnnotation) {
@@ -41,7 +41,7 @@ public class EqualPasswordValidator implements ConstraintValidator<EqualPassword
 
     @Override
     public boolean isValid(final RegistrationUser user, final ConstraintValidatorContext constraintValidatorContext) {
-        if (registrationService.isConfirmPasswordRequired()) {
+        if (config.isConfirmPasswordRequired()) {
             constraintValidatorContext.disableDefaultConstraintViolation();
             constraintValidatorContext
                     .buildConstraintViolationWithTemplate("{registration.validation.password.equality}")

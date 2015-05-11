@@ -1,12 +1,16 @@
 package org.osiam.addons.self_administration;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
- * Holds all application wide used properties and enables scheduling
+ * Holds all application wide used properties
  */
-@Configuration
+@Component
 public class Config {
 
     @Value("${org.osiam.scim.extension.urn}")
@@ -51,6 +55,117 @@ public class Config {
 
     @Value("${org.osiam.addon-self-administration.one-time-token-scavenger.enabled:true}")
     private boolean oneTimeTokenScavengerEnabled;
+
+    @Value("${org.osiam.mail.emailchange.linkprefix}")
+    private String emailChangeLinkPrefix;
+
+    /* URI for the change email call from JavaScript */
+    @Value("${org.osiam.html.emailchange.url}")
+    private String clientEmailChangeUri;
+
+    /* Password lost email configuration */
+    @Value("${org.osiam.mail.passwordlost.linkprefix}")
+    private String passwordLostLinkPrefix;
+
+    /* URI for the change password call from JavaScript */
+    @Value("${org.osiam.html.passwordlost.url}")
+    private String clientPasswordChangeUri;
+
+    private String[] allAllowedFields;
+
+    @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
+    private boolean usernameEqualsEmail;
+
+    @Value("${org.osiam.html.form.password.length:8}")
+    private int passwordLength;
+
+    private boolean confirmPasswordRequired = true;
+
+    @Value("${org.osiam.resource-server.home}")
+    private String resourceServerHome;
+
+    @Value("${org.osiam.auth-server.home}")
+    private String authServerHome;
+
+    @Value("${org.osiam.addon-self-administration.client.id}")
+    private String clientId;
+
+    @Value("${org.osiam.addon-self-administration.client.secret}")
+    private String clientSecret;
+
+    @Value("${org.osiam.addon-self-administration.client.scope}")
+    private String clientScope;
+
+    @Autowired
+    private void createAllAllowedFields(@Value("${org.osiam.html.form.fields:}") String[] allowedFields,
+            @Value("${org.osiam.html.form.extensions:}") String[] extensions) {
+        List<String> collectedFields = new ArrayList<>();
+
+        for (String field : allowedFields) {
+            collectedFields.add(field.trim());
+        }
+
+        if (!collectedFields.contains("email")) {
+            collectedFields.add("email");
+        }
+
+        if (!collectedFields.contains("password")) {
+            collectedFields.add("password");
+        }
+
+        if (!collectedFields.contains("confirmPassword")) {
+            confirmPasswordRequired = false;
+        }
+
+        String fieldUserName = "userName";
+        if (!usernameEqualsEmail && !collectedFields.contains(fieldUserName)) {
+            collectedFields.add(fieldUserName);
+        } else if (usernameEqualsEmail && collectedFields.contains(fieldUserName)) {
+            collectedFields.remove(fieldUserName);
+        }
+
+        for (String field : extensions) {
+            collectedFields.add(field.trim());
+        }
+
+        this.allAllowedFields = collectedFields.toArray(new String[collectedFields.size()]);
+    }
+
+    public String getResourceServerHome() {
+        return resourceServerHome;
+    }
+
+    public String getAuthServerHome() {
+        return authServerHome;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public String getClientScope() {
+        return clientScope;
+    }
+
+    public String[] getAllAllowedFields() {
+        return allAllowedFields.clone();
+    }
+
+    public int getPasswordLength() {
+        return passwordLength;
+    }
+
+    public boolean isUsernameEqualsEmail() {
+        return usernameEqualsEmail;
+    }
+
+    public boolean isConfirmPasswordRequired() {
+        return confirmPasswordRequired;
+    }
 
     public String getFromAddress() {
         return fromAddress;
@@ -102,5 +217,21 @@ public class Config {
 
     public boolean isOneTimeTokenScavengerEnabled() {
         return oneTimeTokenScavengerEnabled;
+    }
+
+    public String getEmailChangeLinkPrefix() {
+        return emailChangeLinkPrefix;
+    }
+
+    public String getClientEmailChangeUri() {
+        return clientEmailChangeUri;
+    }
+
+    public String getPasswordLostLinkPrefix() {
+        return passwordLostLinkPrefix;
+    }
+
+    public String getClientPasswordChangeUri() {
+        return clientPasswordChangeUri;
     }
 }

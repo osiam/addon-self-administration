@@ -32,6 +32,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.resources.scim.Address;
 import org.osiam.resources.scim.Email;
@@ -41,7 +44,6 @@ import org.osiam.resources.scim.Name;
 import org.osiam.resources.scim.PhoneNumber;
 import org.osiam.resources.scim.Photo;
 import org.osiam.resources.scim.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -49,8 +51,8 @@ import com.google.common.base.Strings;
 @Component
 public class UserConverter {
 
-    @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
-    private boolean usernameEqualsEmail;
+    @Inject
+    private Config config;
 
     public User toScim(RegistrationUser registrationUser) {
 
@@ -78,7 +80,7 @@ public class UserConverter {
         }
 
         User.Builder userBuilder;
-        if (usernameEqualsEmail) {
+        if (config.isUsernameEqualsEmail()) {
             userBuilder = new User.Builder(registrationUser.getEmail());
         } else {
             userBuilder = new User.Builder(registrationUser.getUserName());

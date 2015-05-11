@@ -38,9 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.OsiamException;
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
 import org.osiam.client.OsiamConnector;
@@ -54,7 +54,6 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -90,14 +89,6 @@ public class LostPasswordController {
 
     @Inject
     private Config config;
-
-    /* Password lost email configuration */
-    @Value("${org.osiam.mail.passwordlost.linkprefix}")
-    private String passwordLostLinkPrefix;
-
-    /* URI for the change password call from JavaScript */
-    @Value("${org.osiam.html.passwordlost.url}")
-    private String clientPasswordChangeUri;
 
     /**
      * This endpoint generates an one time password and send an confirmation email including the one time password to
@@ -143,7 +134,7 @@ public class LostPasswordController {
             return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.BAD_REQUEST);
         }
 
-        String passwordLostLink = SelfAdministrationHelper.createLinkForEmail(passwordLostLinkPrefix,
+        String passwordLostLink = SelfAdministrationHelper.createLinkForEmail(config.getPasswordLostLinkPrefix(),
                 updatedUser.getId(), "oneTimePassword", newOneTimePassword.getToken());
 
         Map<String, Object> mailVariables = new HashMap<>();
@@ -184,7 +175,7 @@ public class LostPasswordController {
         String htmlContent = IOUtils.toString(inputStream, "UTF-8");
 
         // replace all placeholders with appropriate value
-        String replacedUri = htmlContent.replace("$CHANGELINK", clientPasswordChangeUri);
+        String replacedUri = htmlContent.replace("$CHANGELINK", config.getClientPasswordChangeUri());
         String replacedOtp = replacedUri.replace("$OTP", oneTimePassword);
         String replacedAll = replacedOtp.replace("$USERID", userId);
 
