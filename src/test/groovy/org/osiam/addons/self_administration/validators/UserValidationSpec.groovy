@@ -23,6 +23,7 @@
 
 package org.osiam.addons.self_administration.validators
 
+import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.registration.RegistrationService
 import org.osiam.addons.self_administration.registration.RegistrationUser
 import org.springframework.context.MessageSource
@@ -34,11 +35,12 @@ class UserValidationSpec extends Specification {
 
     MessageSource messageSource = Mock()
 
-    EqualPasswordValidator equalPasswordValidator = new EqualPasswordValidator(registrationService: registrationService)
-    PasswordValidator passwordValidator = new PasswordValidator(registrationService: registrationService, messageSource: messageSource)
+    Config config = Mock()
+    EqualPasswordValidator equalPasswordValidator = new EqualPasswordValidator(config: config)
+    PasswordValidator passwordValidator = new PasswordValidator(messageSource: messageSource, config: config)
     PhotoValidator photoValidator = new PhotoValidator()
-    EmailValidator registrationEmailValidator = new EmailValidator(registrationService: registrationService)
-    UsernameValidator usernameValidator = new UsernameValidator(registrationService: registrationService)
+    EmailValidator registrationEmailValidator = new EmailValidator(registrationService: registrationService, config: config)
+    UsernameValidator usernameValidator = new UsernameValidator(registrationService: registrationService, config: config)
 
     def 'validator should have no errors if all fields are valid'() {
         given:
@@ -49,8 +51,8 @@ class UserValidationSpec extends Specification {
         user.password = 'password'
         user.confirmPassword = 'password'
 
-        registrationService.passwordLength >> 8
-        registrationService.usernameEqualsEmail >> true
+        config.passwordLength >> 8
+        config.usernameEqualsEmail >> true
         registrationService.isUsernameIsAlreadyTaken(_) >> false
 
         when:

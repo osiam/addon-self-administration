@@ -23,7 +23,6 @@
 package org.osiam.addons.self_administration.controller;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
@@ -45,22 +44,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class AccountDeletionController {
 
     @Inject
-    AccountManagementService accountManagementService;
+    private AccountManagementService accountManagementService;
 
     /**
      * Deletes the user with the given ID.
      * 
      * @param authorization
-     *        Authorization header with access token
+     *            Authorization header with access token
      * @param userId
-     *        the user ID
+     *            the user ID
      * @return the resulting HTTP status code
      */
     @RequestMapping(value = "/deletion/{userId}", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") final String authorization,
-            @PathVariable final String userId, final HttpServletRequest request) {
+            @PathVariable final String userId) {
 
-        AccessToken accessToken = new AccessToken.Builder(SelfAdministrationHelper.extractAccessToken(authorization)).build();
+        AccessToken accessToken = new AccessToken.Builder(SelfAdministrationHelper.extractAccessToken(authorization))
+                .build();
 
         try {
             accountManagementService.deleteUser(userId, accessToken);

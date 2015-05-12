@@ -34,9 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.oauth.AccessToken;
@@ -49,7 +49,6 @@ import org.osiam.resources.scim.Role;
 import org.osiam.resources.scim.SCIMSearchResult;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Optional;
@@ -66,49 +65,6 @@ public class RegistrationService {
 
     @Inject
     private Config config;
-
-    private String[] allowedFields;
-    private String[] allAllowedFields;
-
-    @Value("${org.osiam.html.form.extensions:}")
-    private String[] extensions;
-
-    @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
-    private boolean usernameEqualsEmail;
-
-    @Value("${org.osiam.html.form.password.length:8}")
-    private int passwordLength;
-
-    private boolean confirmPasswordRequired = true;
-
-    @Value("${org.osiam.html.form.fields:}")
-    private void setAllowedFields(String[] allowedFields) {
-        List<String> trimmedFields = new ArrayList<>();
-
-        for (String field : allowedFields) {
-            trimmedFields.add(field.trim());
-        }
-
-        if (!trimmedFields.contains("email")) {
-            trimmedFields.add("email");
-        }
-
-        if (!trimmedFields.contains("password")) {
-            trimmedFields.add("password");
-        }
-
-        if (!trimmedFields.contains("confirmPassword")) {
-            confirmPasswordRequired = false;
-        }
-
-        String fieldUserName = "userName";
-        if (!usernameEqualsEmail && !trimmedFields.contains(fieldUserName)) {
-            trimmedFields.add(fieldUserName);
-        } else if (usernameEqualsEmail && trimmedFields.contains(fieldUserName)) {
-            trimmedFields.remove(fieldUserName);
-        }
-        this.allowedFields = trimmedFields.toArray(new String[trimmedFields.size()]);
-    }
 
     public boolean isUsernameIsAlreadyTaken(String userName) {
         Query query = new QueryBuilder().filter("userName eq \"" + userName + "\"").build();
@@ -208,33 +164,5 @@ public class RegistrationService {
                 .build();
 
         return osiamConnector.updateUser(userId, updateUser, accessToken);
-    }
-
-    public String[] getAllAllowedFields() {
-        if (allAllowedFields == null || allAllowedFields.length == 0) {
-            List<String> allFields = new ArrayList<>();
-
-            for (String field : allowedFields) {
-                allFields.add(field.trim());
-            }
-            for (String field : extensions) {
-                allFields.add(field.trim());
-            }
-
-            this.allAllowedFields = allFields.toArray(new String[allFields.size()]);
-        }
-        return allAllowedFields.clone();
-    }
-
-    public int getPasswordLength() {
-        return passwordLength;
-    }
-
-    public boolean isUsernameEqualsEmail() {
-        return usernameEqualsEmail;
-    }
-
-    public boolean isConfirmPasswordRequired() {
-        return confirmPasswordRequired;
     }
 }

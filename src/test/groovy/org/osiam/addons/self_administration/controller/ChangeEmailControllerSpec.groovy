@@ -27,10 +27,10 @@ import org.joda.time.Duration
 import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken
 import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.EmailTemplateRenderer
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
-import org.osiam.addons.self_administration.one_time_token.OneTimeToken
 import org.osiam.addons.self_administration.util.UserObjectMapper
 import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.UnauthorizedException
@@ -75,15 +75,15 @@ class ChangeEmailControllerSpec extends Specification {
             confirmationTokenField: confirmTokenField,
             tempEmailField: tempMailField,
             fromAddress: emailChangeMailFrom,
+            clientEmailChangeUri: clientEmailChangeUri,
+            emailChangeLinkPrefix: emailChangeLinkPrefix,
             extensionUrn: urn,
             bootStrapLib: bootStrapLib,
             angularLib: angularLib,
             jqueryLib: jqueryLib)
 
     ChangeEmailController changeEmailController = new ChangeEmailController(context: context,
-            emailChangeLinkPrefix: emailChangeLinkPrefix,
             mapper: mapper,
-            clientEmailChangeUri: clientEmailChangeUri,
             renderAndSendEmailService: renderAndSendEmailService,
             connectorBuilder: connectorBuilder,
             config: config)
@@ -96,7 +96,7 @@ class ChangeEmailControllerSpec extends Specification {
         User user = new User.Builder().build()
 
         when:
-        def result = changeEmailController.change(authZHeader, newEmailValue)
+        changeEmailController.change(authZHeader, newEmailValue)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
@@ -114,7 +114,7 @@ class ChangeEmailControllerSpec extends Specification {
         User user = new User.Builder().build()
 
         when:
-        def result = changeEmailController.change(authZHeader, newEmailValue)
+        changeEmailController.change(authZHeader, newEmailValue)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
@@ -132,7 +132,7 @@ class ChangeEmailControllerSpec extends Specification {
         User user = new User.Builder().build()
 
         when:
-        def result = changeEmailController.change(authZHeader, newEmailValue)
+        changeEmailController.change(authZHeader, newEmailValue)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector

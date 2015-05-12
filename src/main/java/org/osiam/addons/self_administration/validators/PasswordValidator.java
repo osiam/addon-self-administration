@@ -29,17 +29,17 @@ import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.osiam.addons.self_administration.registration.RegistrationService;
+import org.osiam.addons.self_administration.Config;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 public class PasswordValidator implements ConstraintValidator<Password, String> {
 
     @Inject
-    private RegistrationService registrationService;
+    private MessageSource messageSource;
 
     @Inject
-    private MessageSource messageSource;
+    private Config config;
 
     @Override
     public void initialize(Password password) {
@@ -50,8 +50,8 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
         if (isNullOrEmpty(password)) {
             return false;
         }
-        if (password.length() < registrationService.getPasswordLength()) {
-            String[] argument = { String.valueOf(registrationService.getPasswordLength()) };
+        if (password.length() < config.getPasswordLength()) {
+            String[] argument = { String.valueOf(config.getPasswordLength()) };
             String message = messageSource.getMessage("registration.validation.password.length", argument,
                     LocaleContextHolder.getLocale());
             constraintValidatorContext.disableDefaultConstraintViolation();

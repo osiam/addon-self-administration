@@ -38,9 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.OsiamException;
+import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
-import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
 import org.osiam.client.OsiamConnector;
@@ -56,7 +56,6 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -92,13 +91,6 @@ public class ChangeEmailController {
     @Inject
     private Config config;
 
-    @Value("${org.osiam.mail.emailchange.linkprefix}")
-    private String emailChangeLinkPrefix;
-
-    /* URI for the change email call from JavaScript */
-    @Value("${org.osiam.html.emailchange.url}")
-    private String clientEmailChangeUri;
-
     /**
      * Generates a HTTP form with the fields for change email purpose.
      */
@@ -108,7 +100,7 @@ public class ChangeEmailController {
         InputStream inputStream = context.getResourceAsStream("/WEB-INF/registration/change_email.html");
         String htmlContent = IOUtils.toString(inputStream, "UTF-8");
         // replacing the url
-        String replacedAll = htmlContent.replace("$CHANGELINK", clientEmailChangeUri);
+        String replacedAll = htmlContent.replace("$CHANGELINK", config.getClientEmailChangeUri());
 
         // replace all lib links
         replacedAll = replacedAll.replace("$BOOTSTRAP", config.getBootStrapLib());
@@ -151,7 +143,7 @@ public class ChangeEmailController {
             return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        String activateLink = SelfAdministrationHelper.createLinkForEmail(emailChangeLinkPrefix,
+        String activateLink = SelfAdministrationHelper.createLinkForEmail(config.getEmailChangeLinkPrefix(),
                 updatedUser.getId(),
                 "confirmToken", confirmationToken.getToken());
 

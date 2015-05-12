@@ -23,34 +23,24 @@
 
 package org.osiam.addons.self_administration.service;
 
+import javax.inject.Inject;
+
+import org.osiam.addons.self_administration.Config;
 import org.osiam.client.OsiamConnector;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ConnectorBuilder {
 
-    @Value("${org.osiam.resource-server.home}")
-    private String resourceServerHome;
-
-    @Value("${org.osiam.auth-server.home}")
-    private String authServerHome;
-
-    @Value("${org.osiam.addon-self-administration.client.id}")
-    private String clientId;
-
-    @Value("${org.osiam.addon-self-administration.client.secret}")
-    private String clientSecret;
-
-    @Value("${org.osiam.addon-self-administration.client.scope}")
-    private String clientScope;
+    @Inject
+    private Config config;
 
     public OsiamConnector createConnector() {
         OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
-                setAuthServerEndpoint(authServerHome).
-                setResourceServerEndpoint(resourceServerHome).
-                setClientId(clientId).
-                setClientSecret(clientSecret);
+                setAuthServerEndpoint(config.getAuthServerHome()).
+                setResourceServerEndpoint(config.getResourceServerHome()).
+                setClientId(config.getClientId()).
+                setClientSecret(config.getClientSecret());
         return oConBuilder.build();
     }
 }

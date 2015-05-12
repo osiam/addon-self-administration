@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationService;
 import org.osiam.resources.exception.SCIMDataValidationException;
 
@@ -37,13 +38,16 @@ public class EmailValidator implements ConstraintValidator<Email, String> {
     @Inject
     private RegistrationService registrationService;
 
+    @Inject
+    private Config config;
+
     @Override
     public void initialize(Email constraintAnnotation) {
     }
 
     @Override
     public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
-        if (registrationService.isUsernameEqualsEmail()) {
+        if (config.isUsernameEqualsEmail()) {
             if (isNullOrEmpty(email)) {
                 return false;
             }

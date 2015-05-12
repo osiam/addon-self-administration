@@ -24,9 +24,6 @@
 package org.osiam.addons.self_administration.controller
 
 import org.osiam.addons.self_administration.Config
-
-import javax.servlet.http.HttpServletRequest
-
 import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
 import org.osiam.client.OsiamConnector
@@ -37,9 +34,9 @@ import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.User
 import org.springframework.http.HttpStatus
 import org.springframework.mail.MailSendException
-
 import spock.lang.Specification
 
+import javax.servlet.http.HttpServletRequest
 
 class AccountDeactivationControllerSpec extends Specification {
 
@@ -48,10 +45,11 @@ class AccountDeactivationControllerSpec extends Specification {
     RenderAndSendEmail renderAndSendEmailService = Mock()
     HttpServletRequest servletRequest = Mock()
     Config config = new Config()
-    AccountManagementService accountManagementService = new AccountManagementService(connectorBuilder: connectorBuilder, renderAndSendEmailService:
-    renderAndSendEmailService, config: config)
+    AccountManagementService accountManagementService = new AccountManagementService(connectorBuilder: connectorBuilder,
+            renderAndSendEmailService: renderAndSendEmailService, config: config)
 
-    AccountDeactivationController controller = new AccountDeactivationController(accountManagementService: accountManagementService)
+    AccountDeactivationController controller =
+            new AccountDeactivationController(accountManagementService: accountManagementService)
 
     def 'A valid request should return HTTP status 200, the user should be deactivated and an email should be sent'() {
         def authHeader = 'Bearer token'
@@ -68,7 +66,7 @@ class AccountDeactivationControllerSpec extends Specification {
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> user
-        1 * osiamConnector.updateUser(userId, {it.getScimConformUpdateUser().isActive() == false}, accessToken)
+        1 * osiamConnector.updateUser(userId, { it.getScimConformUpdateUser().isActive() == false }, accessToken)
         1 * renderAndSendEmailService.renderAndSendEmail('deactivation', _, mailAddress, _, _)
         result.getStatusCode() == HttpStatus.OK
     }
@@ -85,7 +83,7 @@ class AccountDeactivationControllerSpec extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getUser(userId, accessToken) >> {throw new UnauthorizedException(message)}
+        1 * osiamConnector.getUser(userId, accessToken) >> { throw new UnauthorizedException(message) }
         result.getStatusCode() == HttpStatus.UNAUTHORIZED
         result.getBody() == '{\"error\":\"Authorization failed: ' + message + '\"}'
     }
@@ -102,7 +100,7 @@ class AccountDeactivationControllerSpec extends Specification {
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
-        1 * osiamConnector.getUser(userId, accessToken) >> {throw new NoResultException(message)}
+        1 * osiamConnector.getUser(userId, accessToken) >> { throw new NoResultException(message) }
         result.getStatusCode() == HttpStatus.NOT_FOUND
         result.getBody() == '{\"error\":\"No such entity: ' + message + '\"}'
     }
@@ -145,7 +143,9 @@ class AccountDeactivationControllerSpec extends Specification {
         2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> user
         1 * osiamConnector.updateUser(userId, _, accessToken)
-        1 * renderAndSendEmailService.renderAndSendEmail('deactivation', _, mailAddress, _, _) >> {throw new MailSendException(message)}
+        1 * renderAndSendEmailService.renderAndSendEmail('deactivation', _, mailAddress, _, _) >> {
+            throw new MailSendException(message)
+        }
         result.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
         result.getBody() == '{\"error\":\"Failed to send email: ' + message + '\"}'
     }

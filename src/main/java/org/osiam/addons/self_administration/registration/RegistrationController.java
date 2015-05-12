@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.plugin_api.CallbackException;
 import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
 import org.osiam.resources.scim.User;
@@ -58,15 +59,18 @@ public class RegistrationController {
     @Inject
     private RegistrationService registrationService;
 
+    @Inject
+    private Config config;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        binder.setAllowedFields(registrationService.getAllAllowedFields());
+        binder.setAllowedFields(config.getAllAllowedFields());
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public String getRegistrationForm(final Model model) {
         model.addAttribute("registrationUser", new RegistrationUser());
-        model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
+        model.addAttribute("allowedFields", config.getAllAllowedFields());
         return "registration";
     }
 
@@ -76,7 +80,7 @@ public class RegistrationController {
             final HttpServletResponse response) {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
+            model.addAttribute("allowedFields", config.getAllAllowedFields());
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             return "registration";
         }
@@ -87,7 +91,7 @@ public class RegistrationController {
             callbackPlugin.performPreRegistrationActions(user);
         } catch (CallbackException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("allowedFields", registrationService.getAllAllowedFields());
+            model.addAttribute("allowedFields", config.getAllAllowedFields());
 
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             return "registration";

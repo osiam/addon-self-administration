@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationService;
 
 public class UsernameValidator implements ConstraintValidator<Username, String> {
@@ -36,13 +37,16 @@ public class UsernameValidator implements ConstraintValidator<Username, String> 
     @Inject
     private RegistrationService registrationService;
 
+    @Inject
+    private Config config;
+
     @Override
     public void initialize(Username username) {
     }
 
     @Override
     public boolean isValid(String username, ConstraintValidatorContext constraintValidatorContext) {
-        if (!registrationService.isUsernameEqualsEmail()) {
+        if (!config.isUsernameEqualsEmail()) {
             username = username.trim();
             if (isNullOrEmpty(username)) {
                 return false;
