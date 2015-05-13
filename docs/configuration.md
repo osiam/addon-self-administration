@@ -9,7 +9,6 @@
     - [org.osiam.mail.server.*](#orgosiammailserver-with-examples-mostly-self-explained)
     - [org.osiam.auth.client.id](#orgosiamauthclientid)
     - [org.osiam.auth.client.secret](#orgosiamauthclientsecret)
-    - [org.osiam.auth.client.scope](#orgosiamauthclientscope)
     - [org.osiam.addon-self-administration.registration.activation-token-timeout](#orgosiamaddon-self-administrationregistrationactivation-token-timeout)
     - [org.osiam.addon-self-administration.change-email.confirmation-token-timeout](#orgosiamaddon-self-administrationchange-emailconfirmation-token-timeout)
     - [org.osiam.addon-self-administration.lost-password.one-time-password-timeout](#orgosiamaddon-self-administrationlost-passwordone-time-password-timeout)
