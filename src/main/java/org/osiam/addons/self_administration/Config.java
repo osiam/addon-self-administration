@@ -88,9 +88,6 @@ public class Config {
     @Value("${org.osiam.addon-self-administration.client.secret}")
     private String clientSecret;
 
-    @Value("${org.osiam.addon-self-administration.client.scope}")
-    private String clientScope;
-
     @Autowired
     private void createAllAllowedFields(@Value("${org.osiam.html.form.fields:}") String[] allowedFields,
             @Value("${org.osiam.html.form.extensions:}") String[] extensions) {
@@ -140,10 +137,6 @@ public class Config {
 
     public String getClientSecret() {
         return clientSecret;
-    }
-
-    public String getClientScope() {
-        return clientScope;
     }
 
     public String[] getAllAllowedFields() {
