@@ -4,9 +4,9 @@
     - [org.osiam.mail.from](#orgosiammailfrom)
     - [org.osiam.mail.*.linkprefix](#orgosiammaillinkprefix)
     - [org.osiam.html.*.url](#orgosiamhtmlurl)
-    - [org.osiam.mail.server.*](#orgosiammailserver-with-examples-mostly-self-explained)
-    - [org.osiam.auth.client.id](#orgosiamauthclientid)
-    - [org.osiam.auth.client.secret](#orgosiamauthclientsecret)
+    - [org.osiam.mail.server.*](#orgosiammailserver)
+    - [org.osiam.addon-self-administration.client.id](#orgosiamaddon-self-administrationclientid)
+    - [org.osiam.addon-self-administration.client.secret](#orgosiamaddon-self-administrationclientsecret)
     - [org.osiam.addon-self-administration.registration.activation-token-timeout](#orgosiamaddon-self-administrationregistrationactivation-token-timeout)
     - [org.osiam.addon-self-administration.change-email.confirmation-token-timeout](#orgosiamaddon-self-administrationchange-emailconfirmation-token-timeout)
     - [org.osiam.addon-self-administration.lost-password.one-time-password-timeout](#orgosiamaddon-self-administrationlost-passwordone-time-password-timeout)
@@ -51,17 +51,21 @@ with content based on this [example](https://github.com/osiam/addon-self-adminis
 
 ### org.osiam.auth-server.home
 
-The home location of the auth server e.g. http://localhost:8080/osiam-auth-server
+The home location of the auth server.
+
+Default: http://localhost:8080/osiam-auth-server
 
 ### org.osiam.resource-server.home
 
-The home location of the resource server e.g. http://localhost:8080/osiam-resource-server
+The home location of the resource server.
+
+Default: http://localhost:8080/osiam-resource-server
 
 #### org.osiam.mail.from
 
 The sender address from where the emails will be send to the user.
 
-#### org.osiam.mail.*.linkprefix####
+#### org.osiam.mail.*.linkprefix
 (*changeemail, *lostpassword)
 
 The controller action URL on the client side where the link will point to.
@@ -81,31 +85,25 @@ Here some examples:
 The controller action URL on the client side where the call arrives, submitted by the HTML from.
 This must be a URL on client side and should not point directly to the osiam registration module due to security issues.
 
-#### org.osiam.mail.server.* (with examples, mostly self explained
-* *.smtp.port=25
-* *.host.name=http://www.example.org
-* *.username=username
-* *.password=password
-* *.smtp.starttls.enable=true
-* *.smtp.auth=true
-* *.transport.protocol=smtp
+#### org.osiam.mail.server.*
+* *.smtp.port=25 (default)
+* *.host.name=localhost (default)
+* *.username=username (example)
+* *.password=password (example)
+* *.smtp.starttls.enable=false (default)
+* *.smtp.auth=false (default)
+* *.transport.protocol=smtp (default)
 
-#### org.osiam.auth.client.id
+#### org.osiam.addon-self-administration.client.id
 
-The id of the self administration client.
-For the standard example installation it is 'example-client'
+The id of the self administration client that also has to be imported in the
+database.
 
-#### org.osiam.auth.client.secret
+Default: addon-self-administration-client
 
-The secret of the self administration client:
-For the standard example installation it is 'secret'
+#### org.osiam.addon-self-administration.client.secret
 
-#### org.osiam.auth.client.scope
-
-The needed scopes of the self administration client:
-For the standard example installation you can put in 'GET,POST,PUT,PATCH,DELETE'
--> Actually the scopes are just granulated as the known HTTP-Methods and effective for all resources<br />
-More information on scopes which are configured in the OSIAM server, please click [here](https://github.com/osiam/server/wiki/api_documentation#scopes)
+The secret of the self administration client, needs to be set!
 
 #### org.osiam.addon-self-administration.registration.activation-token-timeout
 
