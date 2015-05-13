@@ -53,10 +53,6 @@ class LostPasswordControllerSpec extends Specification {
 
     ServletContext contextMock = Mock()
 
-    def urn = 'urn:scim:schemas:osiam:1.0:Registration'
-
-    def oneTimePasswordField = 'oneTimePassword'
-
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()
     RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService,
@@ -75,11 +71,9 @@ class LostPasswordControllerSpec extends Specification {
     OsiamConnector osiamConnector = Mock()
 
     Config config = new Config(oneTimePasswordTimeout: Duration.standardHours(24).millis,
-            oneTimePasswordField: oneTimePasswordField,
             fromAddress: passwordLostMailFrom,
             clientPasswordChangeUri: clientPasswordChangeUri,
             passwordLostLinkPrefix: passwordLostLinkPrefix,
-            extensionUrn: urn,
             bootStrapLib: bootStrapLib,
             angularLib: angularLib,
             jqueryLib: jqueryLib)
@@ -169,7 +163,7 @@ class LostPasswordControllerSpec extends Specification {
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         def userId = 'userId'
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', otp.toString())
                 .build()
         User user = new User.Builder()
@@ -195,7 +189,7 @@ class LostPasswordControllerSpec extends Specification {
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         def userId = 'userId'
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', otp)
                 .build()
         User user = new User.Builder()
@@ -220,7 +214,7 @@ class LostPasswordControllerSpec extends Specification {
         OneTimeToken otp = new OneTimeToken()
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', otp.toString())
                 .build()
         User user = new User.Builder()
@@ -279,7 +273,7 @@ class LostPasswordControllerSpec extends Specification {
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
         def userId = 'not_existing_id'
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', 'someOTP')
                 .build()
         User user = new User.Builder()
@@ -301,7 +295,7 @@ class LostPasswordControllerSpec extends Specification {
         def otp = 'invalid one time password'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', 'someOTP')
                 .build()
         User user = new User.Builder()
@@ -324,7 +318,7 @@ class LostPasswordControllerSpec extends Specification {
         def userId = 'someId'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', 'someOTP')
                 .build()
         User user = new User.Builder()
@@ -348,7 +342,7 @@ class LostPasswordControllerSpec extends Specification {
         def otp = 'someOTP'
         def newPassword = 'newPassword'
         def authZHeader = 'Bearer ACCESSTOKEN'
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', 'someOTP')
                 .build()
         User user = new User.Builder()
@@ -407,7 +401,7 @@ class LostPasswordControllerSpec extends Specification {
         def newPassword = 'newPassword'
         def expiredOtp = 'otp:1'
 
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('oneTimePassword', expiredOtp)
                 .build()
         User user = new User.Builder()

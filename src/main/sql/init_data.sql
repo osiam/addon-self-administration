@@ -1,5 +1,5 @@
 --
--- Extension data, according to the attribute values in the addon-self-administration.properties
+-- Extension data to handle one time tokens for all mechanisms
 -- Have to be imported in the database of the resource server, before you deploy the addon-self-administration!
 --
 

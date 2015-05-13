@@ -13,14 +13,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class Config {
 
-    @Value("${org.osiam.scim.extension.urn}")
-    private String extensionUrn;
+    public static final String EXTENSION_URN = "urn:org.osiam:scim:extensions:addon-self-administration";
 
-    @Value("${org.osiam.scim.extension.field.activationtoken}")
-    private String activationTokenField;
+    public static final String ACTIVATION_TOKEN_FIELD = "activationToken";
 
-    @Value("${org.osiam.scim.extension.field.onetimepassword}")
-    private String oneTimePasswordField;
+    public static final String ONETIME_PASSWORD_FIELD = "oneTimePassword";
+
+    public static final String TEMP_EMAIL_FIELD = "tempMail";
+
+    public static final String CONFIRMATION_TOKEN_FIELD = "emailConfirmToken";
 
     @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
             "\"${org.osiam.addon-self-administration.registration.activation-token-timeout:24h}\").getMillis()}")
@@ -33,12 +34,6 @@ public class Config {
     @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
             "\"${org.osiam.addon-self-administration.change-email.confirmation-token-timeout:24h}\").getMillis()}")
     private long confirmationTokenTimeout;
-
-    @Value("${org.osiam.scim.extension.field.tempemail}")
-    private String tempEmailField;
-
-    @Value("${org.osiam.scim.extension.field.emailconfirmtoken}")
-    private String confirmationTokenField;
 
     @Value("${org.osiam.mail.from}")
     private String fromAddress;
@@ -181,26 +176,6 @@ public class Config {
 
     public String getJqueryLib() {
         return jqueryLib;
-    }
-
-    public String getExtensionUrn() {
-        return extensionUrn;
-    }
-
-    public String getActivationTokenField() {
-        return activationTokenField;
-    }
-
-    public String getConfirmationTokenField() {
-        return confirmationTokenField;
-    }
-
-    public String getTempEmailField() {
-        return tempEmailField;
-    }
-
-    public String getOneTimePasswordField() {
-        return oneTimePasswordField;
     }
 
     public long getActivationTokenTimeout() {
