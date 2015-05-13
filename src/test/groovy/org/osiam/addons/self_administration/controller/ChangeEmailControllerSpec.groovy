@@ -55,11 +55,6 @@ class ChangeEmailControllerSpec extends Specification {
     RenderAndSendEmail renderAndSendEmailService = new RenderAndSendEmail(sendMailService: sendMailService,
             emailTemplateRendererService: emailTemplateRendererService)
 
-    def urn = 'urn:scim:schemas:osiam:1.0:Registration'
-
-    def confirmTokenField = 'emailConfirmToken'
-    def tempMailField = 'tempMail'
-
     def emailChangeLinkPrefix = 'http://localhost:8080/stuff'
     def emailChangeMailFrom = 'bugs@bunny.com'
     def clientEmailChangeUri = 'http://test'
@@ -72,12 +67,9 @@ class ChangeEmailControllerSpec extends Specification {
     ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
     Config config = new Config(confirmationTokenTimeout: Duration.standardHours(24).millis,
-            confirmationTokenField: confirmTokenField,
-            tempEmailField: tempMailField,
             fromAddress: emailChangeMailFrom,
             clientEmailChangeUri: clientEmailChangeUri,
             emailChangeLinkPrefix: emailChangeLinkPrefix,
-            extensionUrn: urn,
             bootStrapLib: bootStrapLib,
             angularLib: angularLib,
             jqueryLib: jqueryLib)
@@ -182,7 +174,7 @@ class ChangeEmailControllerSpec extends Specification {
         def authZHeader = 'abc'
         def userId = 'userId'
         OneTimeToken confirmToken = new OneTimeToken()
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('emailConfirmToken', confirmToken.toString())
                 .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
@@ -205,7 +197,7 @@ class ChangeEmailControllerSpec extends Specification {
         def userId = 'userId'
         def oldConfirmToken = 'irrelevant'
 
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('emailConfirmToken', oldConfirmToken)
                 .setField('tempMail', 'my@mail.com')
                 .build()
@@ -230,7 +222,7 @@ class ChangeEmailControllerSpec extends Specification {
         def userId = 'userId'
         def confirmToken = 'confToken'
 
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('emailConfirmToken', 'wrong token')
                 .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)
@@ -274,7 +266,7 @@ class ChangeEmailControllerSpec extends Specification {
         def confirmToken = 'confToken'
         def expiredToken = 'confToken:1'
 
-        Extension extension = new Extension.Builder('urn:scim:schemas:osiam:1.0:Registration')
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField('emailConfirmToken', expiredToken)
                 .setField('tempMail', 'my@mail.com').build()
         User user = new User.Builder().addExtension(extension)

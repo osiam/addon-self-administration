@@ -76,8 +76,8 @@ public class RegistrationService {
     }
 
     public User saveRegistrationUser(final User user) {
-        Extension extension = new Extension.Builder(config.getExtensionUrn())
-                .setField(config.getActivationTokenField(), new OneTimeToken().toString())
+        Extension extension = new Extension.Builder(Config.EXTENSION_URN)
+                .setField(Config.ACTIVATION_TOKEN_FIELD, new OneTimeToken().toString())
                 .build();
 
         List<Role> roles = new ArrayList<Role>();
@@ -104,8 +104,8 @@ public class RegistrationService {
 
         StringBuffer requestURL = request.getRequestURL().append("/activation");
 
-        final OneTimeToken activationToken = OneTimeToken.fromString(user.getExtension(config.getExtensionUrn())
-                .getFieldAsString(config.getActivationTokenField()));
+        final OneTimeToken activationToken = OneTimeToken.fromString(user.getExtension(Config.EXTENSION_URN)
+                .getFieldAsString(Config.ACTIVATION_TOKEN_FIELD));
 
         String registrationLink = SelfAdministrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
                 "activationToken", activationToken.getToken());
@@ -138,14 +138,14 @@ public class RegistrationService {
             return user;
         }
 
-        Extension extension = user.getExtension(config.getExtensionUrn());
+        Extension extension = user.getExtension(Config.EXTENSION_URN);
 
         final OneTimeToken storedActivationToken = OneTimeToken
-                .fromString(extension.getFieldAsString(config.getActivationTokenField()));
+                .fromString(extension.getFieldAsString(Config.ACTIVATION_TOKEN_FIELD));
 
         if (storedActivationToken.isExpired(config.getActivationTokenTimeout())) {
             UpdateUser updateUser = new UpdateUser.Builder()
-                    .deleteExtensionField(extension.getUrn(), config.getActivationTokenField())
+                    .deleteExtensionField(extension.getUrn(), Config.ACTIVATION_TOKEN_FIELD)
                     .build();
             osiamConnector.updateUser(userId, updateUser, accessToken);
 
@@ -159,7 +159,7 @@ public class RegistrationService {
         }
 
         UpdateUser updateUser = new UpdateUser.Builder()
-                .deleteExtensionField(extension.getUrn(), config.getActivationTokenField())
+                .deleteExtensionField(extension.getUrn(), Config.ACTIVATION_TOKEN_FIELD)
                 .updateActive(true)
                 .build();
 

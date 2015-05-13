@@ -179,9 +179,9 @@ public class ChangeEmailController {
         final AccessToken accessToken = new AccessToken.Builder(token).build();
         final BasicUser user = connector.getCurrentUserBasic(accessToken);
 
-        final Extension extension = new Extension.Builder(config.getExtensionUrn())
-                .setField(config.getConfirmationTokenField(), confirmationToken.toString())
-                .setField(config.getTempEmailField(), newEmail)
+        final Extension extension = new Extension.Builder(Config.EXTENSION_URN)
+                .setField(Config.CONFIRMATION_TOKEN_FIELD, confirmationToken.toString())
+                .setField(Config.TEMP_EMAIL_FIELD, newEmail)
                 .build();
 
         final UpdateUser updateUser = new UpdateUser.Builder()
@@ -222,14 +222,14 @@ public class ChangeEmailController {
                     SelfAdministrationHelper.extractAccessToken(authorization)).build();
             User user = osiamConnector.getUser(userId, accessToken);
 
-            Extension extension = user.getExtension(config.getExtensionUrn());
+            Extension extension = user.getExtension(Config.EXTENSION_URN);
             final OneTimeToken storedConfirmationToken = OneTimeToken.fromString(extension
-                    .getFieldAsString(config.getConfirmationTokenField()));
+                    .getFieldAsString(Config.CONFIRMATION_TOKEN_FIELD));
 
             if (storedConfirmationToken.isExpired(config.getConfirmationTokenTimeout())) {
                 UpdateUser updateUser = new UpdateUser.Builder()
-                        .deleteExtensionField(extension.getUrn(), config.getConfirmationTokenField())
-                        .deleteExtensionField(extension.getUrn(), config.getTempEmailField())
+                        .deleteExtensionField(extension.getUrn(), Config.CONFIRMATION_TOKEN_FIELD)
+                        .deleteExtensionField(extension.getUrn(), Config.TEMP_EMAIL_FIELD)
                         .build();
                 osiamConnector.updateUser(userId, updateUser, accessToken);
 
@@ -244,7 +244,7 @@ public class ChangeEmailController {
                 return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
             }
 
-            String newEmail = extension.getField(config.getTempEmailField(), ExtensionFieldType.STRING);
+            String newEmail = extension.getField(Config.TEMP_EMAIL_FIELD, ExtensionFieldType.STRING);
             oldEmail = SCIMHelper.getPrimaryOrFirstEmail(user);
 
             UpdateUser updateUser = getPreparedUserForEmailChange(extension, newEmail, oldEmail.get());
@@ -288,8 +288,8 @@ public class ChangeEmailController {
         return new UpdateUser.Builder()
                 .addEmail(email)
                 .deleteEmail(oldEmail)
-                .deleteExtensionField(extension.getUrn(), config.getConfirmationTokenField())
-                .deleteExtensionField(extension.getUrn(), config.getTempEmailField())
+                .deleteExtensionField(extension.getUrn(), Config.CONFIRMATION_TOKEN_FIELD)
+                .deleteExtensionField(extension.getUrn(), Config.TEMP_EMAIL_FIELD)
                 .build();
     }
 }

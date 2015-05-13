@@ -19,15 +19,15 @@ public class SelfAdministration {
         taskScheduler.initialize();
 
         new ScavengerTask(taskScheduler, connectorBuilder.createConnector(), config.getActivationTokenTimeout(),
-                config.getExtensionUrn(), config.getActivationTokenField())
+                Config.EXTENSION_URN, Config.ACTIVATION_TOKEN_FIELD)
                 .start();
 
         new ScavengerTask(taskScheduler, connectorBuilder.createConnector(), config.getConfirmationTokenTimeout(),
-                config.getExtensionUrn(), config.getConfirmationTokenField(), config.getTempEmailField())
+                Config.EXTENSION_URN, Config.CONFIRMATION_TOKEN_FIELD, Config.TEMP_EMAIL_FIELD)
                 .start();
 
         new ScavengerTask(taskScheduler, connectorBuilder.createConnector(), config.getOneTimePasswordTimeout(),
-                config.getExtensionUrn(), config.getOneTimePasswordField())
+                Config.EXTENSION_URN, Config.ONETIME_PASSWORD_FIELD)
                 .start();
     }
 

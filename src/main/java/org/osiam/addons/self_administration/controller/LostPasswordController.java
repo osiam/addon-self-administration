@@ -108,8 +108,8 @@ public class LostPasswordController {
 
         final OneTimeToken newOneTimePassword = new OneTimeToken();
 
-        final Extension extension = new Extension.Builder(config.getExtensionUrn())
-                .setField(config.getOneTimePasswordField(), newOneTimePassword.toString())
+        final Extension extension = new Extension.Builder(Config.EXTENSION_URN)
+                .setField(Config.ONETIME_PASSWORD_FIELD, newOneTimePassword.toString())
                 .build();
         final UpdateUser updateUser = new UpdateUser.Builder().updateExtension(extension).build();
 
@@ -255,13 +255,13 @@ public class LostPasswordController {
                 user = osiamConnector.getUser(userId, accessToken);
             }
 
-            Extension extension = user.getExtension(config.getExtensionUrn());
+            Extension extension = user.getExtension(Config.EXTENSION_URN);
             final OneTimeToken storedOneTimePassword = OneTimeToken.fromString(extension
-                    .getFieldAsString(config.getOneTimePasswordField()));
+                    .getFieldAsString(Config.ONETIME_PASSWORD_FIELD));
 
             if (storedOneTimePassword.isExpired(config.getOneTimePasswordTimeout())) {
                 UpdateUser updateUser = new UpdateUser.Builder()
-                        .deleteExtensionField(extension.getUrn(), config.getOneTimePasswordField())
+                        .deleteExtensionField(extension.getUrn(), Config.ONETIME_PASSWORD_FIELD)
                         .build();
                 osiamConnector.updateUser(userId, updateUser, accessToken);
 
@@ -278,7 +278,7 @@ public class LostPasswordController {
 
             UpdateUser updateUser = new UpdateUser.Builder()
                     .updatePassword(newPassword)
-                    .deleteExtensionField(extension.getUrn(), config.getOneTimePasswordField())
+                    .deleteExtensionField(extension.getUrn(), Config.ONETIME_PASSWORD_FIELD)
                     .build();
 
             User updatedUser = osiamConnector.updateUser(user.getId(), updateUser, accessToken);

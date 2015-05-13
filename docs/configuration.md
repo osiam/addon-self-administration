@@ -83,18 +83,6 @@ Here some examples:
 The controller action URL on the client side where the call arrives, submitted by the HTML from.
 This must be a URL on client side and should not point directly to the osiam registration module due to security issues.
 
-#### org.osiam.scim.extension.urn
-
-The urn which should used e.g. urn:scim:schemas:osiam:2.0:Registration
-
-#### org.osiam.scim.extension.field.*
-
-The name of the extension field for the specific field.
-* *activationtoken: The token field for the registration activation
-* *onetimepassword: The field which will save the onetimepassword, if the user will change his password
-* *emailconfirmtoken: The field which will be used to save the token, to confirm the email change request
-* *tempemail: This extension field used for temporally save the new email until this email is confirmed
-
 #### org.osiam.mail.server.* (with examples, mostly self explained
 * *.smtp.port=25
 * *.host.name=http://www.example.org
