@@ -26,6 +26,7 @@ package org.osiam.addons.self_administration.registration;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -86,8 +87,7 @@ public class UserConverter {
             userBuilder = new User.Builder(registrationUser.getUserName());
         }
 
-        userBuilder
-                .setName(name)
+        userBuilder.setName(name)
                 .setDisplayName(registrationUser.getDisplayName())
                 .setNickName(registrationUser.getNickName())
                 .setProfileUrl(registrationUser.getProfileUrl())
@@ -100,7 +100,7 @@ public class UserConverter {
                 .addPhoneNumbers(getPhoneNumberList(registrationUser))
                 .addIms(getImList(registrationUser))
                 .addPhotos(getPhotoList(registrationUser))
-                .addAddresses(getAddressList(registrationUser))
+                .addAddresses(getAddresses(registrationUser))
                 .addExtensions(getExtensions(registrationUser));
 
         return userBuilder.build();
@@ -167,29 +167,46 @@ public class UserConverter {
         return phoneNumbers;
     }
 
-    private List<Address> getAddressList(RegistrationUser registrationUser) {
-        List<Address> addresses = new ArrayList<>();
-        if (hasUserAddress(registrationUser)) {
-            Address address = new Address.Builder()
-                    .setFormatted(registrationUser.getFormattedAddress())
-                    .setStreetAddress(registrationUser.getStreetAddress())
-                    .setLocality(registrationUser.getLocality())
-                    .setRegion(registrationUser.getRegion())
-                    .setPostalCode(registrationUser.getPostalCode())
-                    .setCountry(registrationUser.getCountry())
-                    .build();
-            addresses.add(address);
+    private List<Address> getAddresses(RegistrationUser registrationUser) {
+        final Address.Builder addressBuilder = new Address.Builder();
+        boolean hasAddress = false;
+
+        final String formattedAddress = registrationUser.getFormattedAddress();
+        if (!Strings.isNullOrEmpty(formattedAddress)) {
+            addressBuilder.setFormatted(formattedAddress);
+            hasAddress = true;
         }
-        return addresses;
-    }
 
-    private boolean hasUserAddress(RegistrationUser registrationUser) {
-        return Strings.isNullOrEmpty(registrationUser.getFormattedAddress())
-                || Strings.isNullOrEmpty(registrationUser.getStreetAddress())
-                || Strings.isNullOrEmpty(registrationUser.getLocality())
-                || Strings.isNullOrEmpty(registrationUser.getRegion())
-                || Strings.isNullOrEmpty(registrationUser.getPostalCode())
-                || Strings.isNullOrEmpty(registrationUser.getCountry());
-    }
+        final String streetAddress = registrationUser.getStreetAddress();
+        if (!Strings.isNullOrEmpty(streetAddress)) {
+            addressBuilder.setStreetAddress(streetAddress);
+            hasAddress = true;
+        }
 
+        final String locality = registrationUser.getLocality();
+        if (!Strings.isNullOrEmpty(locality)) {
+            addressBuilder.setLocality(locality);
+            hasAddress = true;
+        }
+
+        final String region = registrationUser.getRegion();
+        if (!Strings.isNullOrEmpty(region)) {
+            addressBuilder.setRegion(region);
+            hasAddress = true;
+        }
+
+        final String postalCode = registrationUser.getPostalCode();
+        if (!Strings.isNullOrEmpty(postalCode)) {
+            addressBuilder.setPostalCode(postalCode);
+            hasAddress = true;
+        }
+
+        final String country = registrationUser.getCountry();
+        if (!Strings.isNullOrEmpty(country)) {
+            addressBuilder.setCountry(country);
+            hasAddress = true;
+        }
+
+        return hasAddress ? Arrays.asList(addressBuilder.build()) : new ArrayList<Address>();
+    }
 }
