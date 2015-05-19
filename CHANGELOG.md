@@ -3,6 +3,12 @@
 ## 1.5 - Unreleased
 
 ### Changes
+
+- remove field `expiry` from OAuth client in SQL scripts
+
+    The field `expiry` has been removed from the auth-server (osiam/auth-server#9)
+    and must be removed from the SQL scripts too.
+
 - change some attributes of OAuth client
 
     - remove unnecessary grants: authorisation code grant, refresh token grant,
@@ -31,12 +37,14 @@ information have a look at the [configuration]
 - scavenge expired tokens
 
 ### Changes
+
 - use latest plugin api release: Version 1.3.2
 - switch to latest connector release: Version 1.4
 - bump dependencies and cleanup pom
 - move documentation from wiki to repo
 
 ### Fixes
+
 - handle missing extension field gracefully
 - client database id may lead to problems with other clients
 
