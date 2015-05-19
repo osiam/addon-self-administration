@@ -10,6 +10,6 @@ Start the database commandline:
 
 Now insert it as user osiam by calling
 
-`$ psql -f ./sql/registration_extension.sql -U osiam`
+`$ psql -f ./sql/extension.sql -U osiam`
 
 while being in the directory where you unpacked the sources.

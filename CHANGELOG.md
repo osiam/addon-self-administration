@@ -1,5 +1,22 @@
 # OSIAM addon-self-administration
 
+## 1.5 - Unreleased
+
+### Changes
+- change some attributes of OAuth client
+
+    - remove unnecessary grants: authorisation code grant, refresh token grant,
+      resource owner credentials grant
+    - decrease access token validity to 300 seconds
+
+- rename SQL scripts for installing client and extension
+
+    Use `client.sql` to create the OAuth client in the `auth-server`'s database
+    and `extension.sql` to create the SCIM extension in the `resource-server`'s
+    database. The old files are still in place for compatibility reasons, but
+    will receive no further updates and be eventually removed in a future
+    version. All users are encouraged to update to the new files.
+
 ## 1.4 - 2015-05-11
 
 ### Features

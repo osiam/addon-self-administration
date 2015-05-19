@@ -1,5 +1,7 @@
 --
--- DEPRECATED: replaced by client.sql
+-- Example self-administration client, please sync with the attribute values in
+-- the addon-self-administration.properties. Has to be imported in the database
+-- of the auth-server, before you deploy the addon-self-administration!
 --
 
 INSERT INTO osiam_client (internal_id, accesstokenvalidityseconds, client_secret, expiry,

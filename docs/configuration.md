@@ -22,8 +22,8 @@
 You need to import the sql script into your postgres database which you will find in the OSIAM resource server project!
 
 For the self-administration you need to add some extension fields into the database otherwise it will not work.
-The extension is configured with it's own namespace and will not conflict user defined extensions (init_data.sql).
-You need also to add a specific client for self-administration in the auth-servers database (example_data.sql).
+The extension is configured with it's own namespace and will not conflict user defined extensions (extension.sql).
+You need also to add a specific client for self-administration in the auth-servers database (client.sql).
 
 Start the database commandline:
 
@@ -31,13 +31,13 @@ Start the database commandline:
 
 Now insert it as user osiam while being in the directory where you unpacked the sources by calling
 
-    $ psql -f ./sql/init_data.sql -U osiam
+    $ psql -f ./sql/extension.sql -U osiam
 
 and
 
-    $ psql -f ./sql/example_data.sql -U osiam
+    $ psql -f ./sql/client.sql -U osiam
 
-but update the example_data.sql before you import it and sync the data with the addon-self-administration.properties!
+but update the client.sql before you import it and sync the data with the addon-self-administration.properties!
 
 ## Configuring OSIAM
 
