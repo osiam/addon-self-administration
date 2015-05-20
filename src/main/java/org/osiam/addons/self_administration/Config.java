@@ -23,34 +23,6 @@ public class Config {
 
     public static final String CONFIRMATION_TOKEN_FIELD = "emailConfirmToken";
 
-    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
-            "\"${org.osiam.addon-self-administration.registration.activation-token-timeout:24h}\").getMillis()}")
-    private long activationTokenTimeout;
-
-    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
-            "\"${org.osiam.addon-self-administration.lost-password.one-time-password-timeout:24h}\").getMillis()}")
-    private long oneTimePasswordTimeout;
-
-    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
-            "\"${org.osiam.addon-self-administration.change-email.confirmation-token-timeout:24h}\").getMillis()}")
-    private long confirmationTokenTimeout;
-
-    @Value("${org.osiam.mail.from}")
-    private String fromAddress;
-
-    // css and js libs
-    @Value("${org.osiam.html.dependencies.bootstrap}")
-    private String bootStrapLib;
-
-    @Value("${org.osiam.html.dependencies.angular}")
-    private String angularLib;
-
-    @Value("${org.osiam.html.dependencies.jquery}")
-    private String jqueryLib;
-
-    @Value("${org.osiam.addon-self-administration.one-time-token-scavenger.enabled:true}")
-    private boolean oneTimeTokenScavengerEnabled;
-
     @Value("${org.osiam.mail.emailchange.linkprefix}")
     private String emailChangeLinkPrefix;
 
@@ -66,7 +38,36 @@ public class Config {
     @Value("${org.osiam.html.passwordlost.url}")
     private String clientPasswordChangeUri;
 
-    private String[] allAllowedFields;
+    @Value("${org.osiam.addon-self-administration.client.secret}")
+    private String clientSecret;
+
+    @Value("${org.osiam.addon-self-administration.client.id:addon-self-administration-client}")
+    private String clientId;
+
+    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
+            "\"${org.osiam.addon-self-administration.registration.activation-token-timeout:24h}\").getMillis()}")
+    private long activationTokenTimeout;
+
+    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
+            "\"${org.osiam.addon-self-administration.lost-password.one-time-password-timeout:24h}\").getMillis()}")
+    private long oneTimePasswordTimeout;
+
+    @Value("#{T(org.osiam.addons.self_administration.util.SelfAdministrationHelper).makeDuration(" +
+            "\"${org.osiam.addon-self-administration.change-email.confirmation-token-timeout:24h}\").getMillis()}")
+    private long confirmationTokenTimeout;
+
+    // css and js libs
+    @Value("${org.osiam.html.dependencies.bootstrap:http://getbootstrap.com/dist/css/bootstrap.css}")
+    private String bootStrapLib;
+
+    @Value("${org.osiam.html.dependencies.angular:http://code.angularjs.org/1.2.0-rc.3/angular.min.js}")
+    private String angularLib;
+
+    @Value("${org.osiam.html.dependencies.jquery:http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js}")
+    private String jqueryLib;
+
+    @Value("${org.osiam.addon-self-administration.one-time-token-scavenger.enabled:true}")
+    private boolean oneTimeTokenScavengerEnabled;
 
     @Value("${org.osiam.html.form.usernameEqualsEmail:true}")
     private boolean usernameEqualsEmail;
@@ -74,19 +75,39 @@ public class Config {
     @Value("${org.osiam.html.form.password.length:8}")
     private int passwordLength;
 
-    private boolean confirmPasswordRequired = true;
-
-    @Value("${org.osiam.resource-server.home}")
+    @Value("${org.osiam.resource-server.home:http://localhost:8080/osiam-resource-server}")
     private String resourceServerHome;
 
-    @Value("${org.osiam.auth-server.home}")
+    @Value("${org.osiam.auth-server.home:http://localhost:8080/osiam-auth-server}")
     private String authServerHome;
 
-    @Value("${org.osiam.addon-self-administration.client.id}")
-    private String clientId;
+    @Value("${org.osiam.mail.from:selfadmin@localhost}")
+    private String fromAddress;
 
-    @Value("${org.osiam.addon-self-administration.client.secret}")
-    private String clientSecret;
+    @Value("${org.osiam.mail.server.mailServerHost.name:localhost}")
+    private String mailServerHost;
+
+    @Value("${org.osiam.mail.server.smtp.port:25}")
+    private int mailServerPort;
+
+    @Value("${org.osiam.mail.server.username:}")
+    private String mailServerUserName;
+
+    @Value("${org.osiam.mail.server.password:}")
+    private String mailServerPassword;
+
+    @Value("${org.osiam.mail.server.transport.protocol:smtp}")
+    private String mailServerProtocol;
+
+    @Value("${org.osiam.mail.server.smtp.auth:false}")
+    private boolean mailServerAuthenticationEnabled;
+
+    @Value("${org.osiam.mail.server.smtp.starttls.enable:false}")
+    private boolean mailServerStartTlsEnabled;
+
+    private String[] allAllowedFields;
+
+    private boolean confirmPasswordRequired = true;
 
     @Autowired
     private void createAllAllowedFields(@Value("${org.osiam.html.form.fields:}") String[] allowedFields,
@@ -201,5 +222,33 @@ public class Config {
 
     public String getClientPasswordChangeUri() {
         return clientPasswordChangeUri;
+    }
+
+    public String getMailServerHost() {
+        return mailServerHost;
+    }
+
+    public int getMailServerPort() {
+        return mailServerPort;
+    }
+
+    public String getMailServerUserName() {
+        return mailServerUserName;
+    }
+
+    public String getMailServerPassword() {
+        return mailServerPassword;
+    }
+
+    public String getMailServerProtocol() {
+        return mailServerProtocol;
+    }
+
+    public boolean isMailServerAuthenticationEnabled() {
+        return mailServerAuthenticationEnabled;
+    }
+
+    public boolean isMailServerStartTlsEnabled() {
+        return mailServerStartTlsEnabled;
     }
 }

@@ -44,9 +44,6 @@
 
     <context:annotation-config/>
 
-    <!-- Import configuration for mail -->
-    <import resource="mail-configuration.xml"/>
-
     <import resource="template-configuration.xml"/>
 
 </beans>
