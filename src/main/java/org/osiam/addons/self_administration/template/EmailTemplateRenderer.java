@@ -26,9 +26,8 @@ package org.osiam.addons.self_administration.template;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.osiam.addons.self_administration.exception.TemplateException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
@@ -43,7 +42,7 @@ import com.google.common.base.Strings;
 @Service
 public class EmailTemplateRenderer {
 
-    @Inject
+    @Autowired
     private SpringTemplateEngine templateEngine;
 
     public String renderEmailSubject(String templateName, Locale locale, Map<String, Object> variables) {

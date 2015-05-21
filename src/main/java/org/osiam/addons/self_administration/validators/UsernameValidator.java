@@ -25,19 +25,19 @@ package org.osiam.addons.self_administration.validators;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class UsernameValidator implements ConstraintValidator<Username, String> {
 
-    @Inject
+    @Autowired
     private RegistrationService registrationService;
 
-    @Inject
+    @Autowired
     private Config config;
 
     @Override

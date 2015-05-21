@@ -42,7 +42,6 @@ import org.osiam.resources.scim.User
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 
-import javax.servlet.ServletContext
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
@@ -63,7 +62,6 @@ class ChangeEmailControllerSpec extends Specification {
     def angularLib = 'http://angular'
     def jqueryLib = 'http://jquery'
 
-    ServletContext context = Mock()
     ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
     Config config = new Config(confirmationTokenTimeout: Duration.standardHours(24).millis,
@@ -74,7 +72,7 @@ class ChangeEmailControllerSpec extends Specification {
             angularLib: angularLib,
             jqueryLib: jqueryLib)
 
-    ChangeEmailController changeEmailController = new ChangeEmailController(context: context,
+    ChangeEmailController changeEmailController = new ChangeEmailController(
             mapper: mapper,
             renderAndSendEmailService: renderAndSendEmailService,
             connectorBuilder: connectorBuilder,
@@ -249,13 +247,11 @@ class ChangeEmailControllerSpec extends Specification {
         given:
         def servletResponseMock = Mock(HttpServletResponse)
         def servletOutputStream = Mock(ServletOutputStream)
-        def inputStream = new ByteArrayInputStream('some html stuff with \$CHANGELINK placeholder'.bytes)
 
         when:
         changeEmailController.index(servletResponseMock)
 
         then:
-        1 * context.getResourceAsStream('/WEB-INF/registration/change_email.html') >> inputStream
         1 * servletResponseMock.getOutputStream() >> servletOutputStream
     }
 

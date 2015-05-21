@@ -38,9 +38,9 @@ import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.User
 import org.springframework.http.HttpStatus
+import spock.lang.Ignore
 import spock.lang.Specification
 
-import javax.servlet.ServletContext
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpServletResponse
 
@@ -50,8 +50,6 @@ import javax.servlet.http.HttpServletResponse
 class LostPasswordControllerSpec extends Specification {
 
     UserObjectMapper mapper = new UserObjectMapper()
-
-    ServletContext contextMock = Mock()
 
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()
@@ -78,7 +76,7 @@ class LostPasswordControllerSpec extends Specification {
             angularLib: angularLib,
             jqueryLib: jqueryLib)
 
-    LostPasswordController lostPasswordController = new LostPasswordController(context: contextMock,
+    LostPasswordController lostPasswordController = new LostPasswordController(
             mapper: mapper,
             renderAndSendEmailService: renderAndSendEmailService,
             connectorBuilder: connectorBuilder,
@@ -379,18 +377,15 @@ class LostPasswordControllerSpec extends Specification {
 
     def 'The controller should provide a html form for entering the new password with already known values like otp and user id'() {
         given:
-        def servletResponseMock = Mock(HttpServletResponse)
-        def servletResponseOutputStream = Mock(ServletOutputStream)
+        HttpServletResponse servletResponseMock = Mock()
+        ServletOutputStream servletResponseOutputStream = Mock()
         def otp = 'otp'
         def userId = 'userID'
-
-        def inputStream = new ByteArrayInputStream('some html with placeholder \$CHANGELINK, \$OTP, \$USERID'.bytes)
 
         when:
         lostPasswordController.lostForm(otp, userId, servletResponseMock)
 
         then:
-        1 * contextMock.getResourceAsStream('/WEB-INF/registration/change_password.html') >> inputStream
         1 * servletResponseMock.getOutputStream() >> servletResponseOutputStream
     }
 
@@ -417,5 +412,4 @@ class LostPasswordControllerSpec extends Specification {
         1 * osiamConnector.getCurrentUser(_) >> user
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
-
 }

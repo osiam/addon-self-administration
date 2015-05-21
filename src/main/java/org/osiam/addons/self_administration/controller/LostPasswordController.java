@@ -30,9 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.inject.Inject;
 import javax.mail.MessagingException;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
@@ -54,6 +52,7 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -75,19 +74,16 @@ public class LostPasswordController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LostPasswordController.class);
 
-    @Inject
+    @Autowired
     private UserObjectMapper mapper;
 
-    @Inject
+    @Autowired
     private RenderAndSendEmail renderAndSendEmailService;
 
-    @Inject
-    private ServletContext context;
-
-    @Inject
+    @Autowired
     private ConnectorBuilder connectorBuilder;
 
-    @Inject
+    @Autowired
     private Config config;
 
     /**
@@ -171,7 +167,7 @@ public class LostPasswordController {
             HttpServletResponse response) throws IOException {
 
         // load the html file as stream and convert to String for replacement
-        InputStream inputStream = context.getResourceAsStream("/WEB-INF/registration/change_password.html");
+        InputStream inputStream = getClass().getResourceAsStream("/change_password.html");
         String htmlContent = IOUtils.toString(inputStream, "UTF-8");
 
         // replace all placeholders with appropriate value

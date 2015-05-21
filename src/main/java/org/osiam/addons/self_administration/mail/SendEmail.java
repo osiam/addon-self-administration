@@ -25,42 +25,27 @@ package org.osiam.addons.self_administration.mail;
 
 import java.util.Date;
 
-import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.osiam.addons.self_administration.exception.SendEmailException;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 /**
  * Send email service for sending an email
- * 
+ *
  */
 @Component
 public class SendEmail {
 
-    @Inject
+    @Autowired
     private JavaMailSender mailSender;
-
-    public void sendPlainTextMail(String fromAddress, String toAddress, String subject, String content) {
-        mailSender.send(getMessage(fromAddress, toAddress, subject, content));
-    }
 
     public void sendHTMLMail(String fromAddress, String toAddress, String subject, String htmlContent) {
         mailSender.send(getMimeMessage(fromAddress, toAddress, subject, htmlContent));
-    }
-
-    private SimpleMailMessage getMessage(String fromAddress, String toAddress, String subject, String mailContent) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromAddress);
-        message.setTo(toAddress);
-        message.setSubject(subject);
-        message.setText(mailContent);
-        message.setSentDate(new Date());
-        return message;
     }
 
     private MimeMessage getMimeMessage(String fromAddress, String toAddress, String subject, String mailContent) {

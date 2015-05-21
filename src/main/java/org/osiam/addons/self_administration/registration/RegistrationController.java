@@ -23,7 +23,6 @@
 
 package org.osiam.addons.self_administration.registration;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -34,6 +33,7 @@ import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,16 +50,16 @@ public class RegistrationController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class);
 
-    @Inject
+    @Autowired
     private UserConverter userConverter;
 
-    @Inject
+    @Autowired
     private CallbackPlugin callbackPlugin;
 
-    @Inject
+    @Autowired
     private RegistrationService registrationService;
 
-    @Inject
+    @Autowired
     private Config config;
 
     @InitBinder

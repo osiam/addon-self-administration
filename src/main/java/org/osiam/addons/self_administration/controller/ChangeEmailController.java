@@ -30,9 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.inject.Inject;
-import javax.mail.MessagingException;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
@@ -56,6 +53,7 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -76,19 +74,16 @@ public class ChangeEmailController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeEmailController.class);
 
-    @Inject
+    @Autowired
     private UserObjectMapper mapper;
 
-    @Inject
+    @Autowired
     private RenderAndSendEmail renderAndSendEmailService;
 
-    @Inject
-    private ServletContext context;
-
-    @Inject
+    @Autowired
     private ConnectorBuilder connectorBuilder;
 
-    @Inject
+    @Autowired
     private Config config;
 
     /**
@@ -97,7 +92,7 @@ public class ChangeEmailController {
     @RequestMapping(method = RequestMethod.GET)
     public void index(HttpServletResponse response) throws IOException {
         // load the html file as stream
-        InputStream inputStream = context.getResourceAsStream("/WEB-INF/registration/change_email.html");
+        InputStream inputStream = getClass().getResourceAsStream("/change_email.html");
         String htmlContent = IOUtils.toString(inputStream, "UTF-8");
         // replacing the url
         String replacedAll = htmlContent.replace("$CHANGELINK", config.getClientEmailChangeUri());
@@ -123,11 +118,11 @@ public class ChangeEmailController {
      *            The new email address value
      * @return The HTTP status code
      * @throws IOException
-     * @throws MessagingException
+     *             If the updated user object can't mapped to json
      */
     @RequestMapping(method = RequestMethod.POST, value = "/change", produces = "application/json")
     public ResponseEntity<String> change(@RequestHeader("Authorization") final String authorization,
-            @RequestParam("newEmailValue") final String newEmailValue) throws IOException, MessagingException {
+            @RequestParam("newEmailValue") final String newEmailValue) throws IOException {
 
         User updatedUser;
         final OneTimeToken confirmationToken = new OneTimeToken();
@@ -201,11 +196,13 @@ public class ChangeEmailController {
      * @param confirmationToken
      *            The previously generated confirmation token from the confirmation email
      * @return The HTTP status code and the updated user if successful
+     * @throws IOException
+     *
      */
     @RequestMapping(method = RequestMethod.POST, value = "/confirm", produces = "application/json")
     public ResponseEntity<String> confirm(@RequestHeader("Authorization") final String authorization,
             @RequestParam("userId") final String userId,
-            @RequestParam("confirmToken") final String confirmationToken) throws IOException, MessagingException {
+            @RequestParam("confirmToken") final String confirmationToken) throws IOException {
 
         if (Strings.isNullOrEmpty(confirmationToken)) {
             String message = "The submitted confirmation token is invalid!";

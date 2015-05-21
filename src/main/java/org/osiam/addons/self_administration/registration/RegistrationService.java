@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osiam.addons.self_administration.Config;
@@ -49,6 +48,7 @@ import org.osiam.resources.scim.Role;
 import org.osiam.resources.scim.SCIMSearchResult;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Optional;
@@ -57,13 +57,13 @@ import com.google.common.base.Strings;
 @Service
 public class RegistrationService {
 
-    @Inject
+    @Autowired
     private ConnectorBuilder connectorBuilder;
 
-    @Inject
+    @Autowired
     private RenderAndSendEmail renderAndSendEmailService;
 
-    @Inject
+    @Autowired
     private Config config;
 
     public boolean isUsernameIsAlreadyTaken(String userName) {

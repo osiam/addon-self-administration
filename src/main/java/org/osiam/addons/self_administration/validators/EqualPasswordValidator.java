@@ -23,16 +23,16 @@
 
 package org.osiam.addons.self_administration.validators;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationUser;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class EqualPasswordValidator implements ConstraintValidator<EqualPasswords, RegistrationUser> {
 
-    @Inject
+    @Autowired
     private Config config;
 
     @Override

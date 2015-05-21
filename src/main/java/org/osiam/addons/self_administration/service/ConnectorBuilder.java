@@ -23,16 +23,15 @@
 
 package org.osiam.addons.self_administration.service;
 
-import javax.inject.Inject;
-
 import org.osiam.addons.self_administration.Config;
 import org.osiam.client.OsiamConnector;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ConnectorBuilder {
 
-    @Inject
+    @Autowired
     private Config config;
 
     public OsiamConnector createConnector() {

@@ -25,20 +25,20 @@ package org.osiam.addons.self_administration.validators;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationService;
 import org.osiam.resources.exception.SCIMDataValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class EmailValidator implements ConstraintValidator<Email, String> {
 
-    @Inject
+    @Autowired
     private RegistrationService registrationService;
 
-    @Inject
+    @Autowired
     private Config config;
 
     @Override
