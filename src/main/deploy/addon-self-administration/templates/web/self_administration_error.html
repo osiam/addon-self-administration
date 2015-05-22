@@ -20,8 +20,8 @@
 
 <div class="container">
     <div class="info-container">
-        <p class="alert alert-danger" th:text="#{${key}}">
-            There is an internal problem.
+        <p class="alert alert-danger" th:text="#{${key?:'internal.server.error'}}">
+            We're sorry. An internal Server Error occurred.
         </p>
     </div>
     <div th:if="${exception}" class="info-container">

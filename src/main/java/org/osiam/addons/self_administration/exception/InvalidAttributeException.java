@@ -27,22 +27,11 @@ import org.springframework.http.HttpStatus;
 
 public class InvalidAttributeException extends OsiamException {
 
-    private static final long serialVersionUID = -292158452140136468L;
-
-    public InvalidAttributeException() {
-        super();
-    }
-
-    public InvalidAttributeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     public InvalidAttributeException(String message, String key) {
         super(message, key, HttpStatus.BAD_REQUEST.value());
     }
-    
+
     public InvalidAttributeException(String message, String key, Throwable cause) {
         super(message, key, HttpStatus.BAD_REQUEST.value(), cause);
     }
-
 }

@@ -23,6 +23,8 @@
 
 package org.osiam.addons.self_administration.exception;
 
+import java.util.NoSuchElementException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.osiam.client.exception.OsiamClientException;
@@ -32,9 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class OsiamExceptionHandler {
@@ -46,30 +47,48 @@ public class OsiamExceptionHandler {
 
     @ExceptionHandler(OsiamRequestException.class)
     protected ModelAndView handleException(OsiamRequestException ex, HttpServletResponse response) {
+        response.setStatus(ex.getHttpStatusCode());
         LOGGER.warn(AN_EXCEPTION_OCCURRED, ex);
-        return createResponse(response, ex.getHttpStatusCode(), "registration.form.error");
+        modelAndView.addObject(KEY, "registration.form.error");
+        return modelAndView;
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(OsiamClientException.class)
-    protected ModelAndView handleConflict(OsiamClientException ex, HttpServletResponse response) {
+    protected ModelAndView handleConflict(OsiamClientException ex) {
         LOGGER.error(AN_EXCEPTION_OCCURRED, ex);
-        return createResponse(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "registration.form.error");
+        return createResponse("registration.form.error");
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(OsiamException.class)
-    protected ModelAndView handleException(OsiamException ex, HttpServletResponse response) {
-        LOGGER.warn(AN_EXCEPTION_OCCURRED, ex);
-        return createResponse(response, ex.getHttpStatusCode(), ex.getKey());
+    protected ModelAndView handleException(OsiamException ex) {
+        LOGGER.error(AN_EXCEPTION_OCCURRED, ex);
+        return createResponse(ex.getKey());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidAttributeException.class)
+    protected ModelAndView handleException(InvalidAttributeException ex) {
+        LOGGER.warn(AN_EXCEPTION_OCCURRED, ex);
+        return createResponse(ex.getKey());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoSuchElementException.class)
-    protected ModelAndView handleNoSuchElementException(NoSuchElementException ex, HttpServletResponse response) {
+    protected ModelAndView handleNoSuchElementException(NoSuchElementException ex) {
         LOGGER.warn(AN_EXCEPTION_OCCURRED, ex);
-        return createResponse(response, 400, "activation.exception");
+        return createResponse("activation.exception");
     }
 
-    private ModelAndView createResponse(HttpServletResponse response, int httpStatus, String messageKey) {
-        response.setStatus(httpStatus);
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    protected ModelAndView handleException(Exception ex) {
+        LOGGER.error(AN_EXCEPTION_OCCURRED, ex);
+        return createResponse("internal.server.error");
+    }
+
+    private ModelAndView createResponse(String messageKey) {
         modelAndView.addObject(KEY, messageKey);
         return modelAndView;
     }

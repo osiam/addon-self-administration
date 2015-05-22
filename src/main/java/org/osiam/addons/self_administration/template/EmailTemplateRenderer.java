@@ -51,7 +51,7 @@ public class EmailTemplateRenderer {
             throw new TemplateException(
                     "Could not find the mail subject in your template file '" + templateName
                             + "'. Please provide an HTML element with the ID 'mail-subject'.",
-                    "template.email.exception.malformed");
+                    "internal.server.error");
         }
         return emailSubject;
     }
@@ -62,7 +62,7 @@ public class EmailTemplateRenderer {
             throw new TemplateException(
                     "Could not find the mail body in your template file '" + templateName
                             + "'. Please provide an HTML element with the ID 'mail-body'.",
-                    "template.email.exception.malformed");
+                    "internal.server.error");
         }
         return emailBody;
     }

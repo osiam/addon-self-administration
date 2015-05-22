@@ -24,7 +24,6 @@
 package org.osiam.addons.self_administration.registration;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.osiam.addons.self_administration.Config;
@@ -43,6 +42,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(value = "/registration")
@@ -76,12 +76,10 @@ public class RegistrationController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String register(@Valid final RegistrationUser registrationUser,
-            final BindingResult bindingResult, final Model model, final HttpServletRequest request,
-            final HttpServletResponse response) {
+            final BindingResult bindingResult, final Model model, final HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("allowedFields", config.getAllAllowedFields());
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return "registration";
         }
 
@@ -93,7 +91,6 @@ public class RegistrationController {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("allowedFields", config.getAllAllowedFields());
 
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return "registration";
         }
 
@@ -103,7 +100,6 @@ public class RegistrationController {
 
         model.addAttribute("user", user);
 
-        response.setStatus(HttpStatus.CREATED.value());
         try {
             callbackPlugin.performPostRegistrationActions(user);
         } catch (CallbackException p) {
