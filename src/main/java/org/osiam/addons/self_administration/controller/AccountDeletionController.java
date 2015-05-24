@@ -22,33 +22,32 @@
  */
 package org.osiam.addons.self_administration.controller;
 
-import javax.inject.Inject;
-
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.oauth.AccessToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * A controller providing an operation for account deletion.
  */
-@Controller
+@RestController
 public class AccountDeletionController {
 
-    @Inject
+    @Autowired
     private AccountManagementService accountManagementService;
 
     /**
      * Deletes the user with the given ID.
-     * 
+     *
      * @param authorization
      *            Authorization header with access token
      * @param userId
@@ -68,7 +67,7 @@ public class AccountDeletionController {
             return accountManagementService.handleException(e);
         }
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

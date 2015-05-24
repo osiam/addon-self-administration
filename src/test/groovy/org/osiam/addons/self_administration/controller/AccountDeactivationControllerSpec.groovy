@@ -43,7 +43,6 @@ class AccountDeactivationControllerSpec extends Specification {
     ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
     RenderAndSendEmail renderAndSendEmailService = Mock()
-    HttpServletRequest servletRequest = Mock()
     Config config = new Config()
     AccountManagementService accountManagementService = new AccountManagementService(connectorBuilder: connectorBuilder,
             renderAndSendEmailService: renderAndSendEmailService, config: config)
@@ -61,7 +60,7 @@ class AccountDeactivationControllerSpec extends Specification {
         AccessToken accessToken = new AccessToken.Builder('token').build()
 
         when:
-        def result = controller.deactivateUser(authHeader, userId, servletRequest)
+        def result = controller.deactivateUser(authHeader, userId)
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
@@ -79,7 +78,7 @@ class AccountDeactivationControllerSpec extends Specification {
         AccessToken accessToken = new AccessToken.Builder('invalid').build()
 
         when:
-        def result = controller.deactivateUser(authHeader, userId, servletRequest)
+        def result = controller.deactivateUser(authHeader, userId)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
@@ -96,7 +95,7 @@ class AccountDeactivationControllerSpec extends Specification {
         AccessToken accessToken = new AccessToken.Builder('token').build()
 
         when:
-        def result = controller.deactivateUser(authHeader, userId, servletRequest)
+        def result = controller.deactivateUser(authHeader, userId)
 
         then:
         1 * connectorBuilder.createConnector() >> osiamConnector
@@ -115,7 +114,7 @@ class AccountDeactivationControllerSpec extends Specification {
         AccessToken accessToken = new AccessToken.Builder('token').build()
 
         when:
-        def result = controller.deactivateUser(authHeader, userId, servletRequest)
+        def result = controller.deactivateUser(authHeader, userId)
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector
@@ -137,7 +136,7 @@ class AccountDeactivationControllerSpec extends Specification {
         AccessToken accessToken = new AccessToken.Builder('token').build()
 
         when:
-        def result = controller.deactivateUser(authHeader, userId, servletRequest)
+        def result = controller.deactivateUser(authHeader, userId)
 
         then:
         2 * connectorBuilder.createConnector() >> osiamConnector

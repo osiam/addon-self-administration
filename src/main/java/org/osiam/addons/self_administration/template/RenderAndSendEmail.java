@@ -26,18 +26,17 @@ package org.osiam.addons.self_administration.template;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.osiam.addons.self_administration.mail.SendEmail;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RenderAndSendEmail {
 
-    @Inject
+    @Autowired
     private SendEmail sendMailService;
 
-    @Inject
+    @Autowired
     private EmailTemplateRenderer emailTemplateRendererService;
 
     public void renderAndSendEmail(String templateName, String fromAddress, String toAddress, Locale locale,

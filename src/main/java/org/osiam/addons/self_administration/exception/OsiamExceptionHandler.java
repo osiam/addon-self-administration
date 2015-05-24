@@ -40,31 +40,31 @@ import java.util.NoSuchElementException;
 public class OsiamExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OsiamExceptionHandler.class.getName());
-    private static final String AN_EXCEPTION_OCCURED = "An exception occurred";
+    private static final String AN_EXCEPTION_OCCURRED = "An exception occurred";
     private static final String KEY = "key";
     private ModelAndView modelAndView = new ModelAndView("self_administration_error");
 
     @ExceptionHandler(OsiamRequestException.class)
     protected ModelAndView handleException(OsiamRequestException ex, HttpServletResponse response) {
-        LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
+        LOGGER.warn(AN_EXCEPTION_OCCURRED, ex);
         return createResponse(response, ex.getHttpStatusCode(), "registration.form.error");
     }
 
     @ExceptionHandler(OsiamClientException.class)
     protected ModelAndView handleConflict(OsiamClientException ex, HttpServletResponse response) {
-        LOGGER.error(AN_EXCEPTION_OCCURED, ex);
+        LOGGER.error(AN_EXCEPTION_OCCURRED, ex);
         return createResponse(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "registration.form.error");
     }
 
     @ExceptionHandler(OsiamException.class)
     protected ModelAndView handleException(OsiamException ex, HttpServletResponse response) {
-        LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
+        LOGGER.warn(AN_EXCEPTION_OCCURRED, ex);
         return createResponse(response, ex.getHttpStatusCode(), ex.getKey());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     protected ModelAndView handleNoSuchElementException(NoSuchElementException ex, HttpServletResponse response) {
-        LOGGER.warn(AN_EXCEPTION_OCCURED, ex);
+        LOGGER.warn(AN_EXCEPTION_OCCURRED, ex);
         return createResponse(response, 400, "activation.exception");
     }
 

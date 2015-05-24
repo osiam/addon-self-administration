@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.service.ConnectorBuilder;
@@ -43,6 +41,7 @@ import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -58,18 +57,18 @@ public class AccountManagementService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountManagementService.class);
 
-    @Inject
-    private ConnectorBuilder connectorBuilder;
+    @Autowired
+    protected ConnectorBuilder connectorBuilder;
 
-    @Inject
-    private RenderAndSendEmail renderAndSendEmailService;
+    @Autowired
+    protected RenderAndSendEmail renderAndSendEmailService;
 
-    @Inject
+    @Autowired
     private Config config;
 
     /**
      * Deactivates the account of the user with the given user ID.
-     * 
+     *
      * @param userId
      *            the ID of the user
      * @param token
@@ -84,7 +83,7 @@ public class AccountManagementService {
 
     /**
      * Deletes the account of the user with the given user ID.
-     * 
+     *
      * @param userId
      *            the ID of the user
      * @param token
@@ -98,7 +97,7 @@ public class AccountManagementService {
 
     /**
      * Logs the given exception and returns a suitable response status.
-     * 
+     *
      * @param e
      *            the exception to handle
      * @param {@link ResponseEntity} with the resulting error information and status code
@@ -127,7 +126,7 @@ public class AccountManagementService {
 
     /**
      * Returns the SCIM user with the given user ID.
-     * 
+     *
      * @param userId
      *            the user ID
      * @param token
@@ -141,7 +140,7 @@ public class AccountManagementService {
 
     /**
      * Sends an email informing about the account change.
-     * 
+     *
      * @param user
      *            the user
      * @param template
@@ -163,7 +162,7 @@ public class AccountManagementService {
 
     /**
      * Returns a new OSIAM connector.
-     * 
+     *
      * @return {link {@link OsiamConnector}
      */
     private OsiamConnector getConnector() {

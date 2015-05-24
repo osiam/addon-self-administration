@@ -25,20 +25,20 @@ package org.osiam.addons.self_administration.validators;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.osiam.addons.self_administration.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 public class PasswordValidator implements ConstraintValidator<Password, String> {
 
-    @Inject
+    @Autowired
     private MessageSource messageSource;
 
-    @Inject
+    @Autowired
     private Config config;
 
     @Override
