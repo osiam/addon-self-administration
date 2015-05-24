@@ -84,7 +84,7 @@ public class Config {
     @Value("${org.osiam.mail.from:selfadmin@localhost}")
     private String fromAddress;
 
-    @Value("${org.osiam.mail.server.mailServerHost.name:localhost}")
+    @Value("${org.osiam.mail.server.host.name:localhost}")
     private String mailServerHost;
 
     @Value("${org.osiam.mail.server.smtp.port:25}")
