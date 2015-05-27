@@ -10,7 +10,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 public class TemplateConfiguration {
 
     @Bean
-    public ClassLoaderTemplateResolver emailTemplateResolver() {
+    public ClassLoaderTemplateResolver defaultTemplateResolver() {
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
         resolver.setPrefix("addon-self-administration/templates/mail/");
         resolver.setSuffix(".html");
@@ -34,7 +34,7 @@ public class TemplateConfiguration {
     @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine engine = new SpringTemplateEngine();
-        engine.addTemplateResolver(emailTemplateResolver());
+        engine.addTemplateResolver(defaultTemplateResolver());
         engine.addTemplateResolver(webTemplateResolver());
         return engine;
     }

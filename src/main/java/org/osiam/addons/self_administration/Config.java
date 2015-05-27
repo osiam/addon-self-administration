@@ -5,13 +5,20 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Holds all application wide used properties
  */
 @Component
-public class Config {
+public class Config extends WebMvcConfigurerAdapter {
 
     public static final String EXTENSION_URN = "urn:org.osiam:scim:extensions:addon-self-administration";
 
@@ -250,5 +257,27 @@ public class Config {
 
     public boolean isMailServerStartTlsEnabled() {
         return mailServerStartTlsEnabled;
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/css/**").addResourceLocations(
+                "classpath:/addon-self-administration/resources/css/");
+    }
+
+    @Override
+    public Validator getValidator() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.setValidationMessageSource(messageSource());
+        return validator;
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setBasenames("addon-self-administration/i18n/registration",
+                "addon-self-administration/i18n/mail");
+        return messageSource;
     }
 }
