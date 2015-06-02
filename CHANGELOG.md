@@ -1,27 +1,47 @@
 # OSIAM addon-self-administration
 
-## 1.5 - Unreleased
+## 1.5 - 2015-06-02
 
 ### Changes
 
-- remove field `expiry` from OAuth client in SQL scripts
+- Add sensible default values for most configuration properties
 
-    The field `expiry` has been removed from the auth-server (osiam/auth-server#9)
-    and must be removed from the SQL scripts too.
+    See docs for details
 
-- change some attributes of OAuth client
+- Remove possibility to configure the requested scopes
 
-    - remove unnecessary grants: authorisation code grant, refresh token grant,
+    The configuration parameter wasn't used anyway
+
+- Remove possibility to configure the extension's attributes
+- Remove field `expiry` from OAuth client in SQL scripts
+
+    The field `expiry` has been removed from the auth-server
+    (osiam/auth-server#9) and must be removed from the SQL scripts too.
+
+- Change some attributes of OAuth client
+
+    - Remove unnecessary grants: authorisation code grant, refresh token grant,
       resource owner credentials grant
-    - decrease access token validity to 300 seconds
+    - Decrease access token validity to 300 seconds
 
-- rename SQL scripts for installing client and extension
+- Rename SQL scripts for installing client and extension
 
     Use `client.sql` to create the OAuth client in the `auth-server`'s database
     and `extension.sql` to create the SCIM extension in the `resource-server`'s
     database. The old files are still in place for compatibility reasons, but
     will receive no further updates and be eventually removed in a future
     version. All users are encouraged to update to the new files.
+
+- Bump dependencies
+
+### Fixes
+
+- If no address field is set, the user should have no address
+
+### Other
+
+- Introduce Spring Boot
+- Switch from xml to java configuration
 
 ## 1.4 - 2015-05-11
 

@@ -65,7 +65,7 @@ public class CallbackPluginHandler implements CallbackPlugin, InitializingBean {
         try {
             final URL[] jarLocation = { new File(pluginJarPath).toURI().toURL() };
             final URLClassLoader classLoader = URLClassLoader.newInstance(jarLocation, getClass().getClassLoader());
-            return plugin = (CallbackPlugin) classLoader.loadClass(pluginClass).getConstructor().newInstance();
+            return (CallbackPlugin) classLoader.loadClass(pluginClass).getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
                 | ClassNotFoundException | MalformedURLException e) {
             throw new RuntimeException(e);

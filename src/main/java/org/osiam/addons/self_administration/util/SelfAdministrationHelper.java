@@ -26,7 +26,6 @@ package org.osiam.addons.self_administration.util;
 import java.util.Locale;
 
 import org.joda.time.Duration;
-import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import org.springframework.context.i18n.LocaleContextHolder;

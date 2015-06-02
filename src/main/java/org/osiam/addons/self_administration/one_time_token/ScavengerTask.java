@@ -38,7 +38,7 @@ public class ScavengerTask implements Runnable {
         this.timeout = timeout;
         this.urn = urn;
         this.tokenField = tokenField;
-        this.fieldsToDelete = fieldsToDelete;
+        this.fieldsToDelete = fieldsToDelete.clone();
     }
 
     @Override

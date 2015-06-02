@@ -47,11 +47,13 @@ public class UsernameValidator implements ConstraintValidator<Username, String> 
     @Override
     public boolean isValid(String username, ConstraintValidatorContext constraintValidatorContext) {
         if (!config.isUsernameEqualsEmail()) {
-            username = username.trim();
-            if (isNullOrEmpty(username)) {
+            String trimmedUsername = username.trim();
+
+            if (isNullOrEmpty(trimmedUsername)) {
                 return false;
             }
-            if (registrationService.isUsernameIsAlreadyTaken(username)) {
+
+            if (registrationService.isUsernameIsAlreadyTaken(trimmedUsername)) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
                 constraintValidatorContext.buildConstraintViolationWithTemplate(
                         "{registration.validation.username.alreadytaken}").addConstraintViolation();

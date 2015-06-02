@@ -58,10 +58,10 @@ public class AccountManagementService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountManagementService.class);
 
     @Autowired
-    protected ConnectorBuilder connectorBuilder;
+    private ConnectorBuilder connectorBuilder;
 
     @Autowired
-    protected RenderAndSendEmail renderAndSendEmailService;
+    private RenderAndSendEmail renderAndSendEmailService;
 
     @Autowired
     private Config config;
