@@ -4,8 +4,8 @@
 -- of the auth-server, before you deploy the addon-self-administration!
 --
 
-INSERT INTO osiam_client (internal_id, accesstokenvalidityseconds, client_secret, id,
-                          implicit_approval, redirect_uri, refreshtokenvalidityseconds, validityinseconds)
+INSERT INTO osiam_client (internal_id, access_token_validity_seconds, client_secret, id,
+                          implicit_approval, redirect_uri, refresh_token_validity_seconds, validity_in_seconds)
 VALUES (10, 300, 'super-secret', 'addon-self-administration-client',
         FALSE, 'http://localhost:8080/addon-self-administration', 0, 0);
 
