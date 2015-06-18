@@ -5,6 +5,8 @@
 ### Changes
 
 - Bump connector to make use of more concurrent HTTP connections
+- Bump plugin API to 1.4
+- Bump Jackson version
 
 ## 1.5 - 2015-06-02
 
