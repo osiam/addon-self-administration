@@ -28,6 +28,9 @@
         <div th:if="${errorMessage != null}" class="alert alert-danger" th:text="${errorMessage}">
             Error message
         </div>
+        <div th:if="${errorKey != null}" class="alert alert-danger" th:text="#{${errorKey?:'internal.server.error'}}">
+            We're sorry. An internal Server Error occurred.
+        </div>
         <fieldset>
             <div th:replace="htmlfield :: defaultInput('userName', 'text', true)"></div>
             <div th:replace="htmlfield :: defaultInput('email', 'email', true)"></div>

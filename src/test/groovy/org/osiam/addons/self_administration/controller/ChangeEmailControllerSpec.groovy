@@ -28,7 +28,6 @@ import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.one_time_token.OneTimeToken
-import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.EmailTemplateRenderer
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
 import org.osiam.addons.self_administration.util.UserObjectMapper
@@ -62,7 +61,6 @@ class ChangeEmailControllerSpec extends Specification {
     def angularLib = 'http://angular'
     def jqueryLib = 'http://jquery'
 
-    ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
     Config config = new Config(confirmationTokenTimeout: Duration.standardHours(24).millis,
             fromAddress: emailChangeMailFrom,
@@ -75,7 +73,7 @@ class ChangeEmailControllerSpec extends Specification {
     ChangeEmailController changeEmailController = new ChangeEmailController(
             mapper: mapper,
             renderAndSendEmailService: renderAndSendEmailService,
-            connectorBuilder: connectorBuilder,
+            osiamConnector: osiamConnector,
             config: config)
 
     def 'there should be a failure in change email if email template file was not found'() {
@@ -89,7 +87,6 @@ class ChangeEmailControllerSpec extends Specification {
         changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
@@ -107,7 +104,6 @@ class ChangeEmailControllerSpec extends Specification {
         changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
@@ -125,7 +121,6 @@ class ChangeEmailControllerSpec extends Specification {
         changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> { throw new OsiamException() }
@@ -144,7 +139,6 @@ class ChangeEmailControllerSpec extends Specification {
         def result = changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
@@ -162,7 +156,6 @@ class ChangeEmailControllerSpec extends Specification {
         def result = changeEmailController.change(authZ, 'some@email.de')
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUserBasic(accessToken) >> { throw new UnauthorizedException('unauthorized') }
         result.getBody() == '{\"error\":\"unauthorized\"}'
     }
@@ -182,7 +175,6 @@ class ChangeEmailControllerSpec extends Specification {
         def result = changeEmailController.confirm(authZHeader, userId, confirmToken.token)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(_, _) >> user
         1 * osiamConnector.updateUser(userId, _, _) >> user
 
@@ -207,7 +199,6 @@ class ChangeEmailControllerSpec extends Specification {
         def result = changeEmailController.confirm(authZHeader, userId, oldConfirmToken)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(_, _) >> user
         1 * osiamConnector.updateUser(userId, _, _) >> user
 
@@ -230,7 +221,6 @@ class ChangeEmailControllerSpec extends Specification {
         def response = changeEmailController.confirm(authZHeader, userId, confirmToken)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(_, _) >> user
         response.getStatusCode() == HttpStatus.FORBIDDEN
     }
@@ -272,7 +262,6 @@ class ChangeEmailControllerSpec extends Specification {
         def response = changeEmailController.confirm(authZHeader, userId, confirmToken)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(_, _) >> user
         response.getStatusCode() == HttpStatus.FORBIDDEN
     }

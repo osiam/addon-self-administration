@@ -23,42 +23,26 @@
 
 package org.osiam.addons.self_administration.registration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
+import org.osiam.addons.self_administration.exception.UserNotRegisteredException;
 import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
-import org.osiam.addons.self_administration.service.ConnectorBuilder;
+import org.osiam.addons.self_administration.plugin_api.CallbackException;
+import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
+import org.osiam.addons.self_administration.service.OsiamService;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
-import org.osiam.client.OsiamConnector;
-import org.osiam.client.oauth.AccessToken;
-import org.osiam.client.query.Query;
-import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.helper.SCIMHelper;
-import org.osiam.resources.scim.Email;
-import org.osiam.resources.scim.Extension;
-import org.osiam.resources.scim.Role;
-import org.osiam.resources.scim.SCIMSearchResult;
-import org.osiam.resources.scim.UpdateUser;
-import org.osiam.resources.scim.User;
+import org.osiam.resources.scim.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Strings;
+import java.util.*;
 
 @Service
 public class RegistrationService {
-
-    @Autowired
-    private ConnectorBuilder connectorBuilder;
 
     @Autowired
     private RenderAndSendEmail renderAndSendEmailService;
@@ -66,21 +50,18 @@ public class RegistrationService {
     @Autowired
     private Config config;
 
-    public boolean isUsernameIsAlreadyTaken(String userName) {
-        Query query = new QueryBuilder().filter("userName eq \"" + userName + "\"").build();
+    @Autowired
+    private CallbackPlugin callbackPlugin;
 
-        OsiamConnector osiamConnector = connectorBuilder.createConnector();
-        AccessToken accessToken = osiamConnector.retrieveAccessToken();
-        SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, accessToken);
-        return queryResult.getTotalResults() != 0L;
-    }
+    @Autowired
+    private OsiamService osiamService;
 
     public User saveRegistrationUser(final User user) {
         Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField(Config.ACTIVATION_TOKEN_FIELD, new OneTimeToken().toString())
                 .build();
 
-        List<Role> roles = new ArrayList<Role>();
+        List<Role> roles = new ArrayList<>();
         Role role = new Role.Builder().setValue("USER").build();
         roles.add(role);
 
@@ -90,24 +71,20 @@ public class RegistrationService {
                 .addExtension(extension)
                 .build();
 
-        OsiamConnector osiamConnector = connectorBuilder.createConnector();
-        AccessToken accessToken = osiamConnector.retrieveAccessToken();
-        return osiamConnector.createUser(registrationUser, accessToken);
+        return osiamService.createUser(registrationUser);
     }
 
-    public void sendRegistrationEmail(User user, HttpServletRequest request) {
+    public void sendRegistrationEmail(User user, String requestUrl) {
         Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
         if (!email.isPresent()) {
             String message = "Could not register user. No email of user " + user.getUserName() + " found!";
             throw new InvalidAttributeException(message, "registration.exception.noEmail");
         }
 
-        StringBuffer requestURL = request.getRequestURL().append("/activation");
-
         final OneTimeToken activationToken = OneTimeToken.fromString(user.getExtension(Config.EXTENSION_URN)
                 .getFieldAsString(Config.ACTIVATION_TOKEN_FIELD));
 
-        String registrationLink = SelfAdministrationHelper.createLinkForEmail(requestURL.toString(), user.getId(),
+        String registrationLink = SelfAdministrationHelper.createLinkForEmail(requestUrl + "/activation", user.getId(),
                 "activationToken", activationToken.getToken());
 
         Map<String, Object> mailVariables = new HashMap<>();
@@ -130,9 +107,7 @@ public class RegistrationService {
                     "activation.exception");
         }
 
-        OsiamConnector osiamConnector = connectorBuilder.createConnector();
-        AccessToken accessToken = osiamConnector.retrieveAccessToken();
-        User user = osiamConnector.getUser(userId, accessToken);
+        User user = osiamService.getUser(userId);
 
         if (user.isActive()) {
             return user;
@@ -147,7 +122,7 @@ public class RegistrationService {
             UpdateUser updateUser = new UpdateUser.Builder()
                     .deleteExtensionField(extension.getUrn(), Config.ACTIVATION_TOKEN_FIELD)
                     .build();
-            osiamConnector.updateUser(userId, updateUser, accessToken);
+            osiamService.updateUser(userId, updateUser);
 
             throw new InvalidAttributeException("Activation token is expired", "activation.exception");
         }
@@ -163,6 +138,25 @@ public class RegistrationService {
                 .updateActive(true)
                 .build();
 
-        return osiamConnector.updateUser(userId, updateUser, accessToken);
+        return osiamService.updateUser(userId, updateUser);
+    }
+
+    public User registerUser(User user, String requestUrl) {
+        User result = saveRegistrationUser(user);
+        try {
+            sendRegistrationEmail(user, requestUrl);
+            return result;
+        } catch (Exception e) {
+            osiamService.deleteUser(result.getId());
+            throw new UserNotRegisteredException();
+        }
+    }
+
+    public void postRegistration(User user) throws CallbackException {
+        callbackPlugin.performPostRegistrationActions(user);
+    }
+
+    public void preRegistration(User user) throws CallbackException {
+        callbackPlugin.performPreRegistrationActions(user);
     }
 }
