@@ -27,8 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.osiam.addons.self_administration.Config;
+import org.osiam.addons.self_administration.exception.UserNotRegisteredException;
 import org.osiam.addons.self_administration.plugin_api.CallbackException;
-import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +50,6 @@ public class RegistrationController {
 
     @Autowired
     private UserConverter userConverter;
-
-    @Autowired
-    private CallbackPlugin callbackPlugin;
 
     @Autowired
     private RegistrationService registrationService;
@@ -84,7 +81,7 @@ public class RegistrationController {
         User user = userConverter.toScim(registrationUser);
 
         try {
-            callbackPlugin.performPreRegistrationActions(user);
+            registrationService.preRegistration(user);
         } catch (CallbackException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("allowedFields", config.getAllAllowedFields());
@@ -92,32 +89,38 @@ public class RegistrationController {
             return "registration";
         }
 
-        user = registrationService.saveRegistrationUser(user);
+        final String requestUrl = request.getRequestURL().toString();
 
-        registrationService.sendRegistrationEmail(user, request);
+        try {
+            user = registrationService.registerUser(user, requestUrl);
+        } catch (UserNotRegisteredException e) {
+            model.addAttribute("allowedFields", config.getAllAllowedFields());
+            model.addAttribute("errorKey", "registration.error.tryAgain");
+            return "registration";
+        }
 
         model.addAttribute("user", user);
 
         try {
-            callbackPlugin.performPostRegistrationActions(user);
+            registrationService.postRegistration(user);
         } catch (CallbackException p) {
             LOGGER.error(
                     "An exception occurred while performing post registration actions for user with ID: "
-                            + user.getId(), p);
+                            + user.getId(),
+                    p);
         }
         return "registrationSuccess";
     }
 
     /**
      * Activates a previously registered user.
-     *
+     * <p>
      * After activation E-Mail arrived the activation link will point to this URI.
      *
      * @param userId
-     *            the id of the registered user
+     *        the id of the registered user
      * @param activationToken
-     *            the user's activation token, send by E-Mail
-     *
+     *        the user's activation token, send by E-Mail
      * @return the registrationSuccess page
      */
     @RequestMapping(value = "/activation", method = RequestMethod.GET)

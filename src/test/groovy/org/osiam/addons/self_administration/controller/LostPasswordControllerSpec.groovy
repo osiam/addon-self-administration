@@ -28,7 +28,6 @@ import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.exception.OsiamException
 import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.one_time_token.OneTimeToken
-import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.EmailTemplateRenderer
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
 import org.osiam.addons.self_administration.util.UserObjectMapper
@@ -65,7 +64,6 @@ class LostPasswordControllerSpec extends Specification {
     def angularLib = 'http://angular'
     def jqueryLib = 'http://jquery'
 
-    ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
 
     Config config = new Config(oneTimePasswordTimeout: Duration.standardHours(24).millis,
@@ -79,7 +77,7 @@ class LostPasswordControllerSpec extends Specification {
     LostPasswordController lostPasswordController = new LostPasswordController(
             mapper: mapper,
             renderAndSendEmailService: renderAndSendEmailService,
-            connectorBuilder: connectorBuilder,
+            osiamConnector: osiamConnector,
             config: config)
 
     def 'The controller should start the flow by generating a one time password and send an email to the user'() {
@@ -96,7 +94,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> emailContent
@@ -114,7 +111,6 @@ class LostPasswordControllerSpec extends Specification {
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
         response.getStatusCode() == HttpStatus.BAD_REQUEST
     }
@@ -130,7 +126,6 @@ class LostPasswordControllerSpec extends Specification {
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
         response.getStatusCode() == HttpStatus.BAD_REQUEST
         response.getBody() != null
@@ -148,7 +143,6 @@ class LostPasswordControllerSpec extends Specification {
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
         response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
@@ -173,7 +167,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient(authZHeader, otp.token, newPassword, userId)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * osiamConnector.getUser(userId, _) >> user
 
@@ -199,7 +192,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * osiamConnector.getUser(userId, _) >> user
 
@@ -224,7 +216,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp.token, newPassword)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * osiamConnector.getCurrentUser(_) >> user
 
@@ -243,7 +234,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, _) >> { throw new OsiamRequestException(409, '') }
 
         result.getStatusCode() == HttpStatus.CONFLICT
@@ -259,7 +249,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> { throw new OsiamRequestException(409, '') }
 
         result.getStatusCode() == HttpStatus.CONFLICT
@@ -283,7 +272,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, _) >> user
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
@@ -305,7 +293,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
@@ -328,7 +315,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, _) >> user
         1 * osiamConnector.updateUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
         result.getStatusCode() == HttpStatus.BAD_REQUEST
@@ -352,7 +338,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
         1 * osiamConnector.updateUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
         result.getStatusCode() == HttpStatus.BAD_REQUEST
@@ -408,7 +393,6 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getCurrentUser(_) >> user
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
