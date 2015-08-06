@@ -31,6 +31,7 @@ import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.User
 import org.springframework.mail.MailSendException
 import spock.lang.Specification
+import org.osiam.addons.self_administration.exception.InvalidAttributeException
 
 class RegistrationServiceSpec extends Specification {
     OsiamService osiamService = Mock()
@@ -45,8 +46,13 @@ class RegistrationServiceSpec extends Specification {
         given:
         def userName = 'Joe Random'
         def mailAddress = 'test@osiam.org'
-        Email email = new Email.Builder().setValue(mailAddress).setPrimary(true).build()
-        User user = new User.Builder(userName).addEmail(email).build()
+        Email email = new Email.Builder()
+                .setValue(mailAddress)
+                .setPrimary(true)
+                .build()
+        User user = new User.Builder(userName)
+                .addEmail(email)
+                .build()
         def url = "http://localhost/"
 
         when:
@@ -62,8 +68,13 @@ class RegistrationServiceSpec extends Specification {
         given:
         def userName = 'Joe Random'
         def mailAddress = 'test@osiam.org'
-        Email email = new Email.Builder().setValue(mailAddress).setPrimary(true).build()
-        User user = new User.Builder(userName).addEmail(email).build()
+        Email email = new Email.Builder()
+                .setValue(mailAddress)
+                .setPrimary(true)
+                .build()
+        User user = new User.Builder(userName)
+                .addEmail(email)
+                .build()
         def url = 'http://localhost/'
 
         when:
@@ -75,4 +86,54 @@ class RegistrationServiceSpec extends Specification {
         1 * renderAndSendEmail.renderAndSendEmail(_, _, _, _, _) >> { throw new MailSendException("") }
         1 * osiamService.deleteUser(_)
     }
+
+    def 'activate user with id null - expect InvalidAttributeException'() {
+        given:
+        def userId = null
+        def token = "someToken"
+
+        when:
+        registrationService.activateUser(userId, token)
+
+        then:
+        thrown(InvalidAttributeException)
+    }
+
+    def 'activate user with token null - expect InvalidAttributeException'() {
+        given:
+        def userId = "someId"
+        def token = null
+
+        when:
+        registrationService.activateUser(userId, token)
+
+        then:
+        thrown(InvalidAttributeException)
+    }
+
+    def 'activate user who is already active - resulting user should equal input user object'() {
+        given:
+        def userId = "someId"
+        def token = "someToken"
+
+        and: "a fake user object"
+        def userName = 'Joe Random'
+        def mailAddress = 'test@osiam.org'
+        Email email = new Email.Builder()
+                .setValue(mailAddress)
+                .setPrimary(true)
+                .build()
+        User user = new User.Builder(userName)
+                .setActive(true)
+                .addEmail(email)
+                .build()
+
+        when:
+        def result = registrationService.activateUser(userId, token)
+
+        then:
+        1 * osiamService.getUser("someId") >> user
+        result == user
+    }
+
 }
