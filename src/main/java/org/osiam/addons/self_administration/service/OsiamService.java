@@ -24,6 +24,7 @@
 package org.osiam.addons.self_administration.service;
 
 import org.osiam.client.OsiamConnector;
+import org.osiam.client.oauth.Scope;
 import org.osiam.client.query.Query;
 import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.scim.SCIMSearchResult;
@@ -41,23 +42,24 @@ public class OsiamService {
     public boolean isUsernameIsAlreadyTaken(String userName) {
         Query query = new QueryBuilder().filter("userName eq \"" + userName + "\"").build();
 
-        SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, osiamConnector.retrieveAccessToken());
+        SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query,
+                osiamConnector.retrieveAccessToken(Scope.ADMIN));
         return queryResult.getTotalResults() != 0L;
     }
 
     public User createUser(User user) {
-        return osiamConnector.createUser(user, osiamConnector.retrieveAccessToken());
+        return osiamConnector.createUser(user, osiamConnector.retrieveAccessToken(Scope.ADMIN));
     }
 
     public User getUser(String userId) {
-        return osiamConnector.getUser(userId, osiamConnector.retrieveAccessToken());
+        return osiamConnector.getUser(userId, osiamConnector.retrieveAccessToken(Scope.ADMIN));
     }
 
     public User updateUser(String userId, UpdateUser updateUser) {
-        return osiamConnector.updateUser(userId, updateUser, osiamConnector.retrieveAccessToken());
+        return osiamConnector.updateUser(userId, updateUser, osiamConnector.retrieveAccessToken(Scope.ADMIN));
     }
 
     public void deleteUser(String id) {
-        osiamConnector.deleteUser(id, osiamConnector.retrieveAccessToken());
+        osiamConnector.deleteUser(id, osiamConnector.retrieveAccessToken(Scope.ADMIN));
     }
 }
