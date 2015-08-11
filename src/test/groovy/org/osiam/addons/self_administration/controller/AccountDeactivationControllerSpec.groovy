@@ -24,7 +24,6 @@
 package org.osiam.addons.self_administration.controller
 
 import org.osiam.addons.self_administration.Config
-import org.osiam.addons.self_administration.service.ConnectorBuilder
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
 import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.NoResultException
@@ -40,12 +39,13 @@ import javax.servlet.http.HttpServletRequest
 
 class AccountDeactivationControllerSpec extends Specification {
 
-    ConnectorBuilder connectorBuilder = Mock()
     OsiamConnector osiamConnector = Mock()
     RenderAndSendEmail renderAndSendEmailService = Mock()
     Config config = new Config()
-    AccountManagementService accountManagementService = new AccountManagementService(connectorBuilder: connectorBuilder,
-            renderAndSendEmailService: renderAndSendEmailService, config: config)
+    AccountManagementService accountManagementService = new AccountManagementService(
+            osiamConnector: osiamConnector,
+            renderAndSendEmailService: renderAndSendEmailService,
+            config: config)
 
     AccountDeactivationController controller =
             new AccountDeactivationController(accountManagementService: accountManagementService)
@@ -63,7 +63,6 @@ class AccountDeactivationControllerSpec extends Specification {
         def result = controller.deactivateUser(authHeader, userId)
 
         then:
-        2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> user
         1 * osiamConnector.updateUser(userId, { it.getScimConformUpdateUser().isActive() == false }, accessToken)
         1 * renderAndSendEmailService.renderAndSendEmail('deactivation', _, mailAddress, _, _)
@@ -81,7 +80,6 @@ class AccountDeactivationControllerSpec extends Specification {
         def result = controller.deactivateUser(authHeader, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> { throw new UnauthorizedException(message) }
         result.getStatusCode() == HttpStatus.UNAUTHORIZED
         result.getBody() == '{\"error\":\"Authorization failed: ' + message + '\"}'
@@ -98,7 +96,6 @@ class AccountDeactivationControllerSpec extends Specification {
         def result = controller.deactivateUser(authHeader, userId)
 
         then:
-        1 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> { throw new NoResultException(message) }
         result.getStatusCode() == HttpStatus.NOT_FOUND
         result.getBody() == '{\"error\":\"No such entity: ' + message + '\"}'
@@ -117,7 +114,6 @@ class AccountDeactivationControllerSpec extends Specification {
         def result = controller.deactivateUser(authHeader, userId)
 
         then:
-        2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> user
         1 * osiamConnector.updateUser(userId, _, accessToken)
         result.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
@@ -139,7 +135,6 @@ class AccountDeactivationControllerSpec extends Specification {
         def result = controller.deactivateUser(authHeader, userId)
 
         then:
-        2 * connectorBuilder.createConnector() >> osiamConnector
         1 * osiamConnector.getUser(userId, accessToken) >> user
         1 * osiamConnector.updateUser(userId, _, accessToken)
         1 * renderAndSendEmailService.renderAndSendEmail('deactivation', _, mailAddress, _, _) >> {

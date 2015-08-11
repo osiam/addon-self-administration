@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
-import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.client.OsiamConnector;
@@ -58,7 +57,7 @@ public class AccountManagementService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountManagementService.class);
 
     @Autowired
-    private ConnectorBuilder connectorBuilder;
+    private OsiamConnector osiamConnector;
 
     @Autowired
     private RenderAndSendEmail renderAndSendEmailService;
@@ -75,9 +74,9 @@ public class AccountManagementService {
      *            the access token
      */
     public void deactivateUser(String userId, AccessToken token) {
-        User user = getUser(userId, token);
+        User user = osiamConnector.getUser(userId, token);
         UpdateUser updateUser = getUpdateUserForDeactivation();
-        getConnector().updateUser(userId, updateUser, token);
+        osiamConnector.updateUser(userId, updateUser, token);
         sendEmail(user, "deactivation");
     }
 
@@ -90,8 +89,8 @@ public class AccountManagementService {
      *            the access token
      */
     public void deleteUser(String userId, AccessToken token) {
-        User user = getUser(userId, token);
-        getConnector().deleteUser(userId, token);
+        User user = osiamConnector.getUser(userId, token);
+        osiamConnector.deleteUser(userId, token);
         sendEmail(user, "deletion");
     }
 
@@ -125,20 +124,6 @@ public class AccountManagementService {
     }
 
     /**
-     * Returns the SCIM user with the given user ID.
-     *
-     * @param userId
-     *            the user ID
-     * @param token
-     *            the access token
-     */
-    private User getUser(String userId, AccessToken token) {
-        OsiamConnector connector = connectorBuilder.createConnector();
-
-        return connector.getUser(userId, token);
-    }
-
-    /**
      * Sends an email informing about the account change.
      *
      * @param user
@@ -158,15 +143,6 @@ public class AccountManagementService {
 
         renderAndSendEmailService.renderAndSendEmail(template, config.getFromAddress(), email.get().getValue(), locale,
                 mailVariables);
-    }
-
-    /**
-     * Returns a new OSIAM connector.
-     *
-     * @return {link {@link OsiamConnector}
-     */
-    private OsiamConnector getConnector() {
-        return connectorBuilder.createConnector();
     }
 
     /*

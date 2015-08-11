@@ -23,23 +23,41 @@
 
 package org.osiam.addons.self_administration.service;
 
-import org.osiam.addons.self_administration.Config;
 import org.osiam.client.OsiamConnector;
+import org.osiam.client.query.Query;
+import org.osiam.client.query.QueryBuilder;
+import org.osiam.resources.scim.SCIMSearchResult;
+import org.osiam.resources.scim.UpdateUser;
+import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class ConnectorBuilder {
+@Service
+public class OsiamService {
 
     @Autowired
-    private Config config;
+    private OsiamConnector osiamConnector;
 
-    public OsiamConnector createConnector() {
-        OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder().
-                setAuthServerEndpoint(config.getAuthServerHome()).
-                setResourceServerEndpoint(config.getResourceServerHome()).
-                setClientId(config.getClientId()).
-                setClientSecret(config.getClientSecret());
-        return oConBuilder.build();
+    public boolean isUsernameIsAlreadyTaken(String userName) {
+        Query query = new QueryBuilder().filter("userName eq \"" + userName + "\"").build();
+
+        SCIMSearchResult<User> queryResult = osiamConnector.searchUsers(query, osiamConnector.retrieveAccessToken());
+        return queryResult.getTotalResults() != 0L;
+    }
+
+    public User createUser(User user) {
+        return osiamConnector.createUser(user, osiamConnector.retrieveAccessToken());
+    }
+
+    public User getUser(String userId) {
+        return osiamConnector.getUser(userId, osiamConnector.retrieveAccessToken());
+    }
+
+    public User updateUser(String userId, UpdateUser updateUser) {
+        return osiamConnector.updateUser(userId, updateUser, osiamConnector.retrieveAccessToken());
+    }
+
+    public void deleteUser(String id) {
+        osiamConnector.deleteUser(id, osiamConnector.retrieveAccessToken());
     }
 }

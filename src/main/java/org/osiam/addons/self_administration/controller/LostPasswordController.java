@@ -37,7 +37,6 @@ import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
-import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
@@ -81,7 +80,7 @@ public class LostPasswordController {
     private RenderAndSendEmail renderAndSendEmailService;
 
     @Autowired
-    private ConnectorBuilder connectorBuilder;
+    private OsiamConnector osiamConnector;
 
     @Autowired
     private Config config;
@@ -113,7 +112,7 @@ public class LostPasswordController {
         final AccessToken accessToken = new AccessToken.Builder(token).build();
         User updatedUser;
         try {
-            updatedUser = connectorBuilder.createConnector().updateUser(userId, updateUser, accessToken);
+            updatedUser = osiamConnector.updateUser(userId, updateUser, accessToken);
         } catch (OsiamRequestException e) {
             LOGGER.warn(e.getMessage());
             return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(),
@@ -238,7 +237,6 @@ public class LostPasswordController {
             return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
         }
 
-        OsiamConnector osiamConnector = connectorBuilder.createConnector();
         AccessToken accessToken = new AccessToken.Builder(SelfAdministrationHelper.extractAccessToken(authorization))
                 .build();
 

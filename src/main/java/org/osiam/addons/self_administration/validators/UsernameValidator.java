@@ -30,12 +30,13 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationService;
+import org.osiam.addons.self_administration.service.OsiamService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class UsernameValidator implements ConstraintValidator<Username, String> {
 
     @Autowired
-    private RegistrationService registrationService;
+    private OsiamService osiamService;
 
     @Autowired
     private Config config;
@@ -53,7 +54,7 @@ public class UsernameValidator implements ConstraintValidator<Username, String> 
                 return false;
             }
 
-            if (registrationService.isUsernameIsAlreadyTaken(trimmedUsername)) {
+            if (osiamService.isUsernameIsAlreadyTaken(trimmedUsername)) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
                 constraintValidatorContext.buildConstraintViolationWithTemplate(
                         "{registration.validation.username.alreadytaken}").addConstraintViolation();

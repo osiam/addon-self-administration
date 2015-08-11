@@ -30,13 +30,14 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.registration.RegistrationService;
+import org.osiam.addons.self_administration.service.OsiamService;
 import org.osiam.resources.exception.SCIMDataValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EmailValidator implements ConstraintValidator<Email, String> {
 
     @Autowired
-    private RegistrationService registrationService;
+    private OsiamService osiamService;
 
     @Autowired
     private Config config;
@@ -52,7 +53,7 @@ public class EmailValidator implements ConstraintValidator<Email, String> {
                 return false;
             }
 
-            if (registrationService.isUsernameIsAlreadyTaken(email)) {
+            if (osiamService.isUsernameIsAlreadyTaken(email)) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
                 constraintValidatorContext.buildConstraintViolationWithTemplate(
                         "{registration.validation.email.alreadytaken}").addConstraintViolation();

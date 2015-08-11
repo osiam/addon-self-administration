@@ -36,7 +36,6 @@ import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
-import org.osiam.addons.self_administration.service.ConnectorBuilder;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
 import org.osiam.addons.self_administration.util.UserObjectMapper;
@@ -81,7 +80,7 @@ public class ChangeEmailController {
     private RenderAndSendEmail renderAndSendEmailService;
 
     @Autowired
-    private ConnectorBuilder connectorBuilder;
+    private OsiamConnector osiamConnector;
 
     @Autowired
     private Config config;
@@ -170,9 +169,8 @@ public class ChangeEmailController {
      * @return User which has the values in his extension
      */
     private User getUpdatedUserForEmailChange(String token, String newEmail, OneTimeToken confirmationToken) {
-        final OsiamConnector connector = connectorBuilder.createConnector();
         final AccessToken accessToken = new AccessToken.Builder(token).build();
-        final BasicUser user = connector.getCurrentUserBasic(accessToken);
+        final BasicUser user = osiamConnector.getCurrentUserBasic(accessToken);
 
         final Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField(Config.CONFIRMATION_TOKEN_FIELD, confirmationToken.toString())
@@ -183,7 +181,7 @@ public class ChangeEmailController {
                 .updateExtension(extension)
                 .build();
 
-        return connector.updateUser(user.getId(), updateUser, accessToken);
+        return osiamConnector.updateUser(user.getId(), updateUser, accessToken);
     }
 
     /**
@@ -212,7 +210,6 @@ public class ChangeEmailController {
 
         User updatedUser;
         Optional<Email> oldEmail;
-        OsiamConnector osiamConnector = connectorBuilder.createConnector();
 
         try {
             AccessToken accessToken = new AccessToken.Builder(

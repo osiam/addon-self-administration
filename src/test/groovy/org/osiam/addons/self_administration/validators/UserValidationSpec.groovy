@@ -26,12 +26,13 @@ package org.osiam.addons.self_administration.validators
 import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.registration.RegistrationService
 import org.osiam.addons.self_administration.registration.RegistrationUser
+import org.osiam.addons.self_administration.service.OsiamService
 import org.springframework.context.MessageSource
 import spock.lang.Specification
 
 class UserValidationSpec extends Specification {
 
-    RegistrationService registrationService = Mock()
+    OsiamService osiamService = Mock()
 
     MessageSource messageSource = Mock()
 
@@ -39,8 +40,8 @@ class UserValidationSpec extends Specification {
     EqualPasswordValidator equalPasswordValidator = new EqualPasswordValidator(config: config)
     PasswordValidator passwordValidator = new PasswordValidator(messageSource: messageSource, config: config)
     PhotoValidator photoValidator = new PhotoValidator()
-    EmailValidator registrationEmailValidator = new EmailValidator(registrationService: registrationService, config: config)
-    UsernameValidator usernameValidator = new UsernameValidator(registrationService: registrationService, config: config)
+    EmailValidator registrationEmailValidator = new EmailValidator(osiamService: osiamService, config: config)
+    UsernameValidator usernameValidator = new UsernameValidator(osiamService: osiamService, config: config)
 
     def 'validator should have no errors if all fields are valid'() {
         given:
@@ -53,7 +54,7 @@ class UserValidationSpec extends Specification {
 
         config.passwordLength >> 8
         config.usernameEqualsEmail >> true
-        registrationService.isUsernameIsAlreadyTaken(_) >> false
+        osiamService.isUsernameIsAlreadyTaken(_) >> false
 
         when:
         def isEqualPasswordValid = equalPasswordValidator.isValid(user, null)

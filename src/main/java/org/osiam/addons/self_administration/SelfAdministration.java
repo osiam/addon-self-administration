@@ -1,11 +1,8 @@
 package org.osiam.addons.self_administration;
 
-import java.util.Properties;
-
-import javax.servlet.Filter;
-
+import com.google.common.base.Strings;
 import org.osiam.addons.self_administration.one_time_token.ScavengerTask;
-import org.osiam.addons.self_administration.service.ConnectorBuilder;
+import org.osiam.client.OsiamConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +16,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.google.common.base.Strings;
+import javax.servlet.Filter;
+import java.util.Properties;
 
 @SpringBootApplication
 @EnableWebMvc
@@ -36,7 +34,7 @@ public class SelfAdministration extends SpringBootServletInitializer {
     }
 
     @Autowired
-    public void createOneTokenScavengers(final ConnectorBuilder connectorBuilder, final Config config) {
+    public void createOneTokenScavengers(final Config config) {
         if (!config.isOneTimeTokenScavengerEnabled()) {
             return;
         }
@@ -44,15 +42,15 @@ public class SelfAdministration extends SpringBootServletInitializer {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.initialize();
 
-        new ScavengerTask(taskScheduler, connectorBuilder.createConnector(), config.getActivationTokenTimeout(),
+        new ScavengerTask(taskScheduler, osiamConnector(config), config.getActivationTokenTimeout(),
                 Config.EXTENSION_URN, Config.ACTIVATION_TOKEN_FIELD)
                 .start();
 
-        new ScavengerTask(taskScheduler, connectorBuilder.createConnector(), config.getConfirmationTokenTimeout(),
+        new ScavengerTask(taskScheduler, osiamConnector(config), config.getConfirmationTokenTimeout(),
                 Config.EXTENSION_URN, Config.CONFIRMATION_TOKEN_FIELD, Config.TEMP_EMAIL_FIELD)
                 .start();
 
-        new ScavengerTask(taskScheduler, connectorBuilder.createConnector(), config.getOneTimePasswordTimeout(),
+        new ScavengerTask(taskScheduler, osiamConnector(config), config.getOneTimePasswordTimeout(),
                 Config.EXTENSION_URN, Config.ONETIME_PASSWORD_FIELD)
                 .start();
     }
@@ -88,5 +86,15 @@ public class SelfAdministration extends SpringBootServletInitializer {
         characterEncodingFilter.setEncoding("UTF-8");
         characterEncodingFilter.setForceEncoding(true);
         return characterEncodingFilter;
+    }
+
+    @Bean
+    public OsiamConnector osiamConnector(Config config) {
+        OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder()
+                .setAuthServerEndpoint(config.getAuthServerHome())
+                .setResourceServerEndpoint(config.getResourceServerHome())
+                .setClientId(config.getClientId())
+                .setClientSecret(config.getClientSecret());
+        return oConBuilder.build();
     }
 }
