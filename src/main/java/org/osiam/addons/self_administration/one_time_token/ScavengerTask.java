@@ -50,7 +50,7 @@ public class ScavengerTask implements Runnable {
 
         AccessToken accessToken;
         try {
-            accessToken = osiamConnector.retrieveAccessToken(Scope.GET, Scope.PATCH);
+            accessToken = osiamConnector.retrieveAccessToken(Scope.ADMIN);
         } catch (ConnectionInitializationException e) {
             LOG.warn(e.getMessage());
             return;

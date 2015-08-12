@@ -1,5 +1,12 @@
 # OSIAM addon-self-administration
 
+## Unreleased
+
+### Changes
+
+- Update OSIAM connector4java
+- Remove usage of old, method-based OAuth scopes
+
 ## 1.6 - 2015-06-18
 
 ### Changes
