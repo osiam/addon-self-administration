@@ -28,11 +28,6 @@ public class SelfAdministration extends SpringBootServletInitializer {
         SpringApplication.run(SelfAdministration.class, args);
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SelfAdministration.class);
-    }
-
     @Autowired
     public void createOneTokenScavengers(final Config config) {
         if (!config.isOneTimeTokenScavengerEnabled()) {
