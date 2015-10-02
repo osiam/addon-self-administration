@@ -44,7 +44,6 @@ import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.oauth.AccessToken;
-import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.UpdateUser;
@@ -122,7 +121,7 @@ public class LostPasswordController {
             return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(updatedUser);
+        Optional<Email> email = updatedUser.getPrimaryOrFirstEmail();
         if (!email.isPresent()) {
             String message = "Could not change password. No email of user " + updatedUser.getUserName() + " found!";
             LOGGER.error(message);

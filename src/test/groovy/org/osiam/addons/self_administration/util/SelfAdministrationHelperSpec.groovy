@@ -23,58 +23,13 @@
 
 package org.osiam.addons.self_administration.util
 
-import com.google.common.base.Optional
 import org.joda.time.Duration
-import org.osiam.resources.helper.SCIMHelper
-import org.osiam.resources.scim.Email
-import org.osiam.resources.scim.User
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class SelfAdministrationHelperSpec extends Specification {
-
-    def 'getting primary email from user'() {
-        given:
-        def thePrimaryMail = 'primary@mail.com'
-
-        Email theEmail = new Email.Builder().setPrimary(true).setValue(thePrimaryMail).build()
-        User user = new User.Builder('theMan').addEmails([theEmail] as List).build()
-
-        when:
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
-
-        then:
-        email.isPresent()
-        email.get().value == thePrimaryMail
-    }
-
-    def 'should return not null if no primary email was found'() {
-        given:
-        def thePrimaryMail = 'primary@mail.com'
-
-        Email theEmail = new Email.Builder().setPrimary(false).setValue(thePrimaryMail).build()
-        User user = new User.Builder('theMan').addEmails([theEmail] as List).build()
-
-        when:
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
-
-        then:
-        email.isPresent()
-        email.get().value == 'primary@mail.com'
-    }
-
-    def 'should not throw exception if users emails are not present'() {
-        given:
-        User user = new User.Builder('theMan').build()
-
-        when:
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user)
-
-        then:
-        !email.isPresent()
-    }
 
     def 'should create a link'() {
         given:

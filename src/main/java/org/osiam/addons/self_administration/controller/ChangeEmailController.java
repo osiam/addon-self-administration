@@ -44,7 +44,6 @@ import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.client.user.BasicUser;
-import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
 import org.osiam.resources.scim.ExtensionFieldType;
@@ -163,7 +162,7 @@ public class ChangeEmailController {
     /**
      * Puts the new email an the confirmation token into the extensions of the user of the given token.
      *
-     * @param token
+     * @param token The string representation of the access token
      * @param newEmail
      * @param confirmationToken
      * @return User which has the values in his extension
@@ -239,7 +238,7 @@ public class ChangeEmailController {
             }
 
             String newEmail = extension.getField(Config.TEMP_EMAIL_FIELD, ExtensionFieldType.STRING);
-            oldEmail = SCIMHelper.getPrimaryOrFirstEmail(user);
+            oldEmail = user.getPrimaryOrFirstEmail();
 
             UpdateUser updateUser = getPreparedUserForEmailChange(extension, newEmail, oldEmail.get());
 

@@ -22,10 +22,7 @@
  */
 package org.osiam.addons.self_administration.controller;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
+import com.google.common.base.Optional;
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.InvalidAttributeException;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
@@ -34,7 +31,6 @@ import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.NoResultException;
 import org.osiam.client.exception.UnauthorizedException;
 import org.osiam.client.oauth.AccessToken;
-import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
@@ -46,7 +42,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 
-import com.google.common.base.Optional;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Service class for controllers dealing with account management.
@@ -68,10 +66,8 @@ public class AccountManagementService {
     /**
      * Deactivates the account of the user with the given user ID.
      *
-     * @param userId
-     *            the ID of the user
-     * @param token
-     *            the access token
+     * @param userId the ID of the user
+     * @param token  the access token
      */
     public void deactivateUser(String userId, AccessToken token) {
         User user = osiamConnector.getUser(userId, token);
@@ -83,10 +79,8 @@ public class AccountManagementService {
     /**
      * Deletes the account of the user with the given user ID.
      *
-     * @param userId
-     *            the ID of the user
-     * @param token
-     *            the access token
+     * @param userId the ID of the user
+     * @param token  the access token
      */
     public void deleteUser(String userId, AccessToken token) {
         User user = osiamConnector.getUser(userId, token);
@@ -97,9 +91,7 @@ public class AccountManagementService {
     /**
      * Logs the given exception and returns a suitable response status.
      *
-     * @param e
-     *            the exception to handle
-     * @param {@link ResponseEntity} with the resulting error information and status code
+     * @param e the exception to handle
      */
     public ResponseEntity<String> handleException(RuntimeException e) {
         StringBuilder messageBuilder = new StringBuilder();
@@ -120,25 +112,23 @@ public class AccountManagementService {
         messageBuilder.insert(0, "{\"error\":\"");
         messageBuilder.append(e.getMessage());
         messageBuilder.append("\"}");
-        return new ResponseEntity<String>(messageBuilder.toString(), status);
+        return new ResponseEntity<>(messageBuilder.toString(), status);
     }
 
     /**
      * Sends an email informing about the account change.
      *
-     * @param user
-     *            the user
-     * @param template
-     *            the email template name
+     * @param user     the user
+     * @param template the email template name
      */
     private void sendEmail(User user, String template) {
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
+        Optional<Email> email = user.getPrimaryOrFirstEmail();
         if (!email.isPresent()) {
             String message = "Unable to send email. No email of user " + user.getUserName() + " found!";
             throw new InvalidAttributeException(message, "registration.exception.noEmail");
         }
 
-        Map<String, Object> mailVariables = new HashMap<String, Object>();
+        Map<String, Object> mailVariables = new HashMap<>();
         Locale locale = SelfAdministrationHelper.getLocale(user.getLocale());
 
         renderAndSendEmailService.renderAndSendEmail(template, config.getFromAddress(), email.get().getValue(), locale,

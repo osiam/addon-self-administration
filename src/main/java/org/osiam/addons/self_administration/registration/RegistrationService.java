@@ -34,7 +34,6 @@ import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
 import org.osiam.addons.self_administration.service.OsiamService;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
-import org.osiam.resources.helper.SCIMHelper;
 import org.osiam.resources.scim.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,7 +74,7 @@ public class RegistrationService {
     }
 
     public void sendRegistrationEmail(User user, String requestUrl) {
-        Optional<Email> email = SCIMHelper.getPrimaryOrFirstEmail(user);
+        Optional<Email> email = user.getPrimaryOrFirstEmail();
         if (!email.isPresent()) {
             String message = "Could not register user. No email of user " + user.getUserName() + " found!";
             throw new InvalidAttributeException(message, "registration.exception.noEmail");
