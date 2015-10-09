@@ -65,7 +65,7 @@
         <connection>scm:git:ssh://git@github.com/osiam/addon-self-administration.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/osiam/addon-self-administration.git</developerConnection>
         <url>https://github.com/osiam/addon-self-administration</url>
-        <tag>HEAD</tag>
+        <tag>maintenance-1.x</tag>
     </scm>
 
     <properties>
