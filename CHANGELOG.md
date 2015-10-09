@@ -1,5 +1,17 @@
 # OSIAM addon-self-administration
 
+## 1.7 - Unreleased
+
+### Features
+
+- Rollback User Creation on MailException
+
+### Updates
+
+- OSIAM connector4java 1.7
+- Spring Boot 1.2.6
+- Joda Time 2.8.2
+
 ## 1.6 - 2015-06-18
 
 ### Changes
