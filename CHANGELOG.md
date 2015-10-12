@@ -1,11 +1,22 @@
 # OSIAM addon-self-administration
 
-## Unreleased
+## 2.0 - Unreleased
 
 ### Changes
 
-- Update OSIAM connector4java
 - Remove usage of old, method-based OAuth scopes
+
+## 1.7 - 2015-10-09
+
+### Features
+
+- Rollback User Creation on MailException
+
+### Updates
+
+- OSIAM connector4java 1.7
+- Spring Boot 1.2.6
+- Joda Time 2.8.2
 
 ## 1.6 - 2015-06-18
 
