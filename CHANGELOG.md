@@ -1,5 +1,11 @@
 # OSIAM addon-self-administration
 
+## unreleased
+
+### Features
+
+- Configuration of required attributes for registration
+
 ## 1.8 - 2015-12-16
 
 **NOTICE:** This version should be compatible with all versions of OSIAM >= 2.2.

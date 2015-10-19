@@ -59,13 +59,12 @@ public class RegistrationController {
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        binder.setAllowedFields(config.getAllAllowedFields());
+        binder.setAllowedFields(config.getAllowedFields());
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public String getRegistrationForm(final Model model) {
         model.addAttribute("registrationUser", new RegistrationUser());
-        model.addAttribute("allowedFields", config.getAllAllowedFields());
         return "registration";
     }
 
@@ -74,7 +73,7 @@ public class RegistrationController {
             final BindingResult bindingResult, final Model model, final HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("allowedFields", config.getAllAllowedFields());
+            model.addAttribute("requiredFieldMapping", config.getAllAllowedFields());
             return "registration";
         }
 
@@ -84,7 +83,7 @@ public class RegistrationController {
             registrationService.preRegistration(user);
         } catch (CallbackException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("allowedFields", config.getAllAllowedFields());
+            model.addAttribute("requiredFieldMapping", config.getAllAllowedFields());
 
             return "registration";
         }
@@ -94,7 +93,7 @@ public class RegistrationController {
         try {
             user = registrationService.registerUser(user, requestUrl);
         } catch (UserNotRegisteredException e) {
-            model.addAttribute("allowedFields", config.getAllAllowedFields());
+            model.addAttribute("requiredFieldMapping", config.getAllAllowedFields());
             model.addAttribute("errorKey", "registration.error.tryAgain");
             return "registration";
         }
