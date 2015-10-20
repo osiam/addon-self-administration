@@ -10,13 +10,18 @@
 - [Callback plugin](#callback-plugin)
 
 # User registration
-The registration will be done via a double opt in mechanism.
 
-In the first step the user will register at osiam via the addon-self-administration application.
-Then an email will be send to the address provided in the first step. The content of that email will
-include a registration link with an activation token.
-The second step for the user will be to confirm his email address by going to that url.
-After this the user will be activated by the addon-self-administration. This will be done by set the active flag of the User to true.
+The registration will be done via a double opt in mechanism:
+
+In the first step the user will register at osiam via the
+addon-self-administration application. Then an email will be send to the address
+provided in the first step. The content of that email will include a
+registration link with an activation token.
+
+The second step for the user will be to confirm his email address by going to
+that url. After this the user will be activated by the
+addon-self-administration. This will be done by set the active flag of the User
+to true.
 
 ## HTTP endpoints
 
@@ -130,7 +135,7 @@ If you don't have 'confirmPassword' as part of the configuration the user only h
 
 ####org.osiam.html.form.extensions
 
-I you wan't to show own extension fields in the self administration you have to do 3 things (besides from [registering](https://github.com/osiam/server/wiki/detailed_reference_installation#configuring-scim-extension) them in the database)
+If you wan't to show own extension fields in the self administration you have to do 3 things (besides from [registering](https://github.com/osiam/osiam/blob/master/docs/detailed-reference-installation.md#configuring-scim-extension) them in the database)
 
 First you have to add them to the register.html file
 
@@ -224,7 +229,7 @@ The callback mechanism provides the possibility to extend the registration proce
 * add your own post-registration steps
 
 ### Implement a Callback plugin
-If you'd like to implement your own plugin, you have to create a little java-project and package it as a jar file. The plugin needs to provide a class that implements the CallbackPlugin interface. We provided a little Plugin-Example-Project that you can find [here](https://github.com/osiam/addon-self-administration/tree/master/plugin-example-impl).
+If you'd like to implement your own plugin, you have to create a little java-project and package it as a jar file. The plugin needs to provide a class that implements the CallbackPlugin interface. We provided a little Plugin-Example-Project that you can find [here](https://github.com/osiam/examples/tree/master/addon-self-administration-plugin).
 
 ### Provide and enable the Callback plugin
 To enable your plugin you have to configure some properties in _addon-self-administration.properties_ 

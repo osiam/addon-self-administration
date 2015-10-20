@@ -1,7 +1,7 @@
 --
 -- Example self-administration client, please sync with the attribute values in
 -- the addon-self-administration.properties. Has to be imported in the database
--- of the auth-server, before you deploy the addon-self-administration!
+-- of OSIAM, before you deploy the addon-self-administration!
 --
 
 INSERT INTO osiam_client (internal_id, access_token_validity_seconds, client_secret, id,

@@ -19,11 +19,11 @@
 ## Database setup
 
 **PRECONDITION**
-You need to import the sql script into your postgres database which you will find in the OSIAM resource server project!
+You need to import the sql script into your postgres database which you will find in the OSIAM project!
 
 For the self-administration you need to add some extension fields into the database otherwise it will not work.
 The extension is configured with it's own namespace and will not conflict user defined extensions (extension.sql).
-You need also to add a specific client for self-administration in the auth-servers database (client.sql).
+You need also to add a specific client for self-administration in OSIAM's database (client.sql).
 
 Start the database commandline:
 
@@ -45,21 +45,15 @@ This add-on needs some configuration values. Create the file
 
     /etc/osiam/addon-self-administration.properties
 
-with content based on this [example](https://github.com/osiam/addon-self-administration/blob/master/src/main/deploy/addon-self-administration.properties)
+with content based on this [example](../src/main/deploy/addon-self-administration.properties)
 
 ### Configuration values
 
-### org.osiam.auth-server.home
+### org.osiam.home
 
-The home location of the auth server.
+The home location of OSIAM.
 
-Default: http://localhost:8080/osiam-auth-server
-
-### org.osiam.resource-server.home
-
-The home location of the resource server.
-
-Default: http://localhost:8080/osiam-resource-server
+Default: http://localhost:8080/osiam
 
 #### org.osiam.mail.from
 

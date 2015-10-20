@@ -1,19 +1,18 @@
 package org.osiam.addons.self_administration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Holds all application wide used properties
@@ -83,11 +82,8 @@ public class Config extends WebMvcConfigurerAdapter {
     @Value("${org.osiam.html.form.password.length:8}")
     private int passwordLength;
 
-    @Value("${org.osiam.resource-server.home:http://localhost:8080/osiam-resource-server}")
-    private String resourceServerHome;
-
-    @Value("${org.osiam.auth-server.home:http://localhost:8080/osiam-auth-server}")
-    private String authServerHome;
+    @Value("${org.osiam.home:http://localhost:8080/osiam}")
+    private String osiamHome;
 
     @Value("${org.osiam.mail.from:selfadmin@localhost}")
     private String fromAddress;
@@ -152,12 +148,8 @@ public class Config extends WebMvcConfigurerAdapter {
         this.allAllowedFields = collectedFields.toArray(new String[collectedFields.size()]);
     }
 
-    public String getResourceServerHome() {
-        return resourceServerHome;
-    }
-
-    public String getAuthServerHome() {
-        return authServerHome;
+    public String getOsiamHome() {
+        return osiamHome;
     }
 
     public String getClientId() {
