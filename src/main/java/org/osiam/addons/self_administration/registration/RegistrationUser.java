@@ -38,7 +38,7 @@ public class RegistrationUser {
 
     @Username
     private String userName;
-    
+
     // Name attributes
     private String formattedName;
     private String familyName;
@@ -46,7 +46,7 @@ public class RegistrationUser {
     private String middleName;
     private String honorificPrefix;
     private String honorificSuffix;
-    
+
     private String displayName;
     private String nickName;
 
@@ -68,17 +68,17 @@ public class RegistrationUser {
 
     @Photo
     private String photo;
-    
-    //Address
+
+    // Address
     private String formattedAddress;
     private String streetAddress;
     private String locality;
     private String region;
     private String postalCode;
     private String country;
-    
+
     private Map<String, RegistrationExtension> extensions = new HashMap<>();
-    
+
     public RegistrationUser() {
     }
 

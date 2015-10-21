@@ -66,7 +66,7 @@ public class RegistrationController {
     public String getRegistrationForm(final Model model) {
         model.addAttribute("registrationUser", new RegistrationUser());
         model.addAttribute("allowedFields", config.getAllAllowedFields());
-        return "registration";
+        return "web/registration";
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -75,7 +75,7 @@ public class RegistrationController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("allowedFields", config.getAllAllowedFields());
-            return "registration";
+            return "web/registration";
         }
 
         User user = userConverter.toScim(registrationUser);
@@ -86,7 +86,7 @@ public class RegistrationController {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("allowedFields", config.getAllAllowedFields());
 
-            return "registration";
+            return "web/registration";
         }
 
         final String requestUrl = request.getRequestURL().toString();
@@ -109,7 +109,7 @@ public class RegistrationController {
                             + user.getId(),
                     p);
         }
-        return "registrationSuccess";
+        return "web/registrationSuccess";
     }
 
     /**
@@ -131,6 +131,6 @@ public class RegistrationController {
 
         model.addAttribute("user", user);
 
-        return "activationSuccess";
+        return "web/activationSuccess";
     }
 }

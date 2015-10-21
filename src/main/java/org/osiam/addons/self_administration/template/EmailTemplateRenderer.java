@@ -73,6 +73,6 @@ public class EmailTemplateRenderer {
         context.setVariables(variables);
 
         return templateEngine
-                .process(templateName + "-email", context, new DOMSelectorFragmentSpec(selectorExpression));
+                .process("mail/" + templateName + "-email", context, new DOMSelectorFragmentSpec(selectorExpression));
     }
 }

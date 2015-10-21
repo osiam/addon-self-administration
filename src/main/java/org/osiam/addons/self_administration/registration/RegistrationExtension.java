@@ -28,9 +28,9 @@ import java.util.Map;
 public class RegistrationExtension {
 
     private Map<String, String> fields;
-    
+
     public RegistrationExtension() {
-        
+
     }
 
     public Map<String, String> getFields() {

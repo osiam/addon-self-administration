@@ -34,8 +34,8 @@
 
     <fileSets>
         <fileSet>
-            <directory>src/main/deploy</directory>
-            <outputDirectory>/configuration</outputDirectory>
+            <directory>src/main/resources</directory>
+            <outputDirectory>/config</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>src/main/sql</directory>
@@ -46,7 +46,7 @@
     <files>
 
         <file>
-            <source>target/addon-self-administration.war</source>
+            <source>target/addon-self-administration.jar</source>
         </file>
 
         <file>

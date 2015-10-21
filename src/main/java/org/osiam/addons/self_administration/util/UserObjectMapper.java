@@ -23,12 +23,13 @@
 
 package org.osiam.addons.self_administration.util;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.osiam.resources.helper.UserDeserializer;
 import org.osiam.resources.scim.User;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * Class extending jackson's object mapper to be able to add deserializer configuration for scim user with extensions.
