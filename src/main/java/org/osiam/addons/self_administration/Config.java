@@ -82,8 +82,17 @@ public class Config extends WebMvcConfigurerAdapter {
     @Value("${org.osiam.html.form.password.length:8}")
     private int passwordLength;
 
-    @Value("${org.osiam.home:http://localhost:8080/osiam}")
+    @Value("${org.osiam.home:}")
     private String osiamHome;
+
+    @Value("${org.osiam.resource-server.home:http://localhost:8080/osiam-resource-server}")
+    private String resourceServerHome;
+
+    @Value("${org.osiam.auth-server.home:http://localhost:8080/osiam-auth-server}")
+    private String authServerHome;
+
+    @Value("${org.osiam.connector.legacy-schemas:false}")
+    private boolean useLegacySchemas;
 
     @Value("${org.osiam.mail.from:selfadmin@localhost}")
     private String fromAddress;
@@ -150,6 +159,18 @@ public class Config extends WebMvcConfigurerAdapter {
 
     public String getOsiamHome() {
         return osiamHome;
+    }
+
+    public String getResourceServerHome() {
+        return resourceServerHome;
+    }
+
+    public String getAuthServerHome() {
+        return authServerHome;
+    }
+
+    public boolean useLegacySchemas() {
+        return useLegacySchemas;
     }
 
     public String getClientId() {

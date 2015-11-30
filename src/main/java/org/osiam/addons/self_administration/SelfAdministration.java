@@ -85,9 +85,17 @@ public class SelfAdministration extends SpringBootServletInitializer {
     @Bean
     public OsiamConnector osiamConnector(Config config) {
         OsiamConnector.Builder oConBuilder = new OsiamConnector.Builder()
-                .withEndpoint(config.getOsiamHome())
                 .setClientId(config.getClientId())
                 .setClientSecret(config.getClientSecret());
+
+        if (!Strings.isNullOrEmpty(config.getOsiamHome())) {
+            oConBuilder.withEndpoint(config.getOsiamHome());
+        } else {
+            oConBuilder.setAuthServerEndpoint(config.getAuthServerHome())
+                    .setResourceServerEndpoint(config.getResourceServerHome())
+                    .withLegacySchemas(config.useLegacySchemas());
+        }
+
         return oConBuilder.build();
     }
 }
