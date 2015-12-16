@@ -74,13 +74,19 @@ OSIAM 2.x is split into auth-server and resource-server. Hence you have to confi
 
 The home location of the auth server
 
-Default: http://localhost:8080/osiam-auth-server
+Default: `http://localhost:8080/osiam-auth-server`
 
 ### org.osiam.resource-server.home
 
 The home location of the resource server
 
-Default: http://localhost:8080/osiam-resource-server
+Default: `http://localhost:8080/osiam-resource-server`
+
+### org.osiam.connector.legacy-schemas
+
+Enable the use of legacy schemas, i.e. schemas that were defined before SCIM 2 draft 09
+
+Default: `false`
 
 # E-Mail
 
