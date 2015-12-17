@@ -1,12 +1,45 @@
 # OSIAM addon-self-administration
 
-## 2.0 - Unreleased
+## 1.8 - 2015-12-16
+
+**NOTICE:** This version should be compatible with all versions of OSIAM >= 2.2.
+
+### Features
+
+- Support legacy SCIM schemas for connecting to OSIAM <= 2.3
+
+    See [Connection to OSIAM](docs/configuration.md#orgosiamconnectorlegacy-schemas), if you use
+    OSIAM <= 2.3.
+
+- Support OSIAM 3.x
+
+    See [Connection to OSIAM](docs/configuration.md#osiam-3x), if you use OSIAM 3.x.
 
 ### Changes
 
-- Remove usage of old, method-based OAuth scopes
+- Make SQL scripts more independent of database schema
+
+    Use `INSERT`s without field names.
+
+- Use the new scope `ADMIN` for connections to OSIAM
+
+    Abandon the usage of the deprecated method-based scoped.
+    SQL files have been changed to install the necessary client with scope `ADMIN`.
+    Add the scope `ADMIN` to the `addon-self-administration-client`:
+
+        INSERT INTO osiam_client_scopes (id, scope) VALUES (<id of addon-self-administration-client>, 'ADMIN');
+
+    By default `<id of addon-self-administration-client>` is set to `10`.
+
+### Updates
+
+- OSIAM connector4java 1.8
+- Plugin API 1.5
+- Spring Boot 1.2.7
 
 ## 1.7 - 2015-10-09
+
+**NOTICE:** This version is only compatible with OSIAM 2.4 and later.
 
 ### Features
 
