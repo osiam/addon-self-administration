@@ -3,13 +3,36 @@
 -- database of OSIAM, before you deploy the addon-self-administration!
 --
 
-INSERT INTO scim_extension VALUES (5, 'urn:org.osiam:scim:extensions:addon-self-administration');
+INSERT INTO scim_extension VALUES (
+  5, -- internal_id
+  'urn:org.osiam:scim:extensions:addon-self-administration' -- urn
+);
 
-INSERT INTO scim_extension_field (internal_id, required, name, type, extension)
-VALUES (6, FALSE, 'activationToken', 'STRING', 5);
-INSERT INTO scim_extension_field (internal_id, required, name, type, extension)
-VALUES (7, FALSE, 'oneTimePassword', 'STRING', 5);
-INSERT INTO scim_extension_field (internal_id, required, name, type, extension)
-VALUES (8, FALSE, 'emailConfirmToken', 'STRING', 5);
-INSERT INTO scim_extension_field (internal_id, required, name, type, extension)
-VALUES (9, FALSE, 'tempMail', 'STRING', 5);
+INSERT INTO scim_extension_field VALUES (
+  6, -- internal_id
+  'activationToken', -- name
+  FALSE, -- required
+  'STRING', -- type
+  5 -- extension
+);
+INSERT INTO scim_extension_field VALUES (
+  7, -- internal_id
+  'oneTimePassword', -- name
+  FALSE, -- required
+  'STRING', -- type
+  5 -- extension
+);
+INSERT INTO scim_extension_field VALUES (
+  8, -- internal_id
+  'emailConfirmToken', -- name
+  FALSE, -- required
+  'STRING', -- type
+  5 -- extension
+);
+INSERT INTO scim_extension_field VALUES (
+  9, -- internal_id
+  'tempMail', -- name
+  FALSE, -- required
+  'STRING', -- type
+  5 -- extension
+);

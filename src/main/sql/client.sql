@@ -4,10 +4,16 @@
 -- of OSIAM, before you deploy the addon-self-administration!
 --
 
-INSERT INTO osiam_client (internal_id, access_token_validity_seconds, client_secret, id,
-                          implicit_approval, redirect_uri, refresh_token_validity_seconds, validity_in_seconds)
-VALUES (10, 300, 'super-secret', 'addon-self-administration-client',
-        FALSE, 'http://localhost:8080/addon-self-administration', 0, 0);
+INSERT INTO osiam_client VALUES (
+  10, -- internal_id
+  300, -- access_token_validity_seconds
+  'super-secret', -- client_secret
+  'addon-self-administration-client', -- id
+  FALSE, -- implicit_approval
+  'http://localhost:8080/addon-self-administration', -- redirect_uri
+  0, -- refresh_token_validity_seconds
+  0 -- validity_in_seconds
+);
 
-INSERT INTO osiam_client_scopes (id, scope) VALUES (10, 'ADMIN');
-INSERT INTO osiam_client_grants (id, grants) VALUES (10, 'client_credentials');
+INSERT INTO osiam_client_scopes VALUES (10, 'ADMIN');
+INSERT INTO osiam_client_grants VALUES (10, 'client_credentials');
