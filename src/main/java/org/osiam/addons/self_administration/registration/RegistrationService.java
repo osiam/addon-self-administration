@@ -141,14 +141,14 @@ public class RegistrationService {
     }
 
     public User registerUser(User user, String requestUrl) {
-        User result = saveRegistrationUser(user);
+        User savedUser = saveRegistrationUser(user);
         try {
-            sendRegistrationEmail(user, requestUrl);
-            return result;
+            sendRegistrationEmail(savedUser, requestUrl);
         } catch (Exception e) {
-            osiamService.deleteUser(result.getId());
+            osiamService.deleteUser(savedUser.getId());
             throw new UserNotRegisteredException();
         }
+        return savedUser;
     }
 
     public void postRegistration(User user) throws CallbackException {
