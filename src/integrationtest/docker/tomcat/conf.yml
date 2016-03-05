@@ -1,0 +1,20 @@
+packaging:
+  add:
+    - target/addon-self-administration-${project.version}
+    - target/dependency/addon-self-administration-plugin-example.jar
+    - target/dependency/osiam.war
+
+links:
+  - postgres
+
+ports:
+  - 8480
+  - 11110
+
+healthChecks:
+  pings:
+    - url: ${osiam.test.host}/manager/text/list
+      timeout: 80000
+      pattern: osiam:running
+
+tag: ${project.artifactId}_tomcat
