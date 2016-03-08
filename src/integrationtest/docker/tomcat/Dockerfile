@@ -5,8 +5,7 @@ COPY addon-self-administration-${project.version} $CATALINA_HOME/webapps/addon-s
 COPY addon-self-administration-plugin-example.jar /install/plugin-example.jar
 COPY selfadminexample.properties /install/
 
-COPY osiam-home /var/lib/osiam
-COPY osiam-home/config/osiam.yaml /var/lib/osiam/config/osiam.yaml
+COPY osiam.yaml /var/lib/osiam/config/osiam.yaml
 COPY osiam.xml /usr/local/tomcat/conf/Catalina/localhost/osiam.xml
 COPY osiam.war $CATALINA_HOME/webapps/osiam.war
 
