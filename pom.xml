@@ -91,9 +91,6 @@
 
         <!-- OSIAM -->
         <version.osiam>3.0-SNAPSHOT</version.osiam>
-        <version.osiam.addon-self-administration-plugin-example>
-            1.4-SNAPSHOT
-        </version.osiam.addon-self-administration-plugin-example>
 
         <sonar.core.codeCoveragePlugin>cobertura</sonar.core.codeCoveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -437,6 +434,7 @@
                                 <configuration>
                                     <sources>
                                         <source>src/integrationtest/groovy</source>
+                                        <source>src/integrationtest/java</source>
                                     </sources>
                                 </configuration>
                             </execution>
@@ -466,6 +464,26 @@
                     </plugin>
 
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.6</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>test-jar</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>addon-self-administration-plugin-example</finalName>
+                                    <includes>
+                                        <include>**/plugin/impl/*</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
@@ -482,25 +500,6 @@
                                             <version>${version.osiam}</version>
                                             <type>war</type>
                                             <destFileName>osiam.war</destFileName>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <overWriteSnapshots>true</overWriteSnapshots>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>download-addon-self-administration-plugin</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.osiam</groupId>
-                                            <artifactId>addon-self-administration-plugin-example</artifactId>
-                                            <version>${version.osiam.addon-self-administration-plugin-example}</version>
-                                            <type>jar</type>
-                                            <destFileName>addon-self-administration-plugin-example.jar</destFileName>
                                         </artifactItem>
                                     </artifactItems>
                                     <overWriteSnapshots>true</overWriteSnapshots>

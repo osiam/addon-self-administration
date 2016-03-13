@@ -2,7 +2,7 @@ FROM tomcat:8-jre8
 
 COPY addon-self-administration-${project.version} $CATALINA_HOME/webapps/addon-self-administration
 
-COPY addon-self-administration-plugin-example.jar /install/plugin-example.jar
+COPY addon-self-administration-plugin-example-tests.jar /install/plugin-example.jar
 COPY selfadminexample.properties /install/
 
 COPY osiam.yaml /var/lib/osiam/config/osiam.yaml
