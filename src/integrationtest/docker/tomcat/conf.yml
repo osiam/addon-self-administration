@@ -1,7 +1,7 @@
 packaging:
   add:
     - target/addon-self-administration-${project.version}
-    - target/dependency/addon-self-administration-plugin-example.jar
+    - target/addon-self-administration-plugin-example-tests.jar
     - target/dependency/osiam.war
 
 links:
