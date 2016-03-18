@@ -68,6 +68,14 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>oss-jfrog-artifactory-snapshots</name>
+            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <start-class>org.osiam.addons.self_administration.SelfAdministration</start-class>
 
@@ -258,11 +266,17 @@
 
     <repositories>
         <repository>
-            <id>osiam snapshots repo</id>
-            <url>https://maven-repo.evolvis.org/snapshots</url>
-            <releases>
+            <id>osiam-releases</id>
+            <url>https://maven-repo.evolvis.org/releases</url>
+            <snapshots>
                 <enabled>false</enabled>
-            </releases>
+            </snapshots>
+        </repository>
+        <repository>
+            <snapshots />
+            <id>osiam-snapshots</id>
+            <name>libs-snapshot</name>
+            <url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
         </repository>
     </repositories>
 
