@@ -217,7 +217,7 @@ class LostPasswordControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.updateUser(_, _, _) >> user
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getMe(_) >> user
 
         result.getStatusCode() == HttpStatus.OK
         result.getBody() != null
@@ -249,7 +249,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        1 * osiamConnector.getCurrentUser(_) >> { throw new OsiamRequestException(409, '') }
+        1 * osiamConnector.getMe(_) >> { throw new OsiamRequestException(409, '') }
 
         result.getStatusCode() == HttpStatus.CONFLICT
     }
@@ -293,7 +293,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getMe(_) >> user
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
 
@@ -338,7 +338,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getMe(_) >> user
         1 * osiamConnector.updateUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
         result.getStatusCode() == HttpStatus.BAD_REQUEST
         result.getBody() != null
@@ -393,7 +393,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp, newPassword)
 
         then:
-        1 * osiamConnector.getCurrentUser(_) >> user
+        1 * osiamConnector.getMe(_) >> user
         result.getStatusCode() == HttpStatus.FORBIDDEN
     }
 }

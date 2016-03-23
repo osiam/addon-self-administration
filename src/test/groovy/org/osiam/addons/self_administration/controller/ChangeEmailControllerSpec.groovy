@@ -80,14 +80,13 @@ class ChangeEmailControllerSpec extends Specification {
         given:
         def authZHeader = 'Bearer ACCESSTOKEN'
         def newEmailValue = 'bam@boom.com'
-        BasicUser basicUser = new BasicUser()
         User user = new User.Builder().build()
 
         when:
         changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
+        1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
@@ -97,14 +96,13 @@ class ChangeEmailControllerSpec extends Specification {
         given:
         def authZHeader = 'Bearer ACCESSTOKEN'
         def newEmailValue = 'bam@boom.com'
-        BasicUser basicUser = new BasicUser()
         User user = new User.Builder().build()
 
         when:
         changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
+        1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
@@ -114,14 +112,13 @@ class ChangeEmailControllerSpec extends Specification {
         given:
         def authZHeader = 'Bearer ACCESSTOKEN'
         def newEmailValue = 'bam@boom.com'
-        BasicUser basicUser = new BasicUser()
         User user = new User.Builder().build()
 
         when:
         changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
+        1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> { throw new OsiamException() }
     }
@@ -130,8 +127,7 @@ class ChangeEmailControllerSpec extends Specification {
         given:
         def authZHeader = 'Bearer ACCESSTOKEN'
         def newEmailValue = 'bam@boom.com'
-        BasicUser basicUser = new BasicUser()
-        User user = new User.Builder().build()
+        User user = new User.Builder('irrelevant').build()
 
         def emailContent = 'nine bytes and one placeholder $EMAILCHANGEURL and $BOOTSTRAP and $ANGULAR and $JQUERY'
 
@@ -139,7 +135,7 @@ class ChangeEmailControllerSpec extends Specification {
         def result = changeEmailController.change(authZHeader, newEmailValue)
 
         then:
-        1 * osiamConnector.getCurrentUserBasic(_) >> basicUser
+        1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
         1 * osiamConnector.updateUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> emailContent
@@ -156,7 +152,7 @@ class ChangeEmailControllerSpec extends Specification {
         def result = changeEmailController.change(authZ, 'some@email.de')
 
         then:
-        1 * osiamConnector.getCurrentUserBasic(accessToken) >> { throw new UnauthorizedException('unauthorized') }
+        1 * osiamConnector.getMe(accessToken) >> { throw new UnauthorizedException('unauthorized') }
         result.getBody() == '{\"error\":\"unauthorized\"}'
     }
 
