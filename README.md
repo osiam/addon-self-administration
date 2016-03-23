@@ -28,11 +28,27 @@ Run the integration-tests
 
     $ mvn clean verify -P integration-tests
 
+### Run with Debugging
+
+If you want to debug the running Self Administration, then just add the `debug`
+profile when you run Maven:
+
+    $ mvn clean verify -P integration-tests,debug
+
+You can connect to the debugging agent using `localhost:8000`.
+
 ### Run in your IDE
 
 To run the integration-tests in your IDE against the started containers
 
     $ mvn clean pre-integration-test -P integration-tests
+
+If you also want to debug the running Self Administration, add the `debug`
+profile when you run Maven:
+
+    $ mvn clean pre-integration-test -P integration-tests,debug
+
+You can connect to the debugging agent using `localhost:8000`.
 
 If you are on mac or want to run them in a VM, just checkout the
 [OSIAM vagrant VM](https://github.com/osiam/vagrant). It's pretty easy to setup.

@@ -84,6 +84,8 @@
 
         <osiam.database.host>${osiam.host}</osiam.database.host>
 
+        <debug.pre.command.tomcat/>
+
         <osiam.mail.host>${osiam.host}</osiam.mail.host>
         <osiam.mail.port>11110</osiam.mail.port>
 
@@ -602,6 +604,14 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>debug</id>
+            <properties>
+                <debug.pre.command.tomcat>"jpda",</debug.pre.command.tomcat>
+            </properties>
+        </profile>
+
 
         <!-- ==================== Profile: build internally for integration runs ==================== -->
         <!-- Deployment needs to be run from jenkins server which has credentials to access the internal repository -->
