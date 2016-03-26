@@ -84,6 +84,8 @@
 
         <osiam.database.host>${osiam.host}</osiam.database.host>
 
+        <debug.pre.command.tomcat/>
+
         <osiam.mail.host>${osiam.host}</osiam.mail.host>
         <osiam.mail.port>11110</osiam.mail.port>
 
@@ -100,13 +102,13 @@
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>connector4java</artifactId>
-            <version>1.8</version>
+            <version>1.9-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>addon-self-administration-plugin-api</artifactId>
-            <version>1.5</version>
+            <version>1.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -602,6 +604,14 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>debug</id>
+            <properties>
+                <debug.pre.command.tomcat>"jpda",</debug.pre.command.tomcat>
+            </properties>
+        </profile>
+
 
         <!-- ==================== Profile: build internally for integration runs ==================== -->
         <!-- Deployment needs to be run from jenkins server which has credentials to access the internal repository -->

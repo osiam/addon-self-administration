@@ -8,6 +8,7 @@ links:
   - postgres
 
 ports:
+  - 8000
   - 8480
   - 11110
 

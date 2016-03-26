@@ -169,7 +169,7 @@ public class ChangeEmailController {
      */
     private User getUpdatedUserForEmailChange(String token, String newEmail, OneTimeToken confirmationToken) {
         final AccessToken accessToken = new AccessToken.Builder(token).build();
-        final BasicUser user = osiamConnector.getCurrentUserBasic(accessToken);
+        final User user = osiamConnector.getMe(accessToken);
 
         final Extension extension = new Extension.Builder(Config.EXTENSION_URN)
                 .setField(Config.CONFIRMATION_TOKEN_FIELD, confirmationToken.toString())

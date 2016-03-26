@@ -243,7 +243,7 @@ public class LostPasswordController {
 
             User user;
             if (Strings.isNullOrEmpty(userId)) {
-                user = osiamConnector.getCurrentUser(accessToken);
+                user = osiamConnector.getMe(accessToken);
             } else {
                 user = osiamConnector.getUser(userId, accessToken);
             }
