@@ -5,6 +5,12 @@ A self administration for OSIAM.
 Learn how to install and configure this add-on for production in the
 [documentation](docs/README.md).
 
+## Snapshots
+
+To use the latest snapshot of the OSIAM self-administration just download it
+from the oss jfrog repository:
+https://oss.jfrog.org/artifactory/repo/org/osiam/addon-self-administration
+
 ## Run the integration-tests
 
 ### Configure Docker
