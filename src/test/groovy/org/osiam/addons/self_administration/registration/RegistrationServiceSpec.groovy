@@ -60,7 +60,7 @@ class RegistrationServiceSpec extends Specification {
 
         then:
         resultUser != null
-        1 * osiamService.createUser(user) >> user
+        1 * osiamService.createUser(_) >> { User registrationUser -> registrationUser }
         1 * renderAndSendEmail.renderAndSendEmail(_, _, _, _, _)
     }
 
@@ -82,7 +82,7 @@ class RegistrationServiceSpec extends Specification {
 
         then:
         thrown(UserNotRegisteredException)
-        1 * osiamService.createUser(user) >> user
+        1 * osiamService.createUser(_) >> { User registrationUser -> registrationUser }
         1 * renderAndSendEmail.renderAndSendEmail(_, _, _, _, _) >> { throw new MailSendException("") }
         1 * osiamService.deleteUser(_)
     }
