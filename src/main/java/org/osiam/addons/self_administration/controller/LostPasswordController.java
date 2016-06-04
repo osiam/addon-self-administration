@@ -23,16 +23,8 @@
 
 package org.osiam.addons.self_administration.controller;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.Config;
 import org.osiam.addons.self_administration.exception.OsiamException;
@@ -46,7 +38,6 @@ import org.osiam.client.exception.OsiamRequestException;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Extension;
-import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +51,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Strings;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Controller to handle the lost password flow
@@ -85,8 +82,8 @@ public class LostPasswordController {
     private Config config;
 
     /**
-     * This endpoint generates an one time password and send an confirmation email including the one time password to
-     * users primary email
+     * This endpoint generates a one time password and sends a confirmation email including the one time password to
+     * users primary email.
      *
      * @param authorization
      *            authZ header with valid access token
@@ -100,18 +97,27 @@ public class LostPasswordController {
     public ResponseEntity<String> lost(@RequestHeader("Authorization") final String authorization,
             @PathVariable final String userId) throws IOException, MessagingException {
 
+        final User updatedUser;
         final OneTimeToken newOneTimePassword = new OneTimeToken();
-
-        final Extension extension = new Extension.Builder(Config.EXTENSION_URN)
-                .setField(Config.ONETIME_PASSWORD_FIELD, newOneTimePassword.toString())
-                .build();
-        final UpdateUser updateUser = new UpdateUser.Builder().updateExtension(extension).build();
-
-        final String token = SelfAdministrationHelper.extractAccessToken(authorization);
-        final AccessToken accessToken = new AccessToken.Builder(token).build();
-        User updatedUser;
         try {
-            updatedUser = osiamConnector.updateUser(userId, updateUser, accessToken);
+            final AccessToken accessToken = new AccessToken.Builder(SelfAdministrationHelper.extractAccessToken(authorization)).build();
+            final User user = osiamConnector.getUser(userId, accessToken);
+            final Extension.Builder extensionBuilder;
+            if (user.isExtensionPresent(Config.EXTENSION_URN)) {
+                extensionBuilder = new Extension.Builder(user.getExtension(Config.EXTENSION_URN));
+            } else {
+                extensionBuilder = new Extension.Builder(Config.EXTENSION_URN);
+            }
+            updatedUser = osiamConnector.replaceUser(
+                    user.getId(),
+                    new User.Builder(user)
+                            .removeExtension(Config.EXTENSION_URN)
+                            .addExtension(extensionBuilder
+                                    .setField(Config.ONETIME_PASSWORD_FIELD, newOneTimePassword.toString())
+                                    .build())
+                            .build(),
+                    accessToken
+            );
         } catch (OsiamRequestException e) {
             LOGGER.warn(e.getMessage());
             return SelfAdministrationHelper.createErrorResponseEntity(e.getMessage(),
@@ -253,10 +259,12 @@ public class LostPasswordController {
                     .getFieldAsString(Config.ONETIME_PASSWORD_FIELD));
 
             if (storedOneTimePassword.isExpired(config.getOneTimePasswordTimeout())) {
-                UpdateUser updateUser = new UpdateUser.Builder()
-                        .deleteExtensionField(extension.getUrn(), Config.ONETIME_PASSWORD_FIELD)
-                        .build();
-                osiamConnector.updateUser(userId, updateUser, accessToken);
+                osiamConnector.replaceUser(userId, new User.Builder(user)
+                        .removeExtension(Config.EXTENSION_URN)
+                        .addExtension(new Extension.Builder(extension)
+                                .removeField(Config.ONETIME_PASSWORD_FIELD)
+                                .build())
+                        .build(), accessToken);
 
                 String message = "The submitted one time password is invalid!";
                 LOGGER.warn(message);
@@ -269,12 +277,13 @@ public class LostPasswordController {
                 return SelfAdministrationHelper.createErrorResponseEntity(message, HttpStatus.FORBIDDEN);
             }
 
-            UpdateUser updateUser = new UpdateUser.Builder()
-                    .updatePassword(newPassword)
-                    .deleteExtensionField(extension.getUrn(), Config.ONETIME_PASSWORD_FIELD)
-                    .build();
-
-            User updatedUser = osiamConnector.updateUser(user.getId(), updateUser, accessToken);
+            User updatedUser = osiamConnector.replaceUser(user.getId(), new User.Builder(user)
+                    .setPassword(newPassword)
+                    .removeExtension(Config.EXTENSION_URN)
+                    .addExtension(new Extension.Builder(extension)
+                            .removeField(Config.ONETIME_PASSWORD_FIELD)
+                            .build())
+                    .build(), accessToken);
 
             return new ResponseEntity<>(mapper.writeValueAsString(updatedUser), HttpStatus.OK);
         } catch (OsiamRequestException e) {

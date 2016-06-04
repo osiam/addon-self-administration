@@ -87,7 +87,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
     }
@@ -103,7 +103,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
     }
@@ -119,7 +119,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> { throw new OsiamException() }
     }
 
@@ -136,7 +136,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getMe(_) >> new User.Builder('irrelevant').build()
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> emailContent
         1 * sendMailService.sendHTMLMail(_, _, _, _)
@@ -172,7 +172,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getUser(_, _) >> user
-        1 * osiamConnector.updateUser(userId, _, _) >> user
+        1 * osiamConnector.replaceUser(userId, _, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
     }
@@ -196,7 +196,7 @@ class ChangeEmailControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getUser(_, _) >> user
-        1 * osiamConnector.updateUser(userId, _, _) >> user
+        1 * osiamConnector.replaceUser(userId, _, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
     }

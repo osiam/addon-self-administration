@@ -32,7 +32,6 @@ import org.osiam.client.exception.NoResultException;
 import org.osiam.client.exception.UnauthorizedException;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.resources.scim.Email;
-import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,8 +70,8 @@ public class AccountManagementService {
      */
     public void deactivateUser(String userId, AccessToken token) {
         User user = osiamConnector.getUser(userId, token);
-        UpdateUser updateUser = getUpdateUserForDeactivation();
-        osiamConnector.updateUser(userId, updateUser, token);
+        User updatedUser = getUpdatedUserForDeactivation(user);
+        osiamConnector.replaceUser(userId, updatedUser, token);
         sendEmail(user, "deactivation");
     }
 
@@ -135,10 +134,12 @@ public class AccountManagementService {
                 mailVariables);
     }
 
-    /*
-     * Builds an UpdateUser for the deactivation.
+    /**
+     * Builds an updated {@link User} for the deactivation.
      */
-    private UpdateUser getUpdateUserForDeactivation() {
-        return new UpdateUser.Builder().updateActive(false).build();
+    private User getUpdatedUserForDeactivation(User originalUser) {
+        return new User.Builder(originalUser)
+                .setActive(false)
+                .build();
     }
 }

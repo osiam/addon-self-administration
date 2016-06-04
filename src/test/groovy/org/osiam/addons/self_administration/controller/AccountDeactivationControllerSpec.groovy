@@ -64,7 +64,7 @@ class AccountDeactivationControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getUser(userId, accessToken) >> user
-        1 * osiamConnector.updateUser(userId, { it.getScimConformUpdateUser().isActive() == false }, accessToken)
+        1 * osiamConnector.replaceUser(userId, { it.isActive() == false }, accessToken)
         1 * renderAndSendEmailService.renderAndSendEmail('deactivation', _, mailAddress, _, _)
         result.getStatusCode() == HttpStatus.OK
     }
@@ -115,7 +115,7 @@ class AccountDeactivationControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getUser(userId, accessToken) >> user
-        1 * osiamConnector.updateUser(userId, _, accessToken)
+        1 * osiamConnector.replaceUser(userId, _, accessToken)
         result.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
         result.getBody() == '{\"error\":\"An exception occurred: ' + message + '\"}'
     }
@@ -136,7 +136,7 @@ class AccountDeactivationControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getUser(userId, accessToken) >> user
-        1 * osiamConnector.updateUser(userId, _, accessToken)
+        1 * osiamConnector.replaceUser(userId, _, accessToken)
         1 * renderAndSendEmailService.renderAndSendEmail('deactivation', _, mailAddress, _, _) >> {
             throw new MailSendException(message)
         }

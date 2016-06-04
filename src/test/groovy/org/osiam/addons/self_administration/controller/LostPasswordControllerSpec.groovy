@@ -94,7 +94,8 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.getUser(userId, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailSubject(_, _, _) >> 'subject'
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> emailContent
         1 * sendMailService.sendHTMLMail(_, _, _, _)
@@ -106,12 +107,16 @@ class LostPasswordControllerSpec extends Specification {
         given:
         def userId = 'someId'
         def authZHeader = 'Bearer ACCESSTOKEN'
+        User user = new User.Builder()
+                .addEmails([new Email.Builder().setValue('email@example.org').setPrimary(true).build()] as List)
+                .build()
 
         when:
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * osiamConnector.updateUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
+        1 * osiamConnector.getUser(userId, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
         response.getStatusCode() == HttpStatus.BAD_REQUEST
     }
 
@@ -126,7 +131,8 @@ class LostPasswordControllerSpec extends Specification {
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.getUser(userId, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         response.getStatusCode() == HttpStatus.BAD_REQUEST
         response.getBody() != null
     }
@@ -143,7 +149,8 @@ class LostPasswordControllerSpec extends Specification {
         def response = lostPasswordController.lost(authZHeader, userId)
 
         then:
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.getUser(userId, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * emailTemplateRendererService.renderEmailBody(_, _, _) >> { throw new OsiamException() }
         response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR
         response.getBody() != null
@@ -167,7 +174,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient(authZHeader, otp.token, newPassword, userId)
 
         then:
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * osiamConnector.getUser(userId, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
@@ -192,7 +199,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByClient(authZHeader, otp, newPassword, userId)
 
         then:
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * osiamConnector.getUser(userId, _) >> user
 
         result.getStatusCode() == HttpStatus.OK
@@ -216,7 +223,7 @@ class LostPasswordControllerSpec extends Specification {
         def result = lostPasswordController.changePasswordByUser(authZHeader, otp.token, newPassword)
 
         then:
-        1 * osiamConnector.updateUser(_, _, _) >> user
+        1 * osiamConnector.replaceUser(_, _, _) >> user
         1 * osiamConnector.getMe(_) >> user
 
         result.getStatusCode() == HttpStatus.OK
@@ -316,7 +323,7 @@ class LostPasswordControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getUser(userId, _) >> user
-        1 * osiamConnector.updateUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
+        1 * osiamConnector.replaceUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
         result.getStatusCode() == HttpStatus.BAD_REQUEST
         result.getBody() != null
     }
@@ -339,7 +346,7 @@ class LostPasswordControllerSpec extends Specification {
 
         then:
         1 * osiamConnector.getMe(_) >> user
-        1 * osiamConnector.updateUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
+        1 * osiamConnector.replaceUser(_, _, _) >> { throw new OsiamRequestException(400, '') }
         result.getStatusCode() == HttpStatus.BAD_REQUEST
         result.getBody() != null
     }

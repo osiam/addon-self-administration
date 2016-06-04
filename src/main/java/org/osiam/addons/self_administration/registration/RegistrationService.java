@@ -34,11 +34,18 @@ import org.osiam.addons.self_administration.plugin_api.CallbackPlugin;
 import org.osiam.addons.self_administration.service.OsiamService;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
-import org.osiam.resources.scim.*;
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.Extension;
+import org.osiam.resources.scim.Role;
+import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Service
 public class RegistrationService {
@@ -118,10 +125,14 @@ public class RegistrationService {
                 .fromString(extension.getFieldAsString(Config.ACTIVATION_TOKEN_FIELD));
 
         if (storedActivationToken.isExpired(config.getActivationTokenTimeout())) {
-            UpdateUser updateUser = new UpdateUser.Builder()
-                    .deleteExtensionField(extension.getUrn(), Config.ACTIVATION_TOKEN_FIELD)
+            User updatedUser = new User.Builder(user)
+                    .removeExtension(Config.EXTENSION_URN)
+                    .addExtension(new Extension.Builder(extension)
+                            .removeField(Config.ACTIVATION_TOKEN_FIELD)
+                            .build())
                     .build();
-            osiamService.updateUser(userId, updateUser);
+
+            osiamService.replaceUser(userId, updatedUser);
 
             throw new InvalidAttributeException("Activation token is expired", "activation.exception");
         }
@@ -132,12 +143,15 @@ public class RegistrationService {
                     "activation.exception");
         }
 
-        UpdateUser updateUser = new UpdateUser.Builder()
-                .deleteExtensionField(extension.getUrn(), Config.ACTIVATION_TOKEN_FIELD)
-                .updateActive(true)
+        User updatedUser = new User.Builder(user)
+                .setActive(true)
+                .removeExtension(Config.EXTENSION_URN)
+                .addExtension(new Extension.Builder(extension)
+                        .removeField(Config.ACTIVATION_TOKEN_FIELD)
+                        .build())
                 .build();
 
-        return osiamService.updateUser(userId, updateUser);
+        return osiamService.replaceUser(userId, updatedUser);
     }
 
     public User registerUser(User user, String requestUrl) {

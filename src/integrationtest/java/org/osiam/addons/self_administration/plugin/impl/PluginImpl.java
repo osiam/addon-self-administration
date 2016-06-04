@@ -32,8 +32,8 @@ import org.osiam.client.query.Query;
 import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.scim.Email;
 import org.osiam.resources.scim.Group;
+import org.osiam.resources.scim.MemberRef;
 import org.osiam.resources.scim.SCIMSearchResult;
-import org.osiam.resources.scim.UpdateGroup;
 import org.osiam.resources.scim.User;
 
 /**
@@ -57,11 +57,13 @@ public class PluginImpl implements CallbackPlugin {
     @Override
     public void performPostRegistrationActions(User user) throws CallbackException {
         OsiamConnector connector = getOsiamConnector();
-
         Group testGroup = getTestGroup(connector);
-        UpdateGroup uGroup = new UpdateGroup.Builder().addMember(user.getId()).build();
-
-        connector.updateGroup(testGroup.getId(), uGroup, getAccessToken());
+        Group updatedGroup = new Group.Builder(testGroup)
+                .addMember(new MemberRef.Builder()
+                        .setValue(user.getId())
+                        .build())
+                .build();
+        connector.replaceGroup(testGroup.getId(), updatedGroup, getAccessToken());
     }
 
     private Group getTestGroup(OsiamConnector connector) {
