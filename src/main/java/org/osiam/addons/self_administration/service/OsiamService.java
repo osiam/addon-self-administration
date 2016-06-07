@@ -28,7 +28,6 @@ import org.osiam.client.oauth.Scope;
 import org.osiam.client.query.Query;
 import org.osiam.client.query.QueryBuilder;
 import org.osiam.resources.scim.SCIMSearchResult;
-import org.osiam.resources.scim.UpdateUser;
 import org.osiam.resources.scim.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,8 +54,8 @@ public class OsiamService {
         return osiamConnector.getUser(userId, osiamConnector.retrieveAccessToken(Scope.ADMIN));
     }
 
-    public User updateUser(String userId, UpdateUser updateUser) {
-        return osiamConnector.updateUser(userId, updateUser, osiamConnector.retrieveAccessToken(Scope.ADMIN));
+    public User replaceUser(String userId, User updatedUser) {
+        return osiamConnector.replaceUser(userId, updatedUser, osiamConnector.retrieveAccessToken(Scope.ADMIN));
     }
 
     public void deleteUser(String id) {
