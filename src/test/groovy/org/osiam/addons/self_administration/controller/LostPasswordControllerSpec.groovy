@@ -23,6 +23,7 @@
 
 package org.osiam.addons.self_administration.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.joda.time.Duration
 import org.osiam.addons.self_administration.Config
 import org.osiam.addons.self_administration.exception.OsiamException
@@ -30,14 +31,12 @@ import org.osiam.addons.self_administration.mail.SendEmail
 import org.osiam.addons.self_administration.one_time_token.OneTimeToken
 import org.osiam.addons.self_administration.template.EmailTemplateRenderer
 import org.osiam.addons.self_administration.template.RenderAndSendEmail
-import org.osiam.addons.self_administration.util.UserObjectMapper
 import org.osiam.client.OsiamConnector
 import org.osiam.client.exception.OsiamRequestException
 import org.osiam.resources.scim.Email
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.User
 import org.springframework.http.HttpStatus
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import javax.servlet.ServletOutputStream
@@ -48,7 +47,7 @@ import javax.servlet.http.HttpServletResponse
  */
 class LostPasswordControllerSpec extends Specification {
 
-    UserObjectMapper mapper = new UserObjectMapper()
+    ObjectMapper mapper = new ObjectMapper()
 
     SendEmail sendMailService = Mock()
     EmailTemplateRenderer emailTemplateRendererService = Mock()

@@ -23,9 +23,6 @@
 
 package org.osiam.addons.self_administration
 
-import com.fasterxml.jackson.core.Version
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.github.springtestdbunit.annotation.DatabaseOperation
 import com.github.springtestdbunit.annotation.DatabaseSetup
 import com.github.springtestdbunit.annotation.DatabaseTearDown
@@ -37,7 +34,6 @@ import org.osiam.client.oauth.AccessToken
 import org.osiam.client.oauth.Scope
 import org.osiam.client.query.Query
 import org.osiam.client.query.QueryBuilder
-import org.osiam.resources.helper.UserDeserializer
 import org.osiam.resources.scim.Extension
 import org.osiam.resources.scim.ExtensionFieldType
 import org.osiam.resources.scim.SCIMSearchResult
@@ -59,16 +55,7 @@ import javax.ws.rs.core.MediaType
 class RegistrationIT extends IntegrationTest {
 
     @Shared
-    ObjectMapper mapper = new ObjectMapper()
-
-    @Shared
     Client client = ClientBuilder.newClient();
-
-    def setupSpec() {
-        def userDeserializerModule = new SimpleModule('userDeserializerModule', new Version(1, 0, 0, null))
-                .addDeserializer(User.class, new UserDeserializer(User.class))
-        mapper.registerModule(userDeserializerModule)
-    }
 
     def setup() {
         setupToken()
