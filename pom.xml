@@ -68,14 +68,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>oss-jfrog-artifactory-snapshots</name>
-            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <start-class>org.osiam.addons.self_administration.SelfAdministration</start-class>
 
@@ -273,7 +265,7 @@
             </snapshots>
         </repository>
         <repository>
-            <snapshots />
+            <snapshots/>
             <id>osiam-snapshots</id>
             <name>libs-snapshot</name>
             <url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
@@ -376,15 +368,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
-                <configuration>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -624,56 +607,6 @@
             <properties>
                 <debug.pre.command.tomcat>"jpda",</debug.pre.command.tomcat>
             </properties>
-        </profile>
-
-
-        <!-- ==================== Profile: build internally for integration runs ==================== -->
-        <!-- Deployment needs to be run from jenkins server which has credentials to access the internal repository -->
-        <profile>
-            <id>integration</id>
-            <distributionManagement>
-                <repository>
-                    <id>osiam-repository</id>
-                    <name>public evolvis release repository</name>
-                    <url>scpexe://maven-repo.evolvis.org:/var/www/maven_repo/releases</url>
-                </repository>
-                <snapshotRepository>
-                    <id>OSIAM-NG-SNAPSHOT-repository</id>
-                    <name>public evolvis release repository</name>
-                    <url>scpexe://maven-repo.evolvis.org:/var/www/maven_repo/snapshots/</url>
-                </snapshotRepository>
-            </distributionManagement>
-            <repositories>
-                <repository>
-                    <id>osiam releases repo</id>
-                    <url>https://maven-repo.evolvis.org/releases</url>
-                </repository>
-            </repositories>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <version>2.8.2</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.maven.wagon</groupId>
-                                <artifactId>wagon-ssh-external</artifactId>
-                                <version>2.6</version>
-                            </dependency>
-                        </dependencies>
-                        <executions>
-                            <execution>
-                                <id>default-deploy</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>deploy</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <profile>

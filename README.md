@@ -8,8 +8,9 @@ Learn how to install and configure this add-on for production in the
 ## Snapshots
 
 To use the latest snapshot of the OSIAM self-administration just download it
-from the oss jfrog repository:
-https://oss.jfrog.org/artifactory/repo/org/osiam/addon-self-administration
+from Bintray:
+https://dl.bintray.com/osiam/downloads/addon-self-administration/latest/addon-self-administration-latest.war
+([GPG Signature](https://dl.bintray.com/osiam/downloads/addon-self-administration/latest/addon-self-administration-latest.war.asc))
 
 ## Run the integration-tests
 
