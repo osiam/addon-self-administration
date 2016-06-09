@@ -23,6 +23,7 @@
 
 package org.osiam.addons.self_administration.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.osiam.addons.self_administration.Config;
@@ -30,7 +31,6 @@ import org.osiam.addons.self_administration.exception.OsiamException;
 import org.osiam.addons.self_administration.one_time_token.OneTimeToken;
 import org.osiam.addons.self_administration.template.RenderAndSendEmail;
 import org.osiam.addons.self_administration.util.SelfAdministrationHelper;
-import org.osiam.addons.self_administration.util.UserObjectMapper;
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.OsiamClientException;
 import org.osiam.client.exception.OsiamRequestException;
@@ -67,7 +67,7 @@ public class ChangeEmailController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeEmailController.class);
 
     @Autowired
-    private UserObjectMapper mapper;
+    private ObjectMapper mapper;
 
     @Autowired
     private RenderAndSendEmail renderAndSendEmailService;
