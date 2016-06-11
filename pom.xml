@@ -68,6 +68,19 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>osiam-releases</name>
+            <url>https://api.bintray.com/maven/osiam/OSIAM/org.osiam:osiam/;publish=1</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>osiam-snapshots</name>
+            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <start-class>org.osiam.addons.self_administration.SelfAdministration</start-class>
 
