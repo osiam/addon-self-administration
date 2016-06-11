@@ -72,7 +72,7 @@
         <repository>
             <id>releases</id>
             <name>osiam-releases</name>
-            <url>https://api.bintray.com/maven/osiam/OSIAM/org.osiam:osiam/;publish=1</url>
+            <url>https://api.bintray.com/maven/osiam/OSIAM/org.osiam:addon-self-administration/;publish=1</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
