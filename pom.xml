@@ -68,19 +68,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <name>osiam-releases</name>
-            <url>https://api.bintray.com/maven/osiam/OSIAM/org.osiam:addon-self-administration/;publish=1</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>osiam-snapshots</name>
-            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <start-class>org.osiam.addons.self_administration.SelfAdministration</start-class>
 
@@ -369,18 +356,12 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.0</version>
-                <inherited>true</inherited>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <configuration>
+                    <file>${build.directory}/${project.artifactId}.war</file>
+                    <pomFile>pom.xml</pomFile>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -416,6 +397,17 @@
                     <jacocoReports>
                         <entry>${project.build.directory}/coverage-reports/jacoco/jacoco.xml</entry>
                     </jacocoReports>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/distribution.xml</descriptor>
+                    </descriptors>
                 </configuration>
             </plugin>
         </plugins>
@@ -620,33 +612,6 @@
             <properties>
                 <debug.pre.command.tomcat>"jpda",</debug.pre.command.tomcat>
             </properties>
-        </profile>
-
-        <profile>
-            <id>distribution</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <version>2.6</version>
-                        <executions>
-                            <execution>
-                                <id>distribution-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>src/assembly/distribution.xml</descriptor>
-                                    </descriptors>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>
