@@ -14,13 +14,13 @@ installed the latest release version of [OSIAM]
 We recommend to choose the latest OSIAM addon-self-administration release
 version:
 
- * Release Repository: http://maven-repo.evolvis.org/releases/org/osiam/addon-self-administration
+ * Release Repository: https://dl.bintray.com/osiam/downloads/addon-self-administration/
  * GitHub Release Tags: https://github.com/osiam/addon-self-administration/releases
 
 The setup of the addon-self-administration is really easy with the distribution
 .zip or .tar.gz, which you can find here:
 
-    http://maven-repo.evolvis.org/releases/org/osiam/addon-self-administration/<VERSION>/addon-self-administration-<VERSION>.zip or .tar.gz
+    https://dl.bintray.com/osiam/downloads/addon-self-administration/<VERSION>/addon-self-administration-<VERSION>-distribution.zip or .tar.gz
 
 Unpack the distribution and copy the war file to you application server (e.g.
 Tomcat). All files and folders inside the /configuration folder have to copy to

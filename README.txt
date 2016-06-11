@@ -11,7 +11,7 @@ If you find this file in the distribution of the OSIAM addon, please jump
 to the installation instructions among
 
 if not, just download the .zip or .tar.gz distribution file here:
-https://maven-repo.evolvis.org/releases/org/osiam/addon-self-administration/
+https://dl.bintray.com/osiam/downloads/addon-self-administration/
 
 or you can run the following commands on your console:
 $ git clone https://github.com/osiam/addon-self-administration.git
