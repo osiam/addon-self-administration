@@ -7,9 +7,9 @@
 ### Changes
 
 - Use replace API instead of update API, because OSIAM 3.0 removes support for updates.
-- Snapshots build can now be downloaded from [Bintray]
+- Snapshot builds can now be downloaded from [Bintray]
   (https://dl.bintray.com/osiam/downloads/addon-self-administration/latest/addon-self-administration-latest.war)
-  ([GPG Signature](https://dl.bintray.com/osiam/downloads/addon-self-administration/latest/addon-self-administration-latest.war.asc))
+  ([GPG Signature](https://dl.bintray.com/osiam/downloads/addon-self-administration/latest/addon-self-administration-latest.war.asc)).
 
 ### Fixes
 
