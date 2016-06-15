@@ -1,5 +1,27 @@
 # OSIAM addon-self-administration
 
+## Unreleased
+
+**NOTICE:** This version should be compatible with OSIAM 3.x and OSIAM 2.x.
+
+### Changes
+
+- Use replace API instead of update API, because OSIAM 3.0 removes support for updates.
+- Snapshot builds can now be downloaded from [Bintray]
+  (https://dl.bintray.com/osiam/downloads/addon-self-administration/latest/addon-self-administration-latest.war)
+  ([GPG Signature](https://dl.bintray.com/osiam/downloads/addon-self-administration/latest/addon-self-administration-latest.war.asc)).
+
+### Fixes
+
+- The registration mail now contains the right user id in the activation link instead of "null".
+
+### Updates
+
+- OSIAM connector4java 1.9
+- Plugin API 1.6
+- Spring Boot 1.3.5
+- Commons IO 2.5
+
 ## 1.8 - 2015-12-16
 
 **NOTICE:** This version should be compatible with all versions of OSIAM >= 2.2.
