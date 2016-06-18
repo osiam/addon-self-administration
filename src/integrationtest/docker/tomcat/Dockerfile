@@ -1,6 +1,9 @@
 FROM tomcat:8-jre8
 
 COPY addon-self-administration-${project.version} $CATALINA_HOME/webapps/addon-self-administration
+COPY deploy/addon-self-administration $CATALINA_HOME/webapps/addon-self-administration/WEB-INF/classes/addon-self-administration
+COPY test_assets/registration.html $CATALINA_HOME/webapps/addon-self-administration/WEB-INF/classes/addon-self-administration/templates/web/
+COPY addon-self-administration.properties $CATALINA_HOME/webapps/addon-self-administration/WEB-INF/classes/
 
 COPY addon-self-administration-plugin-example-tests.jar /install/plugin-example.jar
 COPY selfadminexample.properties /install/

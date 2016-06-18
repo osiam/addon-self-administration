@@ -3,6 +3,7 @@ packaging:
     - target/addon-self-administration-${project.version}
     - target/addon-self-administration-plugin-example-tests.jar
     - target/dependency/osiam.war
+    - src/main/deploy
 
 links:
   - postgres

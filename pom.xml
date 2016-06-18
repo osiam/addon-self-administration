@@ -509,60 +509,6 @@
                     </plugin>
 
                     <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <configuration>
-                            <includeEmptyDirs>true</includeEmptyDirs>
-                            <encoding>UTF-8</encoding>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>copy-addon-self-administration-config</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/addon-self-administration-${project.version}/WEB-INF/classes
-                                    </outputDirectory>
-                                    <overwrite>true</overwrite>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/main/deploy</directory>
-                                            <exclude>addon-self-administration.properties</exclude>
-                                            <include>**/**</include>
-                                        </resource>
-                                        <resource>
-                                            <directory>src/integrationtest/resources</directory>
-                                            <include>addon-self-administration.properties</include>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-addon-self-administration-test-html</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/addon-self-administration-${project.version}/WEB-INF/classes/addon-self-administration/templates/web
-                                    </outputDirectory>
-                                    <overwrite>true</overwrite>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/integrationtest/resources/test_assets</directory>
-                                            <include>registration.html</include>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>com.alexecollins.docker</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
                         <version>${version.docker-maven-plugin}</version>
