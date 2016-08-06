@@ -1,6 +1,6 @@
 # OSIAM addon-self-administration
 
-## Unreleased
+## 1.9 - 2016-08-06
 
 **NOTICE:** This version should be compatible with OSIAM 3.x and OSIAM 2.x.
 
@@ -19,7 +19,7 @@
 
 - OSIAM connector4java 1.9
 - Plugin API 1.6
-- Spring Boot 1.3.5
+- Spring Boot 1.3.6
 - Commons IO 2.5
 
 ## 1.8 - 2015-12-16
