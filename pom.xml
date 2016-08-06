@@ -108,7 +108,7 @@
         <dependency>
             <groupId>org.osiam</groupId>
             <artifactId>addon-self-administration-plugin-api</artifactId>
-            <version>latest-SNAPSHOT</version>
+            <version>1.6</version>
         </dependency>
 
         <dependency>
